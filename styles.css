@@ -113,33 +113,115 @@ p {
     padding: 2rem;                          /* Padding on all sides */
 }
 
+/* Main content area - positioned after full-height hero section */
+.main-content {
+    background: #fff;                       /* White background for content */
+    position: relative;
+    z-index: 2;
+}
+
+/* Main content container - inherits from .container but with specific styling */
+.main-content .container {
+    padding: 4rem 2rem;                     /* Extra padding for main content */
+}
+
 /* 
 ====================================
-5. HEADER STYLES
+5. HERO SECTION STYLES (FULL PAGE)
 ====================================
 */
 
-/* Main page header with gradient background */
-.header {
-    text-align: center;                     /* Centers header content */
-    padding: 3rem 0;                        /* Vertical padding */
-    /* Gradient background - modify colors as needed */
+/* Full-page hero section with gradient background */
+.hero-section {
+    height: 100vh;                          /* Full viewport height */
+    display: flex;                          /* Flexbox for centering */
+    align-items: center;                    /* Vertical centering */
+    justify-content: center;                /* Horizontal centering */
+    /* Purple gradient background as requested */
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;                           /* White text on colored background */
-    margin-bottom: 3rem;                    /* Space below header */
+    color: white;                           /* White text on purple background */
+    text-align: center;                     /* Center all text */
+    position: relative;                     /* For scroll indicator positioning */
 }
 
-/* Header title styling (overrides H1 color for header) */
-.header h1 {
-    color: white;                           /* White text in header */
-    margin-bottom: 1rem;
+/* Hero container for content spacing */
+.hero-container {
+    max-width: 800px;                       /* Limit content width */
+    padding: 2rem;                          /* Padding around content */
 }
 
-/* Subtitle styling (group name and team members) */
-.subtitle {
-    font-size: 1.2rem;                      /* Slightly larger than body text */
-    font-weight: 300;                       /* Light font weight */
-    opacity: 0.9;                           /* Slightly transparent */
+/* Main title in hero section */
+.hero-title {
+    font-family: 'Roboto Slab', serif;     /* Required font for headings */
+    font-size: 4rem;                        /* Large size for impact */
+    font-weight: 700;                       /* Bold weight */
+    color: white;                           /* White text */
+    margin-bottom: 2rem;                    /* Space below title */
+    text-shadow: 0 2px 10px rgba(0,0,0,0.2); /* Subtle shadow for readability */
+}
+
+/* Group name styling */
+.group-name {
+    font-family: 'Roboto Slab', serif;     /* Required font for headings */
+    font-size: 2.5rem;                      /* Medium-large size */
+    font-weight: 500;                       /* Medium weight */
+    color: white;                           /* White text */
+    margin-bottom: 3rem;                    /* Space below group name */
+    opacity: 0.95;                          /* Slightly transparent */
+}
+
+/* Team members container */
+.team-members {
+    margin-bottom: 4rem;                    /* Space below team section */
+}
+
+/* Individual team member styling - displayed one after another */
+.team-member {
+    font-family: 'Fira Sans', sans-serif;  /* Required font for body text */
+    font-size: 1.5rem;                      /* Medium size */
+    font-weight: 400;                       /* Normal weight */
+    color: white;                           /* White text */
+    margin-bottom: 1rem;                    /* Space between members */
+    padding: 0.75rem 1.5rem;                /* Padding inside each member */
+    background: rgba(255,255,255,0.1);      /* Semi-transparent white background */
+    border-radius: 30px;                    /* Rounded corners */
+    backdrop-filter: blur(10px);            /* Blur effect for modern look */
+    display: inline-block;                  /* Inline but with block properties */
+    width: 100%;                            /* Full width */
+    max-width: 300px;                       /* Maximum width */
+    transition: all 0.3s ease;             /* Smooth transitions */
+}
+
+/* Team member hover effects */
+.team-member:hover {
+    background: rgba(255,255,255,0.2);      /* Lighter background on hover */
+    transform: translateY(-2px);            /* Slight lift effect */
+}
+
+/* Scroll indicator styling */
+.scroll-indicator {
+    position: absolute;                     /* Positioned relative to hero section */
+    bottom: 2rem;                           /* Distance from bottom */
+    left: 50%;                              /* Horizontal centering */
+    transform: translateX(-50%);            /* Center adjustment */
+    text-align: center;                     /* Center text */
+    cursor: pointer;                        /* Pointer cursor for interaction */
+    transition: opacity 0.3s ease;         /* Smooth fade transition */
+}
+
+/* Scroll arrow styling */
+.scroll-arrow {
+    font-size: 2rem;                        /* Large arrow size */
+    margin-bottom: 0.5rem;                  /* Space below arrow */
+    transition: transform 0.5s ease;       /* Smooth movement animation */
+}
+
+/* Scroll indicator text */
+.scroll-indicator p {
+    font-family: 'Fira Sans', sans-serif;  /* Consistent font */
+    font-size: 0.9rem;                      /* Small text size */
+    opacity: 0.8;                           /* Semi-transparent */
+    margin: 0;                              /* Remove default margins */
 }
 
 /* 
@@ -162,7 +244,84 @@ p {
 
 /* 
 ====================================
-7. LIST STYLES
+7. NAVIGATION STYLES (FOR VISUALIZATION PAGES)
+====================================
+*/
+
+/* Navigation bar for visualization pages */
+.visualization-nav {
+    background: #2c3e50;                    /* Dark background */
+    padding: 1rem 0;                        /* Vertical padding */
+    position: sticky;                       /* Sticky positioning */
+    top: 0;                                 /* Stick to top */
+    z-index: 100;                           /* High z-index for overlay */
+}
+
+/* Navigation container */
+.nav-container {
+    max-width: 1200px;                      /* Same max width as main content */
+    margin: 0 auto;                         /* Center the nav */
+    padding: 0 2rem;                        /* Horizontal padding */
+    display: flex;                          /* Flexbox layout */
+    justify-content: space-between;         /* Space between items */
+    align-items: center;                    /* Vertical alignment */
+}
+
+/* Back navigation link */
+.nav-back {
+    color: #ecf0f1;                         /* Light gray text */
+    text-decoration: none;                  /* Remove underline */
+    font-family: 'Fira Sans', sans-serif;  /* Consistent font */
+    font-weight: 500;                       /* Medium weight */
+    transition: color 0.2s ease;           /* Smooth color transition */
+}
+
+.nav-back:hover {
+    color: #667eea;                         /* Accent color on hover */
+}
+
+/* Navigation title */
+.nav-title {
+    color: #ecf0f1;                         /* Light gray text */
+    font-family: 'Roboto Slab', serif;     /* Heading font */
+    font-size: 1.5rem;                      /* Medium size */
+    margin: 0;                              /* Remove default margins */
+}
+
+/* Visualization page container */
+.visualization-page {
+    background: #fff;                       /* White background */
+    min-height: 100vh;                      /* Full height minimum */
+}
+
+/* Visualization description section */
+.viz-description {
+    background: #f8f9fa;                    /* Light background */
+    padding: 2rem;                          /* Padding around content */
+    border-radius: 10px;                    /* Rounded corners */
+    margin-bottom: 2rem;                    /* Space below */
+}
+
+/* Chart information styling */
+.chart-info {
+    background: #e9ecef;                    /* Light gray background */
+    padding: 1rem;                          /* Padding inside */
+    border-radius: 5px;                     /* Rounded corners */
+    margin-top: 1rem;                       /* Space above */
+    font-size: 0.9rem;                      /* Slightly smaller text */
+}
+
+.chart-info p {
+    margin-bottom: 0.5rem;                  /* Small spacing between lines */
+}
+
+.chart-info p:last-child {
+    margin-bottom: 0;                       /* No margin on last paragraph */
+}
+
+/* 
+====================================
+8. LIST STYLES
 ====================================
 */
 
@@ -178,7 +337,7 @@ li {
     font-family: 'Fira Sans', sans-serif;  /* Consistent font with body text */
 }
 
-/* TEAM MEMBERS LIST - Special styling for header team list */
+/* TEAM MEMBERS LIST - Special styling for header team list (DEPRECATED - kept for compatibility) */
 .team-list {
     list-style: none;                       /* Remove default bullets */
     padding-left: 0;                        /* Remove default indentation */
@@ -189,7 +348,7 @@ li {
     margin-top: 1rem;
 }
 
-/* Individual team member styling */
+/* Individual team member styling (DEPRECATED - kept for compatibility) */
 .team-list li {
     background: #f8f9fa;                    /* Light gray background */
     padding: 0.5rem 1rem;                   /* Padding inside each item */
@@ -200,7 +359,7 @@ li {
 
 /* 
 ====================================
-8. CARD COMPONENTS
+9. CARD COMPONENTS
 ====================================
 */
 
@@ -221,10 +380,24 @@ li {
     border-left: 4px solid #667eea;         /* Colored left border accent */
     /* Smooth animations on hover */
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;                     /* For status badge positioning */
+}
+
+/* Clickable card links */
+.page-card-link {
+    text-decoration: none;                  /* Remove link underline */
+    color: inherit;                         /* Inherit text color */
+    display: block;                         /* Block-level for full card click */
+}
+
+.page-card-link:hover {
+    text-decoration: none;                  /* Keep no underline on hover */
+    color: inherit;                         /* Keep inherited color */
 }
 
 /* Card hover effects */
-.page-card:hover {
+.page-card:hover,
+.page-card-link:hover .page-card {
     transform: translateY(-5px);            /* Lift effect on hover */
     box-shadow: 0 5px 20px rgba(0,0,0,0.1); /* Shadow on hover */
 }
@@ -233,6 +406,27 @@ li {
 .page-card h3 {
     color: #667eea;                         /* Accent color for card titles */
     margin-top: 0;                          /* Remove top margin in cards */
+}
+
+/* Status badges for visualization cards */
+.status-ready {
+    background: #28a745;                    /* Green background for ready */
+    color: white;                           /* White text */
+    padding: 0.25rem 0.5rem;                /* Small padding */
+    border-radius: 12px;                    /* Rounded corners */
+    font-size: 0.75rem;                     /* Small font size */
+    font-weight: 600;                       /* Bold weight */
+    text-transform: uppercase;              /* Uppercase text */
+}
+
+.status-planned {
+    background: #ffc107;                    /* Yellow background for planned */
+    color: #212529;                         /* Dark text */
+    padding: 0.25rem 0.5rem;                /* Small padding */
+    border-radius: 12px;                    /* Rounded corners */
+    font-size: 0.75rem;                     /* Small font size */
+    font-weight: 600;                       /* Bold weight */
+    text-transform: uppercase;              /* Uppercase text */
 }
 
 /* 
@@ -283,6 +477,20 @@ Mobile-first approach for different screen sizes
         padding: 1rem;
     }
     
+    /* HERO SECTION RESPONSIVE ADJUSTMENTS */
+    .hero-title {
+        font-size: 2.5rem;                  /* Reduced from 4rem */
+    }
+    
+    .group-name {
+        font-size: 2rem;                    /* Reduced from 2.5rem */
+    }
+    
+    .team-member {
+        font-size: 1.2rem;                  /* Reduced from 1.5rem */
+        padding: 0.5rem 1rem;               /* Reduced padding */
+    }
+    
     /* Smaller heading sizes for mobile */
     h1 {
         font-size: 2rem;                    /* Reduced from 2.5rem */
@@ -292,12 +500,18 @@ Mobile-first approach for different screen sizes
         font-size: 1.5rem;                  /* Reduced from 2rem */
     }
     
-    /* Reduce header padding on mobile */
-    .header {
-        padding: 2rem 0;                    /* Reduced from 3rem */
+    /* Navigation adjustments for mobile */
+    .nav-container {
+        flex-direction: column;             /* Stack navigation items */
+        gap: 1rem;                          /* Space between items */
+        text-align: center;                 /* Center text */
     }
     
-    /* Stack team members vertically on mobile */
+    .nav-title {
+        font-size: 1.25rem;                 /* Smaller navigation title */
+    }
+    
+    /* Stack team members vertically on mobile (deprecated styles) */
     .team-list {
         flex-direction: column;             /* Vertical layout */
         align-items: center;                /* Center items */
@@ -306,6 +520,15 @@ Mobile-first approach for different screen sizes
     /* Single column layout for cards on mobile */
     .page-sections {
         grid-template-columns: 1fr;         /* Single column */
+    }
+    
+    /* Scroll indicator adjustments */
+    .scroll-indicator {
+        bottom: 1rem;                       /* Closer to bottom on mobile */
+    }
+    
+    .scroll-arrow {
+        font-size: 1.5rem;                  /* Smaller arrow on mobile */
     }
 }
 
@@ -326,6 +549,20 @@ NO INLINE STYLES - All visualization styling handled here
     text-align: center;                     /* Center chart content */
 }
 
+/* SVG container styling */
+.chart-svg {
+    max-width: 100%;                        /* Responsive SVG */
+    height: auto;                           /* Maintain aspect ratio */
+}
+
+/* Chart title styling */
+.chart-title {
+    font-family: 'Roboto Slab', serif;     /* Heading font */
+    font-size: 16px;                       /* Medium font size */
+    font-weight: 600;                      /* Semi-bold weight */
+    fill: #2c3e50;                         /* Dark color */
+}
+
 /* SVG BAR CHART STYLES */
 /* Default bar styling - modify colors as needed */
 .bar {
@@ -334,7 +571,8 @@ NO INLINE STYLES - All visualization styling handled here
 }
 
 /* Bar hover effects */
-.bar:hover {
+.bar:hover,
+.bar-hover {
     fill: #764ba2;                          /* Darker color on hover */
 }
 
@@ -345,11 +583,24 @@ NO INLINE STYLES - All visualization styling handled here
     font-size: 12px;                       /* Small font for axis text */
 }
 
+/* Axis text styling */
+.axis text {
+    fill: #495057;                          /* Dark gray text */
+}
+
+/* Axis line styling */
+.axis path,
+.axis line {
+    stroke: #dee2e6;                       /* Light gray lines */
+    stroke-width: 1;                       /* Thin lines */
+}
+
 /* Axis label styling */
 .axis-label {
     font-family: 'Fira Sans', sans-serif;  /* Consistent font */
     font-size: 14px;                       /* Slightly larger for labels */
     font-weight: 500;                      /* Medium weight for emphasis */
+    fill: #495057;                         /* Dark gray text */
 }
 
 /* 
@@ -385,4 +636,13 @@ EXAMPLE OF ADDING NEW VISUALIZATION STYLES:
     stroke: white;
     stroke-width: 1px;
 }
+
+TO MODIFY HERO SECTION:
+- Change .hero-section background gradient
+- Adjust .hero-title, .group-name, .team-member styles
+- Modify .scroll-indicator positioning and styling
+
+TO ADD NEW STATUS BADGES:
+- Follow .status-ready and .status-planned pattern
+- Use semantic color coding (green=ready, yellow=planned, red=blocked, etc.)
 */

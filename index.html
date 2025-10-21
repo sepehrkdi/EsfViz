@@ -15,35 +15,38 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
-    <!-- HEADER SECTION: Contains main title, group name, and team members -->
-    <header class="header">
-        <div class="container">
+    <!-- FULL-PAGE HERO SECTION: Main title, group name, and team members -->
+    <section class="hero-section">
+        <div class="hero-container">
             <!-- Main page title - Change this to update the project title -->
-            <h1>Data Visualization Course</h1>
+            <h1 class="hero-title">Data Visualization Course</h1>
             
-            <!-- Subtitle section with group name and team members -->
-            <div class="subtitle">
-                <!-- Group name - Update this if group name changes -->
-                <p><strong>Group Name:</strong> EsfViz</p>
-                
-                <!-- Team members list - Add/remove <li> elements to modify team -->
-                <ul class="team-list">
-                    <li>Sepehr Khodadadi</li>
-                    <li>Hesam Mohebi</li>
-                    <li>Bahar Khalilian</li>
-                    <!-- Add more team members here if needed:
-                    <li>New Team Member Name</li>
-                    -->
-                </ul>
+            <!-- Group name displayed prominently -->
+            <h2 class="group-name">EsfViz</h2>
+            
+            <!-- Team members displayed one after another -->
+            <div class="team-members">
+                <div class="team-member">Sepehr Khodadadi</div>
+                <div class="team-member">Hesam Mohebi</div>
+                <div class="team-member">Bahar Khalilian</div>
+                <!-- Add more team members here if needed:
+                <div class="team-member">New Team Member Name</div>
+                -->
+            </div>
+            
+            <!-- Scroll indicator -->
+            <div class="scroll-indicator">
+                <div class="scroll-arrow">↓</div>
+                <p>Scroll to explore our visualizations</p>
             </div>
         </div>
-    </header>
+    </section>
 
     <!-- MAIN CONTENT AREA: Contains all page sections -->
-    <main class="container">
+    <main class="main-content">
         
-        <!-- SECTION 1: PROJECT DESCRIPTION AND DATA OVERVIEW -->
-        <!-- This section describes the project goals and available data -->
+        <!-- SECTION 1: PROJECT DESCRIPTION -->
+        <!-- This section describes the project goals - simplified version -->
         <section class="section">
             <!-- Section title - Modify to change section heading -->
             <h2>Project Overview</h2>
@@ -54,48 +57,6 @@
                 complex datasets through innovative D3.js visualizations. Our project aims to make 
                 data more accessible and understandable through compelling visual narratives.
             </p>
-            
-            <!-- Subsection about the data - Customize based on your actual dataset -->
-            <h3>About the Data</h3>
-            <p>
-                Our project utilizes comprehensive datasets that include:
-            </p>
-            <!-- Data characteristics list - Update with your actual data features -->
-            <ul>
-                <li>Temporal data spanning multiple years of observations</li>
-                <li>Categorical variables for detailed segmentation analysis</li>
-                <li>Quantitative metrics enabling statistical insights</li>
-                <li>Geographic information for spatial visualization components</li>
-                <!-- Add more data characteristics here:
-                <li>Your specific data feature</li>
-                -->
-            </ul>
-
-            <!-- Project objectives subsection -->
-            <h3>Project Goals</h3>
-            <p>
-                The main objectives of this visualization project are:
-            </p>
-            <!-- Goals list - Modify objectives based on your project requirements -->
-            <ol>
-                <li>Create intuitive and interactive data exploration tools</li>
-                <li>Reveal hidden patterns and trends within the dataset</li>
-                <li>Provide multiple perspectives on the same underlying data</li>
-                <li>Demonstrate advanced D3.js visualization techniques</li>
-                <li>Ensure accessibility and responsive design principles</li>
-                <!-- Add more goals here:
-                <li>Your specific project goal</li>
-                -->
-            </ol>
-
-            <!-- SAMPLE VISUALIZATION CONTAINER -->
-            <!-- This shows a working D3.js example - Replace with your own visualization -->
-            <div class="visualization-container">
-                <h3>Sample Visualization</h3>
-                <p>Below is a demonstration of our D3.js implementation:</p>
-                <!-- Container for the D3.js chart - ID is referenced in JavaScript -->
-                <div id="sample-chart"></div>
-            </div>
         </section>
 
         <!-- SECTION 2: VISUALIZATION PAGES OVERVIEW -->
@@ -111,7 +72,22 @@
             <!-- Add/remove .page-card divs to modify available visualizations -->
             <div class="page-sections">
                 
-                <!-- VISUALIZATION 1: Interactive Dashboard -->
+                <!-- VISUALIZATION 1: Sample Visualization -->
+                <!-- NEW: Moved from main page - interactive D3.js demonstration -->
+                <a href="sample-visualization.html" class="page-card-link">
+                    <div class="page-card">
+                        <h3>Sample Visualization</h3>
+                        <p>
+                            Interactive D3.js bar chart demonstrating our visualization capabilities. 
+                            This example showcases proper CSS styling, responsive design, and 
+                            smooth hover interactions without using inline styles.
+                        </p>
+                        <p><strong>Features:</strong> CSS-based styling, interactive hover effects, responsive design</p>
+                        <p><strong>Status:</strong> <span class="status-ready">Ready</span></p>
+                    </div>
+                </a>
+
+                <!-- VISUALIZATION 2: Interactive Dashboard -->
                 <!-- Customize title, description, and features for your first visualization -->
                 <div class="page-card">
                     <h3>Interactive Dashboard</h3>
@@ -121,9 +97,10 @@
                         and explore data across different dimensions.
                     </p>
                     <p><strong>Features:</strong> Real-time filtering, synchronized views, responsive design</p>
+                    <p><strong>Status:</strong> <span class="status-planned">Planned</span></p>
                 </div>
 
-                <!-- VISUALIZATION 2: Temporal Analysis -->
+                <!-- VISUALIZATION 3: Temporal Analysis -->
                 <!-- Modify for your time-based analysis visualization -->
                 <div class="page-card">
                     <h3>Temporal Analysis</h3>
@@ -133,9 +110,10 @@
                         different time ranges.
                     </p>
                     <p><strong>Features:</strong> Time brushing, animated transitions, comparative analysis</p>
+                    <p><strong>Status:</strong> <span class="status-planned">Planned</span></p>
                 </div>
 
-                <!-- VISUALIZATION 3: Categorical Exploration -->
+                <!-- VISUALIZATION 4: Categorical Exploration -->
                 <!-- Update for your categorical data visualization -->
                 <div class="page-card">
                     <h3>Categorical Exploration</h3>
@@ -145,9 +123,10 @@
                         summaries to detailed segments.
                     </p>
                     <p><strong>Features:</strong> Hierarchical navigation, dynamic sorting, custom grouping</p>
+                    <p><strong>Status:</strong> <span class="status-planned">Planned</span></p>
                 </div>
 
-                <!-- VISUALIZATION 4: Geographic Mapping -->
+                <!-- VISUALIZATION 5: Geographic Mapping -->
                 <!-- Customize for your geographic/spatial visualization -->
                 <div class="page-card">
                     <h3>Geographic Mapping</h3>
@@ -157,9 +136,10 @@
                         patterns in the data.
                     </p>
                     <p><strong>Features:</strong> Zoom and pan, layer controls, geographic filtering</p>
+                    <p><strong>Status:</strong> <span class="status-planned">Planned</span></p>
                 </div>
 
-                <!-- VISUALIZATION 5: Statistical Deep Dive -->
+                <!-- VISUALIZATION 6: Statistical Deep Dive -->
                 <!-- Modify for your statistical analysis visualization -->
                 <div class="page-card">
                     <h3>Statistical Deep Dive</h3>
@@ -169,9 +149,10 @@
                         and hypothesis testing.
                     </p>
                     <p><strong>Features:</strong> Statistical controls, correlation exploration, distribution comparison</p>
+                    <p><strong>Status:</strong> <span class="status-planned">Planned</span></p>
                 </div>
 
-                <!-- VISUALIZATION 6: Custom Analytics -->
+                <!-- VISUALIZATION 7: Custom Analytics -->
                 <!-- Replace with your specific custom visualization -->
                 <div class="page-card">
                     <h3>Custom Analytics</h3>
@@ -181,6 +162,7 @@
                         configurations.
                     </p>
                     <p><strong>Features:</strong> Custom metrics, saved configurations, export capabilities</p>
+                    <p><strong>Status:</strong> <span class="status-planned">Planned</span></p>
                 </div>
                 
                 <!-- ADD MORE VISUALIZATIONS HERE:
@@ -228,94 +210,49 @@
     </footer>
 
     <!-- JAVASCRIPT SECTION -->
-    <!-- D3.js visualization code - Replace with your own visualizations -->
+    <!-- Basic JavaScript for page interactions -->
     <script>
-        // SAMPLE D3.JS VISUALIZATION
-        // This creates a simple bar chart to demonstrate D3.js functionality
-        // Replace this entire section with your actual visualization code
+        // SCROLL INDICATOR ANIMATION
+        // Smooth scrolling and visual effects for the hero section
         
         document.addEventListener('DOMContentLoaded', function() {
-            // SAMPLE DATA - Replace with your actual dataset
-            const data = [
-                {category: 'A', value: 30},
-                {category: 'B', value: 45},
-                {category: 'C', value: 25},
-                {category: 'D', value: 60},
-                {category: 'E', value: 35}
-                // Add more data points here as needed
-            ];
+            // Animate scroll indicator
+            const scrollIndicator = document.querySelector('.scroll-indicator');
+            const scrollArrow = document.querySelector('.scroll-arrow');
             
-            // CHART DIMENSIONS - Adjust these values to change chart size
-            const margin = {top: 20, right: 20, bottom: 40, left: 50};
-            const width = 500 - margin.left - margin.right;
-            const height = 300 - margin.bottom - margin.top;
+            // Add pulsing animation to scroll arrow
+            if (scrollArrow) {
+                setInterval(() => {
+                    scrollArrow.style.transform = 'translateY(5px)';
+                    setTimeout(() => {
+                        scrollArrow.style.transform = 'translateY(0)';
+                    }, 500);
+                }, 2000);
+            }
             
-            // CREATE SVG CONTAINER
-            // Targets the #sample-chart div in the HTML
-            const svg = d3.select("#sample-chart")
-                .append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
-                .append("g")
-                .attr("transform", `translate(${margin.left},${margin.top})`);
+            // Hide scroll indicator when user scrolls
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 100 && scrollIndicator) {
+                    scrollIndicator.style.opacity = '0';
+                } else if (scrollIndicator) {
+                    scrollIndicator.style.opacity = '1';
+                }
+            });
             
-            // CREATE SCALES
-            // X-scale for categories
-            const xScale = d3.scaleBand()
-                .domain(data.map(d => d.category))
-                .range([0, width])
-                .padding(0.1);
-            
-            // Y-scale for values
-            const yScale = d3.scaleLinear()
-                .domain([0, d3.max(data, d => d.value)])
-                .range([height, 0]);
-            
-            // CREATE BARS
-            // Uses CSS classes defined in styles.css for styling
-            svg.selectAll(".bar")
-                .data(data)
-                .enter().append("rect")
-                .attr("class", "bar")  // CSS class for styling - modify in styles.css
-                .attr("x", d => xScale(d.category))
-                .attr("width", xScale.bandwidth())
-                .attr("y", d => yScale(d.value))
-                .attr("height", d => height - yScale(d.value));
-            
-            // ADD X-AXIS
-            svg.append("g")
-                .attr("class", "axis")  // CSS class for axis styling
-                .attr("transform", `translate(0,${height})`)
-                .call(d3.axisBottom(xScale));
-            
-            // ADD Y-AXIS
-            svg.append("g")
-                .attr("class", "axis")  // CSS class for axis styling
-                .call(d3.axisLeft(yScale));
-            
-            // ADD AXIS LABELS
-            // Y-axis label
-            svg.append("text")
-                .attr("class", "axis-label")  // CSS class for label styling
-                .attr("transform", "rotate(-90)")
-                .attr("y", 0 - margin.left)
-                .attr("x", 0 - (height / 2))
-                .attr("dy", "1em")
-                .style("text-anchor", "middle")
-                .text("Value");  // Change this label text as needed
-            
-            // X-axis label
-            svg.append("text")
-                .attr("class", "axis-label")  // CSS class for label styling
-                .attr("transform", `translate(${width / 2}, ${height + margin.bottom})`)
-                .style("text-anchor", "middle")
-                .text("Category");  // Change this label text as needed
+            // Smooth scroll to content when clicking scroll indicator
+            if (scrollIndicator) {
+                scrollIndicator.addEventListener('click', function() {
+                    document.querySelector('.main-content').scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            }
         });
         
         // ADD YOUR ADDITIONAL JAVASCRIPT FUNCTIONS HERE
         // Example:
-        // function updateVisualization(newData) {
-        //     // Your update logic here
+        // function navigateToVisualization(page) {
+        //     window.location.href = page;
         // }
     </script>
 </body>

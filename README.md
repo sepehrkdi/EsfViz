@@ -88,7 +88,7 @@ These are the project requirements - don't change unless requirements change
 - **Styling**: External CSS only (no inline styles allowed)
 
 ### Visual Elements
-- University of Geneva branding compatible
+- University of Genova branding compatible
 - Responsive design for all devices
 - Accessible color schemes
 - Smooth transitions and interactions

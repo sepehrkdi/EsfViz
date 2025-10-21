@@ -198,6 +198,10 @@ p {
 /* Team members container */
 .team-members {
     margin-bottom: 4rem;                    /* Space below team section */
+    display: flex;                          /* Use flexbox for alignment */
+    justify-content: center;                /* Center the members */
+    flex-wrap: wrap;                        /* Allow wrapping on smaller screens */
+    gap: 1rem;                              /* Add space between members */
 }
 
 /* Individual team member styling - displayed one after another */
@@ -206,14 +210,10 @@ p {
     font-size: 1.5rem;                      /* Medium size */
     font-weight: 400;                       /* Normal weight */
     color: white;                           /* White text */
-    margin-bottom: 1rem;                    /* Space between members */
     padding: 0.75rem 1.5rem;                /* Padding inside each member */
     background: rgba(255,255,255,0.1);      /* Semi-transparent white background */
     border-radius: 30px;                    /* Rounded corners */
     backdrop-filter: blur(10px);            /* Blur effect for modern look */
-    display: inline-block;                  /* Inline but with block properties */
-    width: 100%;                            /* Full width */
-    max-width: 300px;                       /* Maximum width */
     transition: all 0.3s ease;             /* Smooth transitions */
     opacity: 0; /* Start with opacity 0 for animation */
     animation: fadeInUp 0.8s ease-out forwards; /* Animation for all members */

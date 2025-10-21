@@ -137,17 +137,40 @@ p {
     display: flex;                          /* Flexbox for centering */
     align-items: center;                    /* Vertical centering */
     justify-content: center;                /* Horizontal centering */
-    /* Purple gradient background as requested */
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Animated gradient background */
+    background: linear-gradient(135deg, #667eea, #764ba2, #667eea);
+    background-size: 200% 200%;
+    animation: gradientAnimation 15s ease infinite;
     color: white;                           /* White text on purple background */
     text-align: center;                     /* Center all text */
     position: relative;                     /* For scroll indicator positioning */
+    overflow: hidden; /* Hide overflowing animated elements */
+}
+
+/* Keyframes for the background gradient animation */
+@keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Keyframes for fade-in-up animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Hero container for content spacing */
 .hero-container {
     max-width: 800px;                       /* Limit content width */
     padding: 2rem;                          /* Padding around content */
+    z-index: 2; /* Ensure content is above the background */
 }
 
 /* Main title in hero section */
@@ -158,6 +181,7 @@ p {
     color: white;                           /* White text */
     margin-bottom: 2rem;                    /* Space below title */
     text-shadow: 0 2px 10px rgba(0,0,0,0.2); /* Subtle shadow for readability */
+    animation: fadeInUp 1s ease-out;
 }
 
 /* Group name styling */
@@ -167,7 +191,8 @@ p {
     font-weight: 500;                       /* Medium weight */
     color: white;                           /* White text */
     margin-bottom: 3rem;                    /* Space below group name */
-    opacity: 0.95;                          /* Slightly transparent */
+    opacity: 0;                          /* Start with opacity 0 for animation */
+    animation: fadeInUp 1s ease-out 0.5s forwards; /* forwards keeps the state at the end of the animation */
 }
 
 /* Team members container */
@@ -190,6 +215,22 @@ p {
     width: 100%;                            /* Full width */
     max-width: 300px;                       /* Maximum width */
     transition: all 0.3s ease;             /* Smooth transitions */
+    opacity: 0; /* Start with opacity 0 for animation */
+    animation: fadeInUp 0.8s ease-out forwards; /* Animation for all members */
+}
+
+/* Staggered animation delays for team members */
+.team-member:nth-child(1) {
+    animation-delay: 1s;
+}
+.team-member:nth-child(2) {
+    animation-delay: 1.2s;
+}
+.team-member:nth-child(3) {
+    animation-delay: 1.4s;
+}
+.team-member:nth-child(4) {
+    animation-delay: 1.6s;
 }
 
 /* Team member hover effects */

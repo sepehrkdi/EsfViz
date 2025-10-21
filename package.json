@@ -1,0 +1,34 @@
+{
+  "name": "esfviz",
+  "version": "1.0.0",
+  "description": "EsfViz - Interactive Data Visualization Project using D3.js",
+  "main": "index.html",
+  "type": "module",
+  "scripts": {
+    "dev": "python3 -m http.server 8000",
+    "serve": "python3 -m http.server 8000",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sepehrkdi/EsfViz.git"
+  },
+  "keywords": [
+    "data-visualization",
+    "d3js",
+    "interactive",
+    "dashboard",
+    "charts",
+    "github-pages"
+  ],
+  "author": "EsfViz Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sepehrkdi/EsfViz/issues"
+  },
+  "homepage": "https://sepehrkdi.github.io/EsfViz/",
+  "dependencies": {
+    "d3": "^7.9.0"
+  },
+  "devDependencies": {}
+}

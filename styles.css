@@ -1,0 +1,223 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;700&family=Fira+Sans:wght@300;400;500;600&display=swap');
+
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Fira Sans', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #fff;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Roboto Slab', serif;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+h2 {
+    font-size: 2rem;
+    color: #34495e;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+p {
+    font-family: 'Fira Sans', sans-serif;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    line-height: 1.7;
+}
+
+/* Container and layout */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.header {
+    text-align: center;
+    padding: 3rem 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    margin-bottom: 3rem;
+}
+
+.header h1 {
+    color: white;
+    margin-bottom: 1rem;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    font-weight: 300;
+    opacity: 0.9;
+}
+
+/* Sections */
+.section {
+    margin-bottom: 3rem;
+    padding: 2rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.section:last-child {
+    border-bottom: none;
+}
+
+/* Lists */
+ul, ol {
+    margin: 1rem 0;
+    padding-left: 2rem;
+}
+
+li {
+    margin-bottom: 0.5rem;
+    font-family: 'Fira Sans', sans-serif;
+}
+
+/* Team members list */
+.team-list {
+    list-style: none;
+    padding-left: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.team-list li {
+    background: #f8f9fa;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: 500;
+    color: #495057;
+}
+
+/* Page sections grid */
+.page-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.page-card {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.page-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.page-card h3 {
+    color: #667eea;
+    margin-top: 0;
+}
+
+/* Images */
+.project-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1rem 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Links */
+a {
+    color: #667eea;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: #764ba2;
+    text-decoration: underline;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    .header {
+        padding: 2rem 0;
+    }
+    
+    .team-list {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .page-sections {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* D3.js specific styles for visualizations */
+.visualization-container {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 10px;
+    margin: 2rem 0;
+    text-align: center;
+}
+
+/* SVG styling - avoiding inline styles */
+.bar {
+    fill: #667eea;
+    transition: fill 0.2s ease;
+}
+
+.bar:hover {
+    fill: #764ba2;
+}
+
+.axis {
+    font-family: 'Fira Sans', sans-serif;
+    font-size: 12px;
+}
+
+.axis-label {
+    font-family: 'Fira Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+}

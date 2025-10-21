@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EsfViz - Data Visualization Project</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="container">
+            <h1>EsfViz</h1>
+            <div class="subtitle">
+                <p><strong>Group Name:</strong> [Your Group Name]</p>
+                <ul class="team-list">
+                    <li>[Team Member 1]</li>
+                    <li>[Team Member 2]</li>
+                    <li>[Team Member 3]</li>
+                    <li>[Add more team members as needed]</li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Section 1: Project Description -->
+        <section class="section">
+            <h2>Project Overview</h2>
+            <p>
+                Welcome to EsfViz, an interactive data visualization project that explores and presents 
+                complex datasets through innovative D3.js visualizations. Our project aims to make 
+                data more accessible and understandable through compelling visual narratives.
+            </p>
+            
+            <h3>About the Data</h3>
+            <p>
+                Our project utilizes comprehensive datasets that include:
+            </p>
+            <ul>
+                <li>Temporal data spanning multiple years of observations</li>
+                <li>Categorical variables for detailed segmentation analysis</li>
+                <li>Quantitative metrics enabling statistical insights</li>
+                <li>Geographic information for spatial visualization components</li>
+            </ul>
+
+            <h3>Project Goals</h3>
+            <p>
+                The main objectives of this visualization project are:
+            </p>
+            <ol>
+                <li>Create intuitive and interactive data exploration tools</li>
+                <li>Reveal hidden patterns and trends within the dataset</li>
+                <li>Provide multiple perspectives on the same underlying data</li>
+                <li>Demonstrate advanced D3.js visualization techniques</li>
+                <li>Ensure accessibility and responsive design principles</li>
+            </ol>
+
+            <!-- Sample Visualization -->
+            <div class="visualization-container">
+                <h3>Sample Visualization</h3>
+                <p>Below is a demonstration of our D3.js implementation:</p>
+                <div id="sample-chart"></div>
+            </div>
+        </section>
+
+        <!-- Visualization Pages Overview -->
+        <section class="section">
+            <h2>Visualization Pages</h2>
+            <p>
+                Explore our comprehensive data visualizations through the following specialized pages:
+            </p>
+
+            <div class="page-sections">
+                <div class="page-card">
+                    <h3>Interactive Dashboard</h3>
+                    <p>
+                        A comprehensive overview dashboard featuring multiple synchronized visualizations 
+                        that provide real-time insights into key metrics and trends. Users can filter 
+                        and explore data across different dimensions.
+                    </p>
+                    <p><strong>Features:</strong> Real-time filtering, synchronized views, responsive design</p>
+                </div>
+
+                <div class="page-card">
+                    <h3>Temporal Analysis</h3>
+                    <p>
+                        Time-series visualizations that reveal trends, seasonality, and patterns over time. 
+                        Interactive timeline controls allow users to focus on specific periods and compare 
+                        different time ranges.
+                    </p>
+                    <p><strong>Features:</strong> Time brushing, animated transitions, comparative analysis</p>
+                </div>
+
+                <div class="page-card">
+                    <h3>Categorical Exploration</h3>
+                    <p>
+                        Detailed breakdowns by categories using bar charts, pie charts, and hierarchical 
+                        visualizations. Drill-down capabilities enable exploration from high-level 
+                        summaries to detailed segments.
+                    </p>
+                    <p><strong>Features:</strong> Hierarchical navigation, dynamic sorting, custom grouping</p>
+                </div>
+
+                <div class="page-card">
+                    <h3>Geographic Mapping</h3>
+                    <p>
+                        Spatial data visualization using interactive maps and geographic overlays. 
+                        Choropleth maps and point distributions show regional variations and geographic 
+                        patterns in the data.
+                    </p>
+                    <p><strong>Features:</strong> Zoom and pan, layer controls, geographic filtering</p>
+                </div>
+
+                <div class="page-card">
+                    <h3>Statistical Deep Dive</h3>
+                    <p>
+                        Advanced statistical visualizations including correlation matrices, distribution 
+                        plots, and regression analysis. Interactive tools for statistical exploration 
+                        and hypothesis testing.
+                    </p>
+                    <p><strong>Features:</strong> Statistical controls, correlation exploration, distribution comparison</p>
+                </div>
+
+                <div class="page-card">
+                    <h3>Custom Analytics</h3>
+                    <p>
+                        Specialized analytical tools and custom visualizations tailored to specific 
+                        research questions. Users can create custom views and save their analytical 
+                        configurations.
+                    </p>
+                    <p><strong>Features:</strong> Custom metrics, saved configurations, export capabilities</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Information -->
+        <section class="section">
+            <h2>Technical Implementation</h2>
+            <p>
+                This project leverages modern web technologies to deliver high-performance, 
+                interactive data visualizations:
+            </p>
+            <ul>
+                <li><strong>D3.js v7:</strong> For creating dynamic, data-driven visualizations</li>
+                <li><strong>HTML5 & CSS3:</strong> For semantic structure and responsive styling</li>
+                <li><strong>JavaScript ES6+:</strong> For modern, efficient client-side functionality</li>
+                <li><strong>GitHub Pages:</strong> For reliable hosting and version control</li>
+                <li><strong>Responsive Design:</strong> Ensuring compatibility across all devices</li>
+            </ul>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="section" style="text-align: center; border-top: 1px solid #eee; border-bottom: none; padding-top: 2rem;">
+        <p>
+            <strong>EsfViz Project</strong> | 
+            <a href="https://github.com/sepehrkdi/EsfViz" target="_blank">GitHub Repository</a> | 
+            Built with D3.js and ❤️
+        </p>
+    </footer>
+
+    <!-- JavaScript for Sample Visualization -->
+    <script>
+        // Sample D3.js visualization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sample data
+            const data = [
+                {category: 'A', value: 30},
+                {category: 'B', value: 45},
+                {category: 'C', value: 25},
+                {category: 'D', value: 60},
+                {category: 'E', value: 35}
+            ];
+            
+            // Set dimensions and margins
+            const margin = {top: 20, right: 20, bottom: 40, left: 50};
+            const width = 500 - margin.left - margin.right;
+            const height = 300 - margin.bottom - margin.top;
+            
+            // Create SVG
+            const svg = d3.select("#sample-chart")
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+            
+            // Create scales
+            const xScale = d3.scaleBand()
+                .domain(data.map(d => d.category))
+                .range([0, width])
+                .padding(0.1);
+            
+            const yScale = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.value)])
+                .range([height, 0]);
+            
+            // Create bars
+            svg.selectAll(".bar")
+                .data(data)
+                .enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", d => xScale(d.category))
+                .attr("width", xScale.bandwidth())
+                .attr("y", d => yScale(d.value))
+                .attr("height", d => height - yScale(d.value));
+            
+            // Add x-axis
+            svg.append("g")
+                .attr("class", "axis")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(xScale));
+            
+            // Add y-axis
+            svg.append("g")
+                .attr("class", "axis")
+                .call(d3.axisLeft(yScale));
+            
+            // Add axis labels
+            svg.append("text")
+                .attr("class", "axis-label")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0 - margin.left)
+                .attr("x", 0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .text("Value");
+            
+            svg.append("text")
+                .attr("class", "axis-label")
+                .attr("transform", `translate(${width / 2}, ${height + margin.bottom})`)
+                .style("text-anchor", "middle")
+                .text("Category");
+        });
+    </script>
+</body>
+</html>

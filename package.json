@@ -1,34 +1,71 @@
 {
+  "_comment_header": "EsfViz Project Configuration - Data Visualization Course",
+  "_comment_team": "Team: Sepehr Khodadadi, Hesam Mohebi, Bahar Khalilian",
+  
   "name": "esfviz",
+  "_comment_name": "Project name - change this if you want to rename the project",
+  
   "version": "1.0.0",
-  "description": "EsfViz - Interactive Data Visualization Project using D3.js",
+  "_comment_version": "Project version - increment this with major updates",
+  
+  "description": "EsfViz - Interactive Data Visualization Project using D3.js for Data Visualization Course",
+  "_comment_description": "Project description - update this to reflect your specific project focus",
+  
   "main": "index.html",
+  "_comment_main": "Main entry point - index.html is the homepage",
+  
   "type": "module",
+  "_comment_type": "ES Module type for modern JavaScript",
+  
   "scripts": {
+    "_comment_scripts": "Available npm commands - run with 'npm run <script-name>'",
     "dev": "python3 -m http.server 8000",
+    "_comment_dev": "Development server - serves files on localhost:8000",
     "serve": "python3 -m http.server 8000",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "_comment_serve": "Alternative server command",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "_comment_test": "Add your test commands here when you create tests"
   },
+  
   "repository": {
+    "_comment_repository": "GitHub repository information - update if you change repository",
     "type": "git",
     "url": "git+https://github.com/sepehrkdi/EsfViz.git"
   },
+  
   "keywords": [
+    "_comment_keywords": "Search keywords for npm (if published) - add more relevant keywords",
     "data-visualization",
     "d3js",
     "interactive",
     "dashboard",
     "charts",
-    "github-pages"
+    "github-pages",
+    "university-project",
+    "data-analysis"
   ],
-  "author": "EsfViz Team",
+  
+  "author": "EsfViz Team (Sepehr Khodadadi, Hesam Mohebi, Bahar Khalilian)",
+  "_comment_author": "Author information - update if team changes",
+  
   "license": "MIT",
+  "_comment_license": "MIT license allows free use and modification",
+  
   "bugs": {
+    "_comment_bugs": "Where to report issues - GitHub issues page",
     "url": "https://github.com/sepehrkdi/EsfViz/issues"
   },
+  
   "homepage": "https://sepehrkdi.github.io/EsfViz/",
+  "_comment_homepage": "GitHub Pages URL - this is where your site will be hosted",
+  
   "dependencies": {
-    "d3": "^7.9.0"
+    "_comment_dependencies": "Required packages for the project - add new dependencies here",
+    "d3": "^7.9.0",
+    "_comment_d3": "D3.js version 7.9.0 - update version number to upgrade D3.js"
   },
-  "devDependencies": {}
+  
+  "devDependencies": {
+    "_comment_devDependencies": "Development-only dependencies - add build tools, linters, etc. here"
+  }
 }

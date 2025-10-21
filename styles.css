@@ -1,223 +1,388 @@
-/* Import Google Fonts */
+/* 
+====================================
+ESFVIZ PROJECT - MAIN STYLESHEET
+====================================
+Data Visualization Course
+Group: EsfViz
+Team: Sepehr Khodadadi, Hesam Mohebi, Bahar Khalilian
+
+This file contains all styling for the EsfViz project.
+No inline styles are used - all styling is handled here.
+
+SECTIONS:
+1. Google Fonts Import
+2. Reset and Base Styles
+3. Typography (Headings and Text)
+4. Layout and Container Styles
+5. Header Styles
+6. Section Styles
+7. List Styles
+8. Card Components
+9. Image Styles
+10. Link Styles
+11. Responsive Design
+12. D3.js Visualization Styles
+====================================
+*/
+
+/* 
+====================================
+1. GOOGLE FONTS IMPORT
+====================================
+Required fonts as per project specifications:
+- Roboto Slab: For headings and titles
+- Fira Sans: For body text and paragraphs
+*/
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;700&family=Fira+Sans:wght@300;400;500;600&display=swap');
 
-/* Reset and base styles */
+/* 
+====================================
+2. RESET AND BASE STYLES
+====================================
+*/
+/* Universal reset to ensure consistent styling across browsers */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Base body styling - applies to entire page */
 body {
-    font-family: 'Fira Sans', sans-serif;
-    line-height: 1.6;
-    color: #333;
-    background-color: #fff;
+    font-family: 'Fira Sans', sans-serif;  /* Default font for body text */
+    line-height: 1.6;                       /* Improves readability */
+    color: #333;                            /* Dark gray text */
+    background-color: #fff;                 /* White background */
 }
 
-/* Typography */
+/* 
+====================================
+3. TYPOGRAPHY STYLES
+====================================
+*/
+
+/* HEADING STYLES - Uses Roboto Slab as required */
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Roboto Slab', serif;
+    font-family: 'Roboto Slab', serif;     /* Required font for headings */
     margin-bottom: 1rem;
     font-weight: 500;
 }
 
+/* Main page title (H1) */
 h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #2c3e50;
+    font-size: 2.5rem;                      /* Large size for main title */
+    font-weight: 700;                       /* Bold weight */
+    color: #2c3e50;                         /* Dark blue-gray */
     margin-bottom: 0.5rem;
 }
 
+/* Section titles (H2) */
 h2 {
-    font-size: 2rem;
-    color: #34495e;
-    margin-top: 2rem;
+    font-size: 2rem;                        /* Medium-large size */
+    color: #34495e;                         /* Slightly lighter than H1 */
+    margin-top: 2rem;                       /* Space above section titles */
     margin-bottom: 1rem;
 }
 
+/* Subsection titles (H3) */
 h3 {
-    font-size: 1.5rem;
-    color: #2c3e50;
+    font-size: 1.5rem;                      /* Medium size */
+    color: #2c3e50;                         /* Same as H1 for consistency */
     margin-top: 1.5rem;
     margin-bottom: 0.75rem;
 }
 
+/* PARAGRAPH STYLES - Uses Fira Sans as required */
 p {
-    font-family: 'Fira Sans', sans-serif;
+    font-family: 'Fira Sans', sans-serif;  /* Required font for body text */
     margin-bottom: 1rem;
-    font-size: 1.1rem;
-    line-height: 1.7;
+    font-size: 1.1rem;                     /* Slightly larger for readability */
+    line-height: 1.7;                      /* Generous line spacing */
 }
 
-/* Container and layout */
+/* 
+====================================
+4. LAYOUT AND CONTAINER STYLES
+====================================
+*/
+
+/* Main content container - centers content and provides padding */
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
+    max-width: 1200px;                      /* Maximum width for large screens */
+    margin: 0 auto;                         /* Centers the container */
+    padding: 2rem;                          /* Padding on all sides */
 }
 
+/* 
+====================================
+5. HEADER STYLES
+====================================
+*/
+
+/* Main page header with gradient background */
 .header {
-    text-align: center;
-    padding: 3rem 0;
+    text-align: center;                     /* Centers header content */
+    padding: 3rem 0;                        /* Vertical padding */
+    /* Gradient background - modify colors as needed */
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    margin-bottom: 3rem;
+    color: white;                           /* White text on colored background */
+    margin-bottom: 3rem;                    /* Space below header */
 }
 
+/* Header title styling (overrides H1 color for header) */
 .header h1 {
-    color: white;
+    color: white;                           /* White text in header */
     margin-bottom: 1rem;
 }
 
+/* Subtitle styling (group name and team members) */
 .subtitle {
-    font-size: 1.2rem;
-    font-weight: 300;
-    opacity: 0.9;
+    font-size: 1.2rem;                      /* Slightly larger than body text */
+    font-weight: 300;                       /* Light font weight */
+    opacity: 0.9;                           /* Slightly transparent */
 }
 
-/* Sections */
+/* 
+====================================
+6. SECTION STYLES
+====================================
+*/
+
+/* Main content sections */
 .section {
-    margin-bottom: 3rem;
-    padding: 2rem 0;
-    border-bottom: 1px solid #eee;
+    margin-bottom: 3rem;                    /* Space between sections */
+    padding: 2rem 0;                        /* Vertical padding */
+    border-bottom: 1px solid #eee;          /* Light separator line */
 }
 
+/* Remove border from last section */
 .section:last-child {
     border-bottom: none;
 }
 
-/* Lists */
+/* 
+====================================
+7. LIST STYLES
+====================================
+*/
+
+/* General list styling (ul and ol) */
 ul, ol {
-    margin: 1rem 0;
-    padding-left: 2rem;
+    margin: 1rem 0;                         /* Vertical margins */
+    padding-left: 2rem;                     /* Indentation for list items */
 }
 
+/* List item styling */
 li {
-    margin-bottom: 0.5rem;
-    font-family: 'Fira Sans', sans-serif;
+    margin-bottom: 0.5rem;                  /* Space between list items */
+    font-family: 'Fira Sans', sans-serif;  /* Consistent font with body text */
 }
 
-/* Team members list */
+/* TEAM MEMBERS LIST - Special styling for header team list */
 .team-list {
-    list-style: none;
-    padding-left: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: center;
+    list-style: none;                       /* Remove default bullets */
+    padding-left: 0;                        /* Remove default indentation */
+    display: flex;                          /* Flexible layout */
+    flex-wrap: wrap;                        /* Allow wrapping on small screens */
+    gap: 1rem;                              /* Space between team member items */
+    justify-content: center;                /* Center team member list */
     margin-top: 1rem;
 }
 
+/* Individual team member styling */
 .team-list li {
-    background: #f8f9fa;
-    padding: 0.5rem 1rem;
-    border-radius: 25px;
-    font-weight: 500;
-    color: #495057;
+    background: #f8f9fa;                    /* Light gray background */
+    padding: 0.5rem 1rem;                   /* Padding inside each item */
+    border-radius: 25px;                    /* Rounded corners */
+    font-weight: 500;                       /* Medium font weight */
+    color: #495057;                         /* Dark gray text */
 }
 
-/* Page sections grid */
+/* 
+====================================
+8. CARD COMPONENTS
+====================================
+*/
+
+/* Grid container for visualization page cards */
 .page-sections {
-    display: grid;
+    display: grid;                          /* CSS Grid layout */
+    /* Responsive columns: minimum 300px, fill available space */
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
+    gap: 2rem;                              /* Space between cards */
+    margin-top: 2rem;                       /* Space above card grid */
 }
 
+/* Individual page/visualization cards */
 .page-card {
-    background: #f8f9fa;
-    padding: 2rem;
-    border-radius: 10px;
-    border-left: 4px solid #667eea;
+    background: #f8f9fa;                    /* Light gray background */
+    padding: 2rem;                          /* Padding inside cards */
+    border-radius: 10px;                    /* Rounded corners */
+    border-left: 4px solid #667eea;         /* Colored left border accent */
+    /* Smooth animations on hover */
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* Card hover effects */
 .page-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    transform: translateY(-5px);            /* Lift effect on hover */
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1); /* Shadow on hover */
 }
 
+/* Card title styling */
 .page-card h3 {
-    color: #667eea;
-    margin-top: 0;
+    color: #667eea;                         /* Accent color for card titles */
+    margin-top: 0;                          /* Remove top margin in cards */
 }
 
-/* Images */
+/* 
+====================================
+9. IMAGE STYLES
+====================================
+*/
+
+/* Styling for project images */
 .project-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    margin: 1rem 0;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    max-width: 100%;                        /* Responsive image sizing */
+    height: auto;                           /* Maintain aspect ratio */
+    border-radius: 8px;                     /* Rounded corners */
+    margin: 1rem 0;                         /* Vertical margins */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Subtle shadow */
 }
 
-/* Links */
+/* 
+====================================
+10. LINK STYLES
+====================================
+*/
+
+/* General link styling */
 a {
-    color: #667eea;
-    text-decoration: none;
-    transition: color 0.2s ease;
+    color: #667eea;                         /* Accent color for links */
+    text-decoration: none;                  /* Remove default underline */
+    transition: color 0.2s ease;           /* Smooth color transition */
 }
 
+/* Link hover effects */
 a:hover {
-    color: #764ba2;
-    text-decoration: underline;
+    color: #764ba2;                         /* Darker color on hover */
+    text-decoration: underline;             /* Underline on hover */
 }
 
-/* Responsive design */
+/* 
+====================================
+11. RESPONSIVE DESIGN
+====================================
+Mobile-first approach for different screen sizes
+*/
+
+/* Styles for tablets and smaller screens */
 @media (max-width: 768px) {
+    /* Reduce container padding on small screens */
     .container {
         padding: 1rem;
     }
     
+    /* Smaller heading sizes for mobile */
     h1 {
-        font-size: 2rem;
+        font-size: 2rem;                    /* Reduced from 2.5rem */
     }
     
     h2 {
-        font-size: 1.5rem;
+        font-size: 1.5rem;                  /* Reduced from 2rem */
     }
     
+    /* Reduce header padding on mobile */
     .header {
-        padding: 2rem 0;
+        padding: 2rem 0;                    /* Reduced from 3rem */
     }
     
+    /* Stack team members vertically on mobile */
     .team-list {
-        flex-direction: column;
-        align-items: center;
+        flex-direction: column;             /* Vertical layout */
+        align-items: center;                /* Center items */
     }
     
+    /* Single column layout for cards on mobile */
     .page-sections {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr;         /* Single column */
     }
 }
 
-/* D3.js specific styles for visualizations */
+/* 
+====================================
+12. D3.JS VISUALIZATION STYLES
+====================================
+These styles are applied to D3.js SVG elements
+NO INLINE STYLES - All visualization styling handled here
+*/
+
+/* Container for visualization charts */
 .visualization-container {
-    background: #f8f9fa;
-    padding: 2rem;
-    border-radius: 10px;
-    margin: 2rem 0;
-    text-align: center;
+    background: #f8f9fa;                    /* Light background for charts */
+    padding: 2rem;                          /* Padding around visualizations */
+    border-radius: 10px;                    /* Rounded corners */
+    margin: 2rem 0;                         /* Vertical margins */
+    text-align: center;                     /* Center chart content */
 }
 
-/* SVG styling - avoiding inline styles */
+/* SVG BAR CHART STYLES */
+/* Default bar styling - modify colors as needed */
 .bar {
-    fill: #667eea;
-    transition: fill 0.2s ease;
+    fill: #667eea;                          /* Bar color - matches theme */
+    transition: fill 0.2s ease;            /* Smooth color transition */
 }
 
+/* Bar hover effects */
 .bar:hover {
-    fill: #764ba2;
+    fill: #764ba2;                          /* Darker color on hover */
 }
 
+/* AXIS STYLING */
+/* Styling for chart axes */
 .axis {
-    font-family: 'Fira Sans', sans-serif;
-    font-size: 12px;
+    font-family: 'Fira Sans', sans-serif;  /* Consistent font */
+    font-size: 12px;                       /* Small font for axis text */
 }
 
+/* Axis label styling */
 .axis-label {
-    font-family: 'Fira Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
+    font-family: 'Fira Sans', sans-serif;  /* Consistent font */
+    font-size: 14px;                       /* Slightly larger for labels */
+    font-weight: 500;                      /* Medium weight for emphasis */
 }
+
+/* 
+====================================
+CUSTOMIZATION NOTES
+====================================
+
+TO MODIFY COLORS:
+- Change the hex values in the color properties
+- Main theme colors: #667eea (blue) and #764ba2 (purple)
+
+TO ADD NEW VISUALIZATION STYLES:
+- Add new CSS classes below this section
+- Use descriptive class names (e.g., .line-chart, .pie-slice)
+- Follow the existing pattern for hover effects
+
+TO MODIFY FONTS:
+- Headings: Change 'Roboto Slab' references
+- Body text: Change 'Fira Sans' references
+
+TO ADJUST RESPONSIVE BREAKPOINTS:
+- Modify the @media query values
+- Add additional breakpoints as needed
+
+EXAMPLE OF ADDING NEW VISUALIZATION STYLES:
+.line-chart-path {
+    stroke: #667eea;
+    stroke-width: 2px;
+    fill: none;
+}
+
+.pie-slice {
+    stroke: white;
+    stroke-width: 1px;
+}
+*/

@@ -34,7 +34,7 @@
   },
   
   "keywords": [
-    "_comment_keywords": "Search keywords for npm (if published) - add more relevant keywords",
+    "_comment_keywords", "Search keywords for npm (if published) - add more relevant keywords",
     "data-visualization",
     "d3js",
     "interactive",

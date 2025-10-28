@@ -137,14 +137,21 @@ p {
     display: flex;                          /* Flexbox for centering */
     align-items: center;                    /* Vertical centering */
     justify-content: center;                /* Horizontal centering */
-    /* Animated gradient background */
-    background: linear-gradient(135deg, #667eea, #764ba2, #667eea);
-    background-size: 200% 200%;
-    animation: gradientAnimation 15s ease infinite;
-    color: white;                           /* White text on purple background */
-    text-align: center;                     /* Center all text */
-    position: relative;                     /* For scroll indicator positioning */
-    overflow: hidden; /* Hide overflowing animated elements */
+    /* Image background instead of animated gradient:
+       Use a relative path from this CSS file or an absolute URL.
+       Example paths:
+         url('../images/hero.jpg')
+         url('/assets/hero.jpg')
+         url('https://example.com/hero.jpg')
+    */
+    background-image: url('./heading-background.png'); /* <-- change path to your image */
+    background-size: cover;                  /* Cover the area */
+    background-position: center center;      /* Center the image */
+    background-repeat: no-repeat;            /* No tiling */
+    color: white;                            /* White text on image */
+    text-align: center;                      /* Center all text */
+    position: relative;                      /* For overlay / scroll indicator positioning */
+    overflow: hidden;  
 }
 
 /* Keyframes for the background gradient animation */
@@ -168,7 +175,7 @@ p {
 
 /* Hero container for content spacing */
 .hero-container {
-    max-width: 800px;                       /* Limit content width */
+    max-width: 1200px;                       /* Limit content width */
     padding: 2rem;                          /* Padding around content */
     z-index: 2; /* Ensure content is above the background */
 }

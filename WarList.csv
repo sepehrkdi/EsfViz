@@ -1,0 +1,478 @@
+Main type,Type Number,"War
+Number",War Name,Time Span,Locations,State Participants
+INTRA,4,8010,Portuguese vs. Latin American patriots,1816-1817,Uruguay,Portugal
+INTER,1,8000,Egypt vs. Wahabis,1816-1818,Saudi Arabia,"Egypt, Saudi Arabia"
+INTER,1,500,Russia vs. Georgians,1816-1825,Georgia,"Russia, Georgia (Kingdom of Kartli-Kakheti)"
+INTER,1,301,British-Mahrattan,1817-1818,India,"United Kingdom, Maratha Empire"
+INTER,1,302,British-Kandyan,1817-1818,Sri Lanka,"United Kingdom, Sri Lanka (Kingdom of Kandy)"
+INTRA,4,8020,Spanish vs. Mexican nationalists,1817-1818,Mexico,Spain
+INTRA,4,8030,Chilean war of independence,1817-1818,Chile,Spain
+INTRA,6,6000,Xhosa Civil War,1818-1818,South Africa,Xhosa
+INTRA,4,8060,Bolivar vs. Royalists,1818-1823,"Colombia, Ecuador, Venezuela",Spain
+INTRA,6,8040,Durrani succession wars,1818-1826,Afghanistan,Afghanistan (Durrani Kingdom)
+INTER,2,8050,Dahomey's expansion,1818-1840,Benin,"Benin (Kingdom of Dahomey), Oyo"
+INTRA,6,8090,Shaka vs. Zulu clans,1819-1828,South Africa,Zulu Kingdom
+INTER,1,8100,Egypt's conquest of Sudan,1820-1820,Sudan,"Egypt, Sudan (Kingdom of Sinnar)"
+INTRA,6,501,Two Sicilies vs. Anti-Monarchists,1820-1821,Italy,"Austria-Hungary, Two Sicilies"
+INTRA,6,503,Sardinia vs. Sardinian Rebels,1821-1821,Italy,"Austria-Hungary, Italy"
+INTER,2,303,Turko-Persian,1821-1823,Turkey,"Turkey, Iran"
+INTRA,6,502,Spain vs. Royalists,1821-1823,Spain,Spain
+INTRA,4,504,Ottoman Empire vs. Greeks,1821-1828,Greece,Turkey
+INTRA,3,7000,Revolt in Kashgaria,1822-1828,China,China
+INTER,2,1,Franco-Spanish,1823-1823,"France, Spain","France, Spain"
+INTER,1,305,British-Burmese of 1823,1823-1826,"India, Myanmar","United Kingdom, Myanmar"
+INTRA,4,8110,Bolivia's war of independence,1824-1824,Bolivia,Spain
+INTRA,4,8120,Spain vs. Latin American patriots,1824-1824,Peru,Spain
+INTER,1,306,British-Ashanti of 1824,1824-1826,Ghana,"United Kingdom, Ashanti Kingdom"
+INTER,1,309,British-Bharatpuran,1825-1826,India,"United Kingdom, Kingdom of Bharatpur"
+INTRA,4,8130,Argentinian-Brazilian,1825-1828,Uruguay,"Argentina (United Provinces of Rio de la Plata), Brazil"
+INTRA,4,307,Dutch-Javanese,1825-1830,Indonesia,Netherlands
+INTRA,6,505,Ottoman Empire vs. Janissaries,1826-1826,Turkey,Turkey
+INTER,2,310,Russo-Persian,1826-1828,"Armenia, Georgia, Iran","Russia, Iran"
+INTRA,3,8140,Thailand vs. Siamese rebels,1826-1828,"Laos, Thailand",Thailand
+INTER,2,8160,Bolivia vs Peru,1827-1829,Peru,"Bolivia, Peru"
+INTER,2,4,Russo-Turkish,1828-1829,"Russia, Turkey","Russia, Turkey"
+INTRA,6,8150,Argentine Unitarian-Federalist,1828-1831,Argentina,Argentina
+INTRA,6,507,Portugal vs. Conservatives,1829-1834,Portugal,"Portugal, United Kingdom"
+INTER,1,508,Russia vs. Circasians,1829-1840,Russia,Russia
+INTRA,6,510,France vs. Liberals,1830-1830,France,France
+INTRA,4,509,Netherlands vs. Belgians,1830-1831,Belgium,"France, Netherlands, United Kingdom"
+INTRA,5,511,Ottoman Empire vs. Albanians,1830-1831,Macedonia,Turkey
+INTRA,4,512,Russia vs. Poles of 1831,1831-1831,Poland,Russia
+INTER,2,513,Ottoman Empire vs. Egyptians,1831-1832,Syria,"Turkey, Egypt"
+INTER,2,8170,Thailand vs. Cambodia,1831-1834,"Cambodia, Vietnam","Thailand, Cambodia"
+INTRA,6,514,Mexico vs. Liberals of 1832,1832-1832,Mexico,Mexico
+INTRA,5,515,Spain vs. Carlists of 1834,1834-1840,Spain,"France, Portugal, Spain, United Kingdom"
+INTER,1,8190,Bolivia vs. Peru ,1835-1835,Peru,"Bolivia, Peru"
+INTRA,4,517,Mexico vs. Texans,1835-1836,"Mexico, United States of America",Mexico
+INTRA,6,516,Brazil vs. Farrapos,1835-1845,Brazil,Brazil
+INTER,2,8200,Afghanistan vs. Sikh,1836-1836,Pakistan,"Afghanistan (Durrani Kingdom), Kingdom of Lahore"
+INTRA,3,518,Ottoman Empire vs. Bosnians of 1836,1836-1837,Bosnia and Herzegovina,Turkey
+INTRA,3,5060,Boers vs. Matabele,1836-1837,South Africa,Boer state
+INTER,2,8210,Iran vs. Afghanistan ,1838-1838,Afghanistan,"Iran, Afghanistan "
+INTER,1,311,British-Zulu of 1838,1838-1840,South Africa,"United Kingdom, Zulu"
+INTER,2,313,British-Afghan of 1838,1838-1842,Afghanistan,"United Kingdom, Afghanistan"
+INTER,1,314,Russo-Khivan,1839-1839,Uzbekistan,"Russia, Khanate of Kiva"
+INTER,2,8220,War of the Bolivian confederation,1839-1839,Peru,"Peru-Bolivia, Chile, Argentina"
+INTER,2,519,Ottoman Empire vs. Mehmet Ali,1839-1840,Lebanon,"Turkey, United Kingdom"
+INTER,1,315,First Opium,1839-1842,China,"United Kingdom, China"
+INTRA,6,8230,Colorados vs. Blancos,1839-1842,Uruguay,Uruguay
+INTER,1,317,Franco-Algerian of 1839,1839-1847,Algeria,"France, Algeria (Barbary states)"
+INTRA,6,521,Colombia vs. Progressives,1840-1842,Colombia,Colombia
+INTER,2,318,Peruvian-Bolivian,1841-1841,Bolivia,"Peru, Bolivia"
+INTRA,3,523,Ottoman Empire vs. Bosnians of 1841,1841-1841,Bosnia and Herzegovina,Turkey
+INTER,2,7010,Dogra Invasion of Tibet,1841-1841,China,"Tibet, Principality of Jammu"
+INTRA,6,522,Argentina vs. Unitarios,1841-1842,Argentina,Argentina
+INTER,2,8240,Thailand vs. Vietnam over Cambodia,1841-1845,Cambodia,"Thailand, Vietnam"
+INTER,1,319,British-Baluchi,1843-1843,Pakistan,"United Kingdom, Kingdom of Sindh"
+INTER,1,321,Franco-Moroccan,1844-1844,Morocco,"France, Morocco"
+INTRA,4,8250,Dominican war of independence ,1844-1844,Dominican Republic,Haiti
+INTER,1,322,British-Sikh of 1845,1845-1846,India,"United Kingdom, Kingdom of Lahore"
+INTER,2,320,Uruguyan Dispute,1845-1852,Uruguay,"Argentina, Brazil, France, United Kingdom"
+INTRA,4,325,Cracow Revolt,1846-1846,Poland,Austria-Hungary
+INTER,1,323,British-Kaffir of 1846,1846-1847,South Africa,United Kingdom
+INTER,2,7,Mexican-American,1846-1848,"Mexico, United States of America","Mexico, United States of America"
+INTRA,5,524,Spain vs. Carlists of 1847,1847-1849,Spain,Spain
+INTRA,3,525,Mexico vs. Yucatan Maya,1847-1855,Mexico,Mexico
+INTRA,6,528,France vs. Republicans,1848-1848,France,France
+INTRA,5,529,Austria-Hungary vs. Viennese,1848-1848,Austria,Austria-Hungary
+INTRA,4,10,Austro-Sardinian,1848-1849,Italy,"Austria-Hungary, Italy, Modena, Tuscany"
+INTER,2,13,First Schleswig-Holstein,1848-1849,"Denmark, Germany","Denmark, Germany"
+INTER,1,326,British-Sikh of 1848,1848-1849,"India, Pakistan","United Kingdom, Kingdom of Lahore"
+INTRA,6,527,Two Sicilies vs. Liberals,1848-1849,Italy,Two Sicilies
+INTRA,4,530,Austria-Hungary vs. Magyars,1848-1849,"Austria, Hungary, Romania","Austria-Hungary, Russia"
+INTER,2,16,Roman Republic,1849-1849,Italy,"Austria-Hungary, France, Papal States, Two Sicilies"
+INTER,1,327,British-Kaffir of 1850,1850-1853,South Africa,United Kingdom
+INTRA,6,531,France vs. Royalists,1851-1851,France,France
+INTRA,6,532,Chile vs. Liberals,1851-1851,Chile,Chile
+INTRA,6,19,La Plata,1851-1852,"Argentina, Brazil","Argentina, Brazil"
+INTRA,3,7040,"Gilgit, India",1852-1852,Pakistan,Principality of Jammu
+INTER,2,8270,Siege of Montevideo,1852-1852,Uruguay,"Uruguay, Brazil, Argentina, France, Great Britain "
+INTER,1,329,British-Burmese of 1852,1852-1853,Myanmar,United Kingdom
+INTRA,4,533,Ottoman Empire vs. Montenegrins of 1852,1852-1853,Yugoslavia,Turkey
+INTER,1,8260,Tukolor vs. Bambara,1852-1862,"Guinea, Mali","Tukolor Empire, Bambara Empire"
+INTRA,6,534,Peru vs. Liberals of 1853,1853-1855,Peru,Peru
+INTER,2,22,Crimean,1853-1856,Russia,"France, Italy, Russia, Turkey, United Kingdom"
+INTRA,3,5100,Bantu vs. Boers,1854-1854,South Africa,Transvaal
+INTRA,5,330,British-Santal,1855-1856,India,United Kingdom
+INTRA,6,6010,Zulu Civil War,1856-1856,South Africa,Zulu
+INTER,2,25,Anglo-Persian,1856-1857,Iran,"Iran, United Kingdom"
+INTER,1,333,Kabylia Uprising,1856-1857,Algeria,France
+INTER,1,8280,Nicaragua vs. Walker,1856-1857,Nicaragua,Nicaragua
+INTRA,6,535,Peru vs. Conservatives,1856-1858,Peru,Peru
+INTER,1,331,Second Opium,1856-1860,China,"France, United Kingdom, China"
+INTER,1,334,Franco-Senegalese of 1857,1857-1857,Senegal,"France, Kingdom of Waalo"
+INTRA,3,7050,Kashgaria,1857-1857,China,China
+INTRA,3,335,Indian Mutiny,1857-1859,India,United Kingdom
+INTRA,4,538,Ottoman Empire vs. Montenegrins of 1858,1858-1859,Yugoslavia,Turkey
+INTRA,6,537,Mexico vs. Liberals of 1858,1858-1861,Mexico,Mexico
+INTER,1,337,Franco-Indochinese of 1858,1858-1862,"China, Vietnam","France, Vietnam"
+INTRA,4,28,Italian Unification,1859-1859,Italy,"Austria-Hungary, France, Italy"
+INTRA,3,338,Argentine-Buenos Aires,1859-1859,Argentina,Argentina
+INTER,1,31,Spanish-Moroccan,1859-1860,Morocco,"Morocco, Spain"
+INTRA,6,539,Venezuela vs. Liberals,1859-1863,Venezuela,Venezuela
+INTER,2,34,Italo-Roman,1860-1860,Italy,"Italy, Papal States"
+INTER,2,37,Italo-Sicilian,1860-1861,Italy,"Italy, Two Sicilies"
+INTRA,6,544,Colombia vs. Liberals of 1860,1860-1862,Colombia,Colombia
+INTRA,6,540,China vs. Taipings,1860-1864,China,"China, United Kingdom"
+INTRA,6,542,China vs. Niens,1860-1868,China,China
+INTER,1,339,British-Maorin,1860-1870,New Zealand,United Kingdom
+INTRA,5,543,China vs. Miaos,1860-1872,China,China
+INTRA,6,547,Argentina vs. Beunos Aires of 1861,1861-1861,Argentina,Argentina
+INTRA,3,545,United States of America vs. Confederacy,1861-1865,United States of America,United States of America
+INTRA,4,548,Turkey vs. Montenegro,1862-1862,Yugoslavia,Turkey
+INTER,1,40,Franco-Mexican,1862-1867,Mexico,"France, Mexico"
+INTER,2,43,Ecuadorian-Columbian,1863-1863,"Colombia, Ecuador","Colombia, Ecuador"
+INTRA,6,551,Argentina vs. Montoneros,1863-1863,Argentina,Argentina
+INTRA,4,550,Russia vs. Poles of 1863,1863-1864,Poland,Russia
+INTRA,4,341,Spanish-Santo Dominican,1863-1865,Dominican Republic,Spain
+INTRA,3,552,China vs. Muslims of 1863,1863-1877,China,China
+INTER,2,46,Second Schleswig-Holstein,1864-1864,"Denmark, Germany","Austria-Hungary, Denmark, Germany"
+INTER,1,8290,Russia vs. Kokand and Bokhara,1864-1866,"Kazakhstan, Uzbekistan","Russia, Khanates of Kokand and Bokhara"
+INTER,2,49,Lopez,1864-1870,"Argentina, Brazil, Paraguay","Argentina, Brazil, Paraguay"
+INTER,1,342,British-Bhutanese,1865-1865,Bhutan,"United Kingdom, Bhutan"
+INTER,2,52,Spanish-Chilean,1865-1866,"Chile, Peru","Chile, Peru, Spain"
+INTER,2,55,Seven Weeks,1866-1866,"Czech Republic, Italy","Austria-Hungary, Baden, Bavaria, Germany, Hanover, Hesse Electoral, Hesse Grand Ducal, Italy, Mecklenburg Schwerin, Saxony, Wuerttemburg"
+INTRA,6,553,Argentina vs. Federalists,1866-1867,Argentina,Argentina
+INTRA,4,554,Ottoman Empire vs. Cretans of 1866,1866-1867,Greece,Turkey
+INTER,2,343,British-Ethiopian,1867-1868,Ethiopia,"United Kingdom, Ethiopia"
+INTRA,6,557,Spain vs. Liberals,1868-1868,Spain,Spain
+INTRA,6,555,Venezuela vs. Conservatives,1868-1871,Venezuela,Venezuela
+INTRA,4,345,Spanish-Cuban of 1868,1868-1878,Cuba,Spain
+INTER,2,58,Franco-Prussian,1870-1871,"France, Germany","Baden, Bavaria, France, Germany, Wuerttemburg"
+INTRA,6,558,Argentina vs. Entre Rios Province,1870-1871,Argentina,Argentina
+INTRA,6,560,France vs. Communards,1871-1871,France,France
+INTRA,3,346,Franco-Algerian of 1871,1871-1872,Algeria,France
+INTRA,6,561,Spain vs. Carlists of 1872,1872-1876,Spain,Spain
+INTER,1,347,British-Ashanti of 1873,1873-1874,Ghana,"United Kingdom, Ashanti Kingdom"
+INTER,1,350,Dutch-Achinese,1873-1878,Indonesia,"Netherlands, Aceh Sultanate"
+INTER,1,349,Franco-Tonkin,1873-1885,Vietnam,"France, Vietnam, China"
+INTRA,6,562,Argentina vs. Mitre led Rebels,1874-1874,Argentina,Argentina
+INTER,2,351,Egypto-Ethiopian,1875-1876,"Eritrea, Ethiopia","Egypt, Ethiopia"
+INTRA,3,8310,Russia vs. Kokand,1875-1876,Uzbekistan,Russia
+INTRA,5,563,Ottoman Empire vs. Christian Bosnians,1875-1877,Bosnia and Herzegovina,Turkey
+INTRA,4,7200,Ottoman Empire vs. Christian Bosnians,1875-1877,Yugoslavia,Turkey
+INTER,1,60,First Central American,1876-1876,"El Salvador, Guatemala","El Salvador, Guatemala"
+INTRA,3,564,United States of America vs. Sioux Indians,1876-1876,United States of America,United States of America
+INTRA,6,565,Mexico vs. Rebels,1876-1876,Mexico,Mexico
+INTRA,6,567,Colombia vs. Liberals of 1876,1876-1877,Colombia,Colombia
+INTRA,6,568,Japan vs. Satsumas,1877-1877,Japan,Japan
+INTER,2,61,Russo-Turkish,1877-1878,"Bulgaria, Turkey","Russia, Turkey"
+INTER,1,353,British-Kaffir of 1877,1877-1878,South Africa,United Kingdom
+INTRA,3,355,Bosnian,1878-1878,Bosnia and Herzegovina,Austria-Hungary
+INTRA,6,8330,Egypt vs. Slave raiders,1878-1878,Sudan,Egypt
+INTER,2,356,British-Afghan of 1878,1878-1880,Afghanistan,United Kingdom
+INTER,1,354,Russo-Turkoman,1878-1881,Turkmenistan,Russia
+INTER,1,358,British-Zulu of 1879,1879-1879,South Africa,"United Kingdom, Zulu"
+INTER,2,64,Pacific,1879-1883,"Bolivia, Chile, Peru","Bolivia, Chile, Peru"
+INTRA,6,569,Argentina vs. Buenos Aires of 1880,1880-1880,Argentina,Argentina
+INTRA,3,359,Gun War,1880-1881,Lesotho,United Kingdom
+INTRA,4,360,Boer War of 1880,1880-1881,South Africa,United Kingdom
+INTER,1,8320,Russia vs. Turkmen,1881-1881,Turkmenistan,Russia
+INTER,1,362,Franco-Tunisian of 1881,1881-1882,Tunisia,"France, Tunisia"
+INTER,1,65,Anglo-Egyptian,1882-1882,Egypt,"Egypt, United Kingdom"
+INTER,1,363,Franco-Indochinese of 1882,1882-1884,Vietnam,"France, China, Vietnam"
+INTRA,3,364,British-Mahdi,1882-1885,Sudan,United Kingdom
+INTER,1,366,Franco-Madagascan of 1883,1883-1885,Madagascar,"France, Madagascar (Merina Kingdom)"
+INTER,1,67,Sino-French,1884-1885,China,"China, France"
+INTRA,6,570,Colombia vs. Liberals of 1884,1884-1885,Colombia,Colombia
+INTER,1,70,Second Central American,1885-1885,"El Salvador, Guatemala","El Salvador, Guatemala"
+INTER,1,370,Russo-Afghan,1885-1885,Afghanistan,"Russia, Afghanistan"
+INTER,2,371,Serbo-Bulgarian,1885-1885,"Bulgaria, Yugoslavia","Yugoslavia (Kingdom of Serbia), Bulgaria"
+INTER,1,367,British-Burmese of 1885,1885-1886,Myanmar,"United Kingdom, Myanmar"
+INTER,2,368,Mandigo,1885-1886,"Guinea, Mali","France, Mandingo Empire"
+INTRA,3,7030,Sudanese Independence,1885-1895,Sudan,"Egypt, United Kingdom"
+INTER,1,372,Italo-Ethiopian of 1887,1887-1887,"Eritrea, Ethiopia","Italy, Ethiopia"
+INTRA,4,572,Ottoman Empire vs. Cretans of 1888,1888-1889,Greece,Turkey
+INTRA,5,8340,Buganda Protestant vs. Catholics,1888-1892,Uganda,Buganda
+INTER,2,8350,Sudan vs. Ethiopia ,1889-1889,Ethiopia,"Sudan (Mahdiyya state), Ethiopia"
+INTER,1,373,Franco-Dahomeyan,1889-1892,Benin,"France, Benin (Kingdom of Dahomey)"
+INTER,1,375,Franco-Senegalese of 1890,1890-1891,"Mali, Senegal","France, Senegal (Kingdoms of Jolof and Futa Toro)"
+INTRA,6,573,Chile vs. Congressists,1891-1891,Chile,Chile
+INTER,1,8360,French vs. Tukulor Empire,1891-1891,Mali,"France, Mali (Tukulor Empire)"
+INTER,1,376,Belgian-Congolese,1892-1892,"Congo, Dem. Rep.",Belgium
+INTER,2,72,Franco-Thai,1893-1893,Thailand,"France, Thailand"
+INTRA,6,5000,Rabeh vs. Bornu,1893-1893,Chad,Bornu
+INTER,2,7020,Invasion of Bornu near Lake Chad,1893-1893,Nigeria,Bornu
+INTER,1,8370,British vs. Matabele,1893-1893,Zimbabwe,"United Kingdom, Ndebele Kingdom"
+INTER,1,377,British-Ashanti of 1893,1893-1894,Ghana,"United Kingdom, Ashanti Kingdom"
+INTRA,6,574,Brazil vs. Rio Grande do Sul,1893-1894,Brazil,Brazil
+INTRA,6,575,Brazil vs. Naval Royalists,1893-1894,Brazil,Brazil
+INTER,1,379,Dutch-Balian,1894-1894,Indonesia,"Netherlands, Balinese Kingdom of Lombok"
+INTRA,6,8380,Korea vs. Tonghak rebels,1894-1894,"North Korea, South Korea",Korea
+INTER,1,73,Sino-Japanese,1894-1895,"China, Korea","China, Japan"
+INTER,1,380,Franco-Madagascan of 1894,1894-1895,Madagascar,"France, Madagascar (Merina Kingdom)"
+INTRA,6,577,Peru vs. Liberals of 1894,1894-1895,Peru,Peru
+INTRA,4,383,Japano-Taiwanese,1895-1895,Taiwan,Japan
+INTER,1,384,Italo-Ethiopian of 1895,1895-1896,Ethiopia,"Italy, Ethiopia"
+INTRA,4,381,Spanish-Cuban of 1895,1895-1898,Cuba,Spain
+INTRA,5,580,Ottoman Empire vs. Druze,1896-1896,Lebanon,Turkey
+INTRA,5,578,Brazil vs. Canudos,1896-1897,Brazil,Brazil
+INTRA,4,579,Ottoman Empire vs. Cretans of 1896,1896-1897,Greece,Turkey
+INTRA,3,8390,British vs. Matabele and Shona,1896-1897,Zimbabwe,"United Kingdom, Ndebele Kingdom"
+INTRA,4,385,Spanish-Philippino of 1896,1896-1898,Philippines,Spain
+INTER,1,387,Mahdi Uprising,1896-1899,Sudan,"France, United Kingdom, Sudan (Mahdiyya state)"
+INTER,2,76,Greco-Turkish,1897-1897,Greece,"Greece, Turkey"
+INTER,1,388,British-Nigerian,1897-1897,Nigeria,"United Kingdom, Benin Empire"
+INTRA,5,389,Indian Muslim,1897-1898,Pakistan,United Kingdom
+INTER,2,79,Spanish-American,1898-1898,Cuba,"Spain, United States of America"
+INTRA,5,391,Hut Tax,1898-1898,Sierra Leone,United Kingdom
+INTRA,6,583,Venezuela vs. Castro Led Rebels,1899-1899,Venezuela,Venezuela
+INTRA,4,392,American-Philippino,1899-1902,Philippines,"United States of America, Philippines"
+INTER,1,395,Boer War of 1899,1899-1902,South Africa,"United Kingdom, Orange Free State, South African Republic"
+INTRA,6,582,Colombia vs. Liberals of 1899,1899-1903,Colombia,Colombia
+INTRA,5,393,Somali Rebellion,1899-1905,Somalia,United Kingdom
+INTER,2,82,Boxer Rebellion,1900-1900,China,"China, France, Japan, Russia, United Kingdom, United States of America"
+INTER,2,83,Sino-Russian,1900-1900,"China, Russia","China, Russia"
+INTRA,6,584,Venezuela vs. Matos Led Rebels,1901-1903,Venezuela,Venezuela
+INTER,1,396,British Conquest of Kano & Sokoto,1903-1903,Nigeria,"United Kingdom, Emirates of Kano, Sokoto"
+INTRA,4,585,Ottoman Empire vs. VMRO Rebels,1903-1903,Macedonia,Turkey
+INTER,1,8400,United Kingdom vs. Tibet,1903-1904,China,"United Kingdom, Tibet"
+INTRA,6,587,Uruguay vs. Blancos,1904-1904,Uruguay,Uruguay
+INTER,2,85,Russo-Japanese,1904-1905,"China, Korea","Japan, Russia"
+INTER,1,397,South West African Revolt,1904-1905,Namibia,Germany
+INTRA,5,399,Maji-Maji Revolt,1905-1906,Tanzania,Germany
+INTRA,5,588,Russia vs. Workers/Peasants,1905-1906,"Azerbaijan, Russia, Ukraine",Russia
+INTER,2,88,Third Central American,1906-1906,"El Salvador, Honduras","El Salvador, Guatemala, Honduras"
+INTRA,5,400,British-Zulu of 1906,1906-1906,South Africa,United Kingdom
+INTRA,5,8410,United Kingdom vs. Sokoto rebels,1906-1906,Nigeria,United Kingdom
+INTER,2,91,Fourth Central American,1907-1907,Honduras,"El Salvador, Honduras, Nicaragua"
+INTRA,6,589,Rumania vs. Peasants,1907-1907,Romania,Romania
+INTRA,6,590,Morocco vs. Fez Caids of 1907,1907-1908,Morocco,"France, Morocco"
+INTRA,6,591,Iran vs. Constitutionalists,1908-1909,Iran,"Iran, Russia"
+INTER,2,94,Spanish-Moroccan,1909-1910,Morocco,"Morocco, Spain"
+INTRA,6,592,Mexico vs. Liberals & Radicals,1910-1920,Mexico,Mexico
+INTRA,6,593,Morocco vs. Fez Caids of 1911,1911-1911,Morocco,"France, Morocco"
+INTRA,6,595,China vs. Republicans of 1911,1911-1911,China,China
+INTER,1,97,Italo-Turkish,1911-1912,Libya,"Italy, Turkey"
+INTER,1,401,First Moroccan,1911-1912,Morocco,"France, Spain"
+INTRA,6,594,Paraguay vs. Liberals,1911-1912,Paraguay,Paraguay
+INTRA,6,8420,Ecuador vs. Liberal rebels,1912-1912,Ecuador,Ecuador
+INTER,2,100,First Balkan,1912-1913,"Albania, Greece, Macedonia, Turkey","Bulgaria, Greece, Turkey, Yugoslavia (Kingdom of Serbia)"
+INTRA,3,402,Sino-Tibetan of 1912,1912-1913,China,China
+INTER,2,103,Second Balkan,1913-1913,"Bulgaria, Macedonia","Bulgaria, Greece, Romania, Turkey, Yugoslavia"
+INTRA,6,597,China vs. Republicans of 1913,1913-1913,China,China
+INTRA,6,598,China vs. Pai-Lings,1914-1914,China,China
+INTRA,5,8430,Russia vs. Turkestan rebells,1916-1916,Kyrgystan,Russia
+INTRA,4,404,Second Moroccan,1916-1917,Morocco,"France, Spain"
+INTRA,4,599,Russia vs. Kirghiz & Kazables,1916-1917,Poland,Russia
+INTRA,4,602,China vs. Yunnan Rebels,1917-1918,China,China
+INTRA,6,600,Russia vs. Anti-Bolsheviks,1917-1921,Russia,"Finland, France, Japan, Russia, United Kingdom, United States of America"
+INTRA,4,7100,Russia vs. Anti-Bolsheviks LIBER,1917-1921,"Estonia, Latvia, Lithuania, Poland, Ukraine",Russia
+INTER,2,405,Sino-Tibetan of 1918,1918-1918,China,"China, Tibet"
+INTRA,6,603,Finland vs. Communists,1918-1918,Finland,Finland
+INTRA,4,406,Caco Revolt,1918-1920,Haiti,United States of America
+INTER,2,112,Hungarian-Allies,1919-1919,"Hungary, Slovakia","Czechoslovakia, Hungary, Romania"
+INTER,2,408,British-Afghan of 1919,1919-1919,Afghanistan,"United Kingdom, Afghanistan"
+INTER,2,109,Russo-Polish,1919-1920,"Poland, Russia, Ukraine","Poland, Russia"
+INTER,2,604,Hungary vs. Anti-Communists,1919-1920,"Hungary, Slovakia",Hungary
+INTRA,5,8440,United Kingdom vs. Waziri tribesmen,1919-1920,Pakistan,United Kingdom
+INTER,2,116,Franco-Turkish,1919-1921,Turkey,"France, Turkey"
+INTER,2,115,Greco-Turkish,1919-1922,Turkey,"Greece, Turkey"
+INTER,2,117,Lithuanian-Polish,1920-1920,Lithuania,"Lithuania, Poland"
+INTER,1,409,Franco-Syrian,1920-1920,Syria,"France, Syria (Arab Kingdom of Syria)"
+INTRA,4,410,Iraqi-British,1920-1921,Iraq,United Kingdom
+INTRA,6,605,USSR vs. Peasants in Ta,1920-1921,Russia,Russia
+INTER,1,412,Italo-Libyan,1920-1932,Libya,"Italy, Sanusi Empire"
+INTRA,3,414,Moplah Rebellion,1921-1922,India,United Kingdom
+INTRA,4,413,Riff Rebellion,1921-1926,Morocco,"France, Spain"
+INTRA,6,608,Bulgaria vs. Agrarian League,1923-1923,Bulgaria,Bulgaria
+INTRA,6,607,Mexico vs. Huerta Led Rebels,1923-1924,Mexico,Mexico
+INTRA,6,609,Honduras vs. Conservatives,1924-1924,Honduras,Honduras
+INTRA,6,610,Afghanistan vs. Anti-Reformists of 1924,1924-1925,Afghanistan,Afghanistan
+INTRA,4,416,Franco-Druze,1925-1927,"Lebanon, Syria",France
+INTRA,6,612,China vs. Kuomintang,1926-1928,China,"China, Japan"
+INTRA,6,613,Mexico vs. Cristeros,1926-1930,Mexico,Mexico
+INTRA,4,615,China vs. Muslims of 1928,1928-1928,China,China
+INTRA,6,614,Afghanistan vs. Anti-Reformists of 1928,1928-1929,Afghanistan,Afghanistan
+INTER,2,118,Sino-Soviet,1929-1929,China,"China, Russia"
+INTRA,6,617,Mexico vs. Escoban Led Rebels,1929-1929,Mexico,Mexico
+INTRA,6,618,Saudi Arabia vs. Ikhwan,1929-1930,Saudi Arabia,Saudi Arabia
+INTRA,6,619,China vs. War Lords,1929-1930,China,China
+INTRA,3,417,Saya San's Rebellion,1930-1932,Myanmar,United Kingdom
+INTRA,6,620,China vs. Communists of 1930,1930-1935,China,China
+INTER,2,121,Manchurian,1931-1933,China,"China, Japan"
+INTRA,4,622,Russia vs. Central Asian Rebels,1931-1934,China,"Russia, China"
+INTRA,6,623,El Salvador vs. Leftists,1932-1932,El Salvador,El Salvador
+INTRA,6,624,Peru vs. Aprista Rebels,1932-1932,Peru,Peru
+INTRA,6,625,Brazil vs. Paolistas,1932-1932,Brazil,Brazil
+INTER,2,124,Chaco,1932-1935,"Bolivia, Paraguay","Bolivia, Paraguay"
+INTER,2,125,Saudi-Yemeni,1934-1934,Yemen,"Saudi Arabia, Yemen Arab Republic"
+INTRA,6,627,Austria vs. Socialists,1934-1934,Austria,Austria
+INTRA,6,628,Spain vs. Asturian Miners,1934-1934,Spain,Spain
+INTER,1,127,Italo-Ethiopian,1935-1936,Ethiopia,"Ethiopia, Italy"
+INTRA,4,418,British-Palestinian,1936-1939,Israel,United Kingdom
+INTRA,6,629,Spain vs. Fascists,1936-1939,Spain,"Germany, Italy, Portugal, Spain"
+INTER,1,130,Sino-Japanese,1937-1941,China,"China, Japan"
+INTER,2,133,Changkufeng,1938-1938,"China, Mongolia, Russia","Japan, Russia"
+INTER,2,136,Nomonhan,1939-1939,China,"Japan, Mongolia, Russia"
+INTER,2,142,Russo-Finnish,1939-1940,Finland,"Finland, Russia"
+INTER,2,145,Franco-Thai,1940-1941,"Cambodia, Laos","France, Thailand"
+INTRA,6,630,Greece vs. Communists,1944-1949,Greece,"Greece, United Kingdom"
+INTRA,4,420,Indonesian,1945-1946,Indonesia,"Netherlands, United Kingdom"
+INTRA,4,421,Franco-Indochinese of 1945,1945-1954,"Cambodia, Laos, Vietnam",France
+INTRA,6,632,China vs. Communists of 1946,1946-1950,China,China
+INTRA,6,633,Paraguay vs. Leftists,1947-1947,Paraguay,Paraguay
+INTRA,4,634,China vs. Taiwanese,1947-1947,Taiwan,China
+INTRA,4,422,Franco-Madagascan of 1947,1947-1948,Madagascar,France
+INTRA,3,425,Indo-Hyderabad,1948-1948,India,India
+INTRA,6,635,Yemen Arab Republic vs. Yahya Family,1948-1948,Yemen,Yemen Arab Republic
+INTRA,6,637,Costa Rica vs. National Union Party,1948-1948,Costa Rica,Costa Rica
+INTER,2,147,First Kashmir,1948-1949,"India, Pakistan","India, Pakistan"
+INTER,2,148,Palestine,1948-1949,"Egypt, Israel","Egypt, Iraq, Israel, Jordan, Lebanon, Syria"
+INTRA,6,638,Colombia vs. Conservatives,1948-1949,Colombia,Colombia
+INTRA,3,639,Burma vs. Karens,1948-1951,Myanmar,Myanmar
+INTRA,4,424,Malayan Rebellion,1948-1957,Malaysia,United Kingdom
+INTRA,6,640,Colombia vs. Liberals of 1949,1949-1962,Colombia,Colombia
+INTRA,4,641,Indonesia vs. Moluccans,1950-1950,Indonesia,Indonesia
+INTER,1,426,Sino-Tibetan of 1950,1950-1951,China,"China, Tibet"
+INTRA,6,642,Philippines vs. Huks,1950-1952,Philippines,Philippines
+INTER,2,151,Korean,1950-1953,"North Korea, South Korea","Australia, Belgium, Canada, China, Colombia, Ethiopia, France, Greece, Netherlands, North Korea, Philippines, South Korea, Thailand, Turkey, United Kingdom, United States of America"
+INTRA,5,643,Bolivia vs. Leftists,1952-1952,Bolivia,Bolivia
+INTRA,4,428,Franco-Tunisian of 1952,1952-1954,Tunisia,France
+INTRA,4,429,British-Mau Mau,1952-1956,Kenya,United Kingdom
+INTRA,6,644,Indonesia vs. Darul Islam,1953-1953,Indonesia,Indonesia
+INTRA,4,430,Moroccan Independence,1953-1956,Morocco,"France, Spain"
+INTRA,6,645,Guatemala vs. Conservatives,1954-1954,Guatemala,Guatemala
+INTRA,4,432,Franco-Algerian of 1954,1954-1962,Algeria,France
+INTRA,6,647,Argentina vs. Army,1955-1955,Argentina,Argentina
+INTRA,4,433,Cameroon,1955-1960,Cameroon,"France, United Kingdom"
+INTRA,4,154,Russo-Hungarian,1956-1956,Hungary,"Hungary, Russia"
+INTER,2,157,Sinai,1956-1956,"Egypt, Israel","Egypt, France, Israel, United Kingdom"
+INTRA,4,648,China vs. Tibetans,1956-1959,China,China
+INTRA,6,649,Indonesia vs. Leftists,1956-1960,Indonesia,Indonesia
+INTRA,5,650,Lebanon vs. Leftists of 1958,1958-1958,Lebanon,"Lebanon, United States of America"
+INTRA,6,652,Cuba vs. Castroites,1958-1959,Cuba,Cuba
+INTRA,6,653,Iraq vs. Shammar Tribe & Pro-Western Officers,1959-1959,Iraq,Iraq
+INTRA,6,657,Laos vs. Pathet Lao of  1960,1960-1962,Laos,Laos
+INTRA,6,654,Republic of Vietnam vs. NLF,1960-1965,Vietnam,"Republic of Vietnam, United States of America"
+INTRA,3,655,Zaire vs. Katanga & Leftists,1960-1965,"Congo, Dem. Rep.","Belgium, Democratic Republic of the Congo"
+INTRA,4,658,Iraq vs. Kurds of 1961,1961-1963,Iraq,Iraq
+INTRA,4,434,Angolan-Portugese,1961-1975,Angola,Portugal
+INTER,2,160,Assam,1962-1962,"China, India","China, India"
+INTRA,5,659,Algeria vs. Former Rebel Leaders,1962-1963,Algeria,Algeria
+INTRA,6,660,Yemen Arab Republic vs. Royalists,1962-1969,Yemen,"Egypt, Yemen Arab Republic"
+INTRA,4,436,Guinean-Portugese,1962-1974,Guinea-Bissau,Portugal
+INTRA,5,664,Rwanda vs. Watusi,1963-1964,Rwanda,Rwanda
+INTRA,4,663,Sudan vs. Anya Nya,1963-1972,Sudan,Sudan
+INTRA,6,662,Laos vs. Pathet Lao of 1963,1963-1973,Laos,"Laos, United States of America, Vietnam"
+INTRA,4,437,Mozambique-Portugese,1964-1975,Mozambique,Portugal
+INTER,2,166,Second Kashmir,1965-1965,"India, Pakistan","India, Pakistan"
+INTRA,6,665,Dominican Republic vs. Leftists,1965-1965,Dominican Republic,"Dominican Republic, United States of America"
+INTER,2,163,Vietnamese,1965-1975,"Laos, Vietnam","Australia, Cambodia, Philippines, Republic of Vietnam, South Korea, Thailand, United States of America, Vietnam"
+INTRA,5,667,Uganda vs. Buganda Tribe,1966-1966,Uganda,Uganda
+INTRA,5,669,Chad vs. Frolinat of 1966,1966-1971,Chad,"Chad, France"
+INTRA,5,668,Guatemala vs. Indians,1966-1972,Guatemala,Guatemala
+INTER,2,169,Six Day,1967-1967,"Egypt, Israel, Jordan, Syria","Egypt, Israel, Jordan, Syria"
+INTRA,6,670,China vs. Red Guard,1967-1968,China,China
+INTRA,4,672,Nigeria vs. Biafrans,1967-1970,Nigeria,Nigeria
+INTRA,5,673,Burma vs. Ethnic Rebels,1968-1980,Myanmar,Myanmar
+INTER,2,175,Football,1969-1969,"El Salvador, Honduras","El Salvador, Honduras"
+INTER,2,172,Israeli-Egyptian,1969-1970,Egypt,"Egypt, Israel"
+INTRA,5,677,Jordan vs. Palestinians,1970-1970,"Jordan, Syria","Jordan, Syria"
+INTRA,6,678,Guatemala vs. Leftists of 1970,1970-1971,Guatemala,Guatemala
+INTRA,6,674,Thailand vs. Communists,1970-1973,Thailand,Thailand
+INTRA,6,675,Cambodia vs. Khmer Rouge of 1970,1970-1975,Cambodia,"Cambodia, Republic of Vietnam, United States of America, Vietnam"
+INTER,2,178,Bangladesh,1971-1971,"Bangladesh, India, Pakistan","India, Pakistan"
+INTRA,4,679,Pakistan vs. Bengalis,1971-1971,"India, Pakistan",Pakistan
+INTRA,6,680,Sri Lanka vs. Janatha Vimukthi-JVP,1971-1971,Sri Lanka,Sri Lanka
+INTRA,5,683,Burundi vs. Hutu of 1972,1972-1972,Burundi,Burundi
+INTRA,5,685,Zimbabwe vs. Patriotic Front,1972-1979,Zimbabwe,Zimbabwe
+INTRA,4,682,Philippines vs. Moros,1972-1980,Philippines,Philippines
+INTRA,6,684,Philippines vs. NPA,1972-1992,Philippines,Philippines
+INTER,2,181,Yom Kippur,1973-1973,"Egypt, Israel, Syria","Egypt, Iraq, Israel, Jordan, Saudi Arabia, Syria"
+INTRA,6,688,Chile vs. Pinochet Led Rebels,1973-1973,Chile,Chile
+INTRA,5,687,Pakistan vs. Baluchi Rebels,1973-1977,Pakistan,Pakistan
+INTER,2,184,Turco-Cypriot,1974-1974,Cyprus,"Cyprus, Turkey"
+INTRA,4,690,Iraq vs. Kurds of 1974,1974-1975,Iraq,"Iran, Iraq"
+INTRA,4,689,Ethiopia vs. Eritrean Rebels,1974-1991,"Eritrea, Ethiopia","Cuba, Ethiopia"
+INTRA,4,439,East Timorese,1975-1977,Indonesia,Indonesia
+INTER,2,187,Vietnamese-Cambodian,1975-1979,"Cambodia, Laos, Thailand, Vietnam","Cambodia, Vietnam"
+INTRA,4,441,Western Saharan,1975-1983,Morocco,"Algeria, Mauritania, Morocco"
+INTRA,4,440,Namibian,1975-1988,"Angola, Namibia",South Africa
+INTRA,5,691,Lebanon vs. Leftists of 1975,1975-1990,Lebanon,"Israel, Lebanon, Syria"
+INTRA,5,693,Angola vs. UNITA of 1975,1975-1991,Angola,"Angola, Cuba, South Africa"
+INTRA,4,694,Ethiopia vs. Somali Rebels,1976-1983,Ethiopia,"Cuba, Ethiopia, Somalia"
+INTER,2,189,Ethiopian-Somalian,1977-1978,"Ethiopia, Somalia","Cuba, Ethiopia, Somalia"
+INTER,2,190,Ugandan-Tanzanian,1978-1979,"Tanzania, Uganda","Libya, Tanzania, Uganda"
+INTRA,5,699,Iran vs. Anti-Shah Coalition,1978-1979,Iran,Iran
+INTRA,6,700,Nicaragua vs. Sandinistas,1978-1979,Nicaragua,Nicaragua
+INTRA,5,695,Guatemala vs. Leftists of 1978,1978-1984,Guatemala,Guatemala
+INTRA,5,697,Ethiopia vs. Tigrean Liberation Front,1978-1991,Ethiopia,Ethiopia
+INTRA,6,702,Cambodia vs. Khmer Rouge of 1978,1978-1991,Cambodia,"Cambodia, Vietnam"
+INTRA,6,698,Afghanistan vs. Mujahedin,1978-1992,Afghanistan,"Afghanistan, Russia"
+INTER,2,193,Sino-Vietnamese,1979-1979,Vietnam,"China, Vietnam"
+INTRA,6,703,El Salvador vs. Salvadorean Democratic Front,1979-1992,El Salvador,El Salvador
+INTRA,5,704,Mozambique vs. Renamo,1979-1992,Mozambique,"Mozambique, Tanzania, Zimbabwe"
+INTRA,6,707,Nigeria vs. Muslim Fundamentalists of 1980,1980-1981,Nigeria,Nigeria
+INTER,2,199,Iran-Iraq,1980-1988,"Iran, Iraq","Iran, Iraq"
+INTRA,5,705,Chad vs. Frolinat of 1980,1980-1988,Chad,"Chad, France, Libya"
+INTRA,6,708,Uganda vs. National Resistance Army,1980-1988,Uganda,Uganda
+INTRA,6,709,Iran vs. Mujaheddin,1981-1982,Iran,Iran
+INTER,2,202,Falklands,1982-1982,Argentina,"Argentina, United Kingdom"
+INTER,2,205,Israel-Syria (Lebanon),1982-1982,Lebanon,"Israel, Syria"
+INTRA,5,712,Nicaragua vs. Contras,1982-1990,Nicaragua,Nicaragua
+INTRA,6,710,Peru vs. Shining Path,1982-1995,Peru,Peru
+INTRA,6,713,Somalia vs. Clan Factions,1982-1997,Somalia,"France, Italy, Nigeria, Somalia, United States of America"
+INTRA,4,714,Burma vs. Kachin Rebels,1983-1995,Myanmar,Myanmar
+INTRA,4,715,Sri Lanka vs. Tamils,1983-2001,Sri Lanka,"India, Sri Lanka"
+INTRA,5,717,Sudan vs. SPLA-Garang Faction,1983-2001,Sudan,Sudan
+INTRA,6,718,Nigeria vs. Muslim Fundamentalists of 1984,1984-1984,Nigeria,Nigeria
+INTRA,6,719,Colombia vs. M-19 & Drug Lords,1984-2001,Colombia,Colombia
+INTRA,4,720,Iraq vs. Kurds & Shiites,1985-1993,Iraq,"Iran, Iraq"
+INTRA,4,722,India vs. Sikhs & Kashmiros,1985-2001,"India, Pakistan",India
+INTRA,6,723,Yemen People's Republic vs. Leftist Factions,1986-1986,Yemen,Yemen People's Republic
+INTER,2,208,Sino-Vietnamese,1987-1987,"China, Vietnam","China, Vietnam"
+INTRA,6,724,Sri Lanka vs. JVP,1987-1989,Sri Lanka,Sri Lanka
+INTRA,5,725,Burundi vs. Hutu of 1988,1988-1988,Burundi,Burundi
+INTRA,6,728,Rumania vs. Anti-Ceaucescu Rebels,1989-1989,Romania,Romania
+INTRA,5,727,Liberia vs. Anti-Doe Rebels,1989-1990,Liberia,"Liberia, Nigeria"
+INTER,2,211,Gulf War,1990-1991,"Iraq, Kuwait","Canada, Egypt, France, Iraq, Italy, Kuwait, Morocco, Oman, Qatar, Saudi Arabia, Syria, United Arab Emirates, United Kingdom, United States of America"
+INTRA,5,729,Rwanda vs. Tutsi,1990-1993,Rwanda,Rwanda
+INTRA,5,735,Burundi vs. Tutsi Supremacists,1991-1991,Burundi,Burundi
+INTER,2,733,Yugoslavia/Serbia vs. Croatians,1991-1992,Croatia,Yugoslavia
+INTRA,5,736,Georgia vs. Gamsakurdia & Abkaz,1991-1994,Georgia,Georgia
+INTRA,4,737,Azerbaijan vs. Nagorno-Karabakh,1991-1994,Azerbaijan,"Armenia, Azerbaijan"
+INTRA,6,730,Sierra Leone vs. RUF,1991-1996,Sierra Leone,Sierra Leone
+INTRA,4,734,Turkey vs. Kurds,1991-1999,Turkey,Turkey
+INTRA,5,743,Angola vs. UNITA of 1992,1992-1994,Angola,Angola
+INTRA,4,738,Bosnia/Herzogovina vs. Serbs,1992-1995,Bosnia and Herzegovina,"Bosnia and Herzegovina, Yugoslavia"
+INTRA,5,742,Liberia vs. NPFL & ULIMO,1992-1995,Liberia,"Liberia, Nigeria"
+INTRA,6,740,Tadzhikistan vs. Popular Democratic Army,1992-1997,Tajikistan,Tajikistan
+INTRA,6,739,Algeria vs. Islamic Rebels,1992-2001,Algeria,Algeria
+INTRA,5,744,Zaire vs. Rebels,1993-1993,"Congo, Dem. Rep.",Democratic Republic of the Congo
+INTRA,6,747,Cambodia vs. Khmer Rouge of 1993,1993-1997,Cambodia,Cambodia
+INTRA,5,745,Burundi vs. Hutu of 1993,1993-2001,Burundi,Burundi
+INTRA,5,749,Rwanda vs. Patriotic Front,1994-1994,Rwanda,Rwanda
+INTRA,4,750,Yemen vs. South Yemen,1994-1994,Yemen,Yemen
+INTRA,5,752,Pakistan vs. Mohajir,1994-1995,Pakistan,Pakistan
+INTRA,4,748,Russia vs. Chechens,1994-1996,Russia,Russia
+INTRA,5,754,Liberia vs. National Patriotic Forces,1996-1996,Liberia,Liberia
+INTRA,4,756,Iraq vs. KDP Kurds,1996-1996,Iraq,Iraq
+INTRA,5,757,Zaire vs. Kabila-ADFL,1996-1997,"Congo, Dem. Rep.","Democratic Republic of the Congo, Angola, Rwanda, Uganda"
+INTRA,6,1720,Nepal,1996-1997,Nepal,Nepal
+INTRA,5,753,Uganda vs. Lords Resistance Army,1996-2001,Uganda,Uganda
+INTRA,5,3170,Congo-Brazzaville,1997-1998,Congo,"Congo, Angola"
+INTRA,5,760,Congo vs. Denis Sassou Nguemo,1997-1999,Congo,"Angola, Congo"
+INTRA,6,3190,Guinea-Bissau,1998-1998,Guinea-Bissau,"Guinea-Bissau, Senegal, Guinea"
+INTRA,4,3210,Yugoslavia,1998-1999,Yugoslavia,"Yugoslavia, Belgium, Canada, Czech Rep, Denmark, France, Germany, Greece, Hungary, Iceland, Italy, Luxembourg, Netherlands, Norway, Poland, Portugal, Spain, Turkey, United Kingdom, United States"
+INTRA,6,1860,Congo/Zaire,1998-2000,"Congo, Dem. Rep.","Democratic Republic of the Congo, Zimbabwe, Angola, Namibia, Chad, Rwanda, Uganda"
+INTER,2,3180,Eritrea-Ethiopia,1998-2000,"Eritrea, Ethiopia","Eritrea, Ethiopia"
+INTRA,6,3200,Sierra Leone vs. RUF of 1998,1998-2000,Sierra Leone,Sierra Leone
+INTRA,5,2810,Rwanda,1998-2001,Rwanda,Rwanda
+INTER,2,3230,India vs. Pakistan of 1999,1999-1999,"India, Pakistan","India, Pakistan"
+INTRA,3,3220,Philippines Mindanao,2000-2001,Philippines,Philippines
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,

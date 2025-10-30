@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regional Conflicts by Decade - EsfViz Project</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* Additional styles specific to regional conflicts visualization */
+        .tooltip {
+            position: absolute;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 5px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-family: 'Fira Sans', sans-serif;
+            font-size: 12px;
+            max-width: 200px;
+            z-index: 1000;
+        }
+        
+        .legend {
+            font-family: 'Fira Sans', sans-serif;
+            font-size: 12px;
+        }
+        
+        .legend-item {
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        
+        .legend-item:hover {
+            opacity: 0.7;
+        }
+        
+        .legend-rect {
+            stroke: #fff;
+            stroke-width: 1;
+        }
+        
+        .bar-segment {
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        
+        .bar-segment:hover {
+            opacity: 0.8;
+            stroke: #333;
+            stroke-width: 1;
+        }
+
+        .chart-caption {
+            font-family: 'Fira Sans', sans-serif;
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            margin-top: 1rem;
+            font-style: italic;
+        }
+
+        .loading-message {
+            text-align: center;
+            font-family: 'Fira Sans', sans-serif;
+            color: #666;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="visualization-nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-back">← Back to Home</a>
+            <h1 class="nav-title">Regional Conflicts Analysis</h1>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="visualization-page">
+        <div class="container">
+            
+            <!-- Page Description -->
+            <section class="viz-description">
+                <h2>Top Regions by Conflict Frequency per Decade</h2>
+                <p>
+                    This visualization explores how global conflicts have evolved across different regions over time. 
+                    By analyzing historical war data from 1810 onwards, we can identify which regions experienced 
+                    the highest concentration of conflicts in each decade.
+                </p>
+                <p>
+                    The stacked bar chart shows the percentage distribution of conflicts among the top three most 
+                    conflict-prone regions in each 10-year period. This approach reveals shifting patterns of global 
+                    instability and helps identify periods of regional concentration versus global dispersion of conflicts.
+                </p>
+                
+                <div class="chart-info">
+                    <p><strong>Data Source:</strong> Historical war database spanning from 1810 to present</p>
+                    <p><strong>Methodology:</strong> Conflicts are grouped by primary location and 10-year intervals</p>
+                    <p><strong>Visualization:</strong> Interactive stacked bar chart with hover details</p>
+                </div>
+            </section>
+
+            <!-- Chart Container -->
+            <section class="visualization-container">
+                <div id="loading" class="loading-message">
+                    Loading conflict data and generating visualization...
+                </div>
+                <div id="chart-container" style="display: none;">
+                    <!-- Chart will be inserted here by D3.js -->
+                </div>
+                <div class="chart-caption">
+                    Each bar shows the percentage share of the top three regions experiencing conflicts in each decade, based on available war data.
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script>
+        // Regional Conflicts Visualization
+        class RegionalConflictsChart {
+            constructor() {
+                this.data = [];
+                this.processedData = [];
+                this.svg = null;
+                this.tooltip = null;
+                this.colorScale = null;
+                this.regions = [];
+                
+                // Chart dimensions - responsive
+                this.setDimensions();
+                
+            }
+            
+            setDimensions() {
+                // Responsive dimensions based on screen size
+                const containerWidth = Math.min(window.innerWidth - 100, 900);
+                const isMobile = window.innerWidth < 768;
+                
+                this.margin = isMobile 
+                    ? { top: 40, right: 20, bottom: 100, left: 60 }
+                    : { top: 60, right: 150, bottom: 80, left: 80 };
+                    
+                this.width = containerWidth - this.margin.left - this.margin.right;
+                this.height = isMobile ? 400 : 500;
+                this.height = this.height - this.margin.top - this.margin.bottom;
+                
+                this.init();
+            }
+
+            async init() {
+                try {
+                    // Load and process data
+                    await this.loadData();
+                    this.processData();
+                    this.createVisualization();
+                    this.hideLoading();
+                } catch (error) {
+                    console.error('Error initializing chart:', error);
+                    document.getElementById('loading').innerHTML = 'Error loading data. Please try again.';
+                }
+            }
+
+            async loadData() {
+                // Load CSV data
+                this.data = await d3.csv('WarList.csv');
+                console.log('Loaded', this.data.length, 'records');
+            }
+
+            processData() {
+                // Clean and process the data
+                const processedWars = this.data
+                    .filter(d => d['War Name'] && d['Time Span'] && d['Locations'])
+                    .map(d => this.cleanWarData(d))
+                    .filter(d => d.startYear >= 1810); // Filter from 1810 onwards
+
+                // Group by decades and count conflicts per region
+                const decades = this.groupByDecades(processedWars);
+                
+                // Get top 3 regions per decade with percentages
+                this.processedData = this.getTop3RegionsPerDecade(decades);
+                
+                // Get all unique regions for color scale
+                this.regions = [...new Set(this.processedData.flatMap(d => d.regions.map(r => r.region)))];
+                
+                // Create color scale
+                this.createColorScale();
+                
+                console.log('Processed data:', this.processedData);
+            }
+
+            cleanWarData(war) {
+                // Extract start year from time span
+                const timeSpan = war['Time Span'];
+                const startYear = parseInt(timeSpan.split('-')[0]);
+                
+                // Clean location names - remove parenthetical details and split multiple locations
+                const locations = war['Locations']
+                    .split(',')
+                    .map(loc => loc.trim())
+                    .map(loc => loc.replace(/\s*\([^)]*\)/g, '')) // Remove parenthetical content
+                    .map(loc => this.normalizeCountryName(loc))
+                    .filter(loc => loc.length > 0);
+
+                return {
+                    warName: war['War Name'],
+                    startYear: startYear,
+                    locations: locations,
+                    primaryLocation: locations[0] // Use first location as primary
+                };
+            }
+
+            normalizeCountryName(name) {
+                // Normalize country/region names for consistency
+                const normalized = name.trim();
+                
+                // Country name mappings for consistency
+                const mappings = {
+                    'United States of America': 'United States',
+                    'United Kingdom': 'Britain',
+                    'Russia': 'Russia/USSR',
+                    'USSR': 'Russia/USSR',
+                    'Soviet Union': 'Russia/USSR',
+                    'Democratic Republic of the Congo': 'Congo',
+                    'Congo, Dem. Rep.': 'Congo',
+                    'Yemen Arab Republic': 'Yemen',
+                    'Yemen People\'s Republic': 'Yemen',
+                    'North Korea': 'Korea',
+                    'South Korea': 'Korea',
+                    'Bosnia and Herzegovina': 'Bosnia',
+                    'Czech Republic': 'Czechoslovakia',
+                    'Slovakia': 'Czechoslovakia',
+                    'Serbia': 'Yugoslavia',
+                    'Croatia': 'Yugoslavia',
+                    'Slovenia': 'Yugoslavia'
+                };
+
+                return mappings[normalized] || normalized;
+            }
+
+            groupByDecades(wars) {
+                const decades = {};
+                
+                wars.forEach(war => {
+                    const decade = Math.floor(war.startYear / 10) * 10;
+                    const decadeKey = `${decade}-${decade + 9}`;
+                    
+                    if (!decades[decadeKey]) {
+                        decades[decadeKey] = [];
+                    }
+                    
+                    decades[decadeKey].push(war);
+                });
+                
+                return decades;
+            }
+
+            getTop3RegionsPerDecade(decades) {
+                const result = [];
+                
+                Object.keys(decades).sort().forEach(decadeKey => {
+                    const wars = decades[decadeKey];
+                    
+                    // Count conflicts per region (using primary location)
+                    const regionCounts = {};
+                    wars.forEach(war => {
+                        const region = this.getRegionFromCountry(war.primaryLocation);
+                        regionCounts[region] = (regionCounts[region] || 0) + 1;
+                    });
+                    
+                    // Get top 3 regions
+                    const sortedRegions = Object.entries(regionCounts)
+                        .sort((a, b) => b[1] - a[1])
+                        .slice(0, 3);
+                    
+                    // Calculate total conflicts for percentage calculation
+                    const totalConflicts = wars.length;
+                    
+                    // Create region data with percentages
+                    const regionData = sortedRegions.map(([region, count]) => ({
+                        region: region,
+                        count: count,
+                        percentage: (count / totalConflicts) * 100
+                    }));
+                    
+                    result.push({
+                        decade: decadeKey,
+                        totalConflicts: totalConflicts,
+                        regions: regionData
+                    });
+                });
+                
+                return result;
+            }
+
+            getRegionFromCountry(country) {
+                // Map countries to broader regions
+                const regionMap = {
+                    // Europe
+                    'Britain': 'Europe',
+                    'France': 'Europe',
+                    'Germany': 'Europe',
+                    'Spain': 'Europe',
+                    'Italy': 'Europe',
+                    'Austria': 'Europe',
+                    'Austria-Hungary': 'Europe',
+                    'Russia/USSR': 'Europe/Asia',
+                    'Poland': 'Europe',
+                    'Netherlands': 'Europe',
+                    'Portugal': 'Europe',
+                    'Greece': 'Europe',
+                    'Turkey': 'Europe/Asia',
+                    'Yugoslavia': 'Europe',
+                    'Bosnia': 'Europe',
+                    'Romania': 'Europe',
+                    'Hungary': 'Europe',
+                    'Bulgaria': 'Europe',
+                    'Czechoslovakia': 'Europe',
+                    'Finland': 'Europe',
+                    'Norway': 'Europe',
+                    'Denmark': 'Europe',
+                    'Sweden': 'Europe',
+
+                    // Asia
+                    'China': 'Asia',
+                    'Japan': 'Asia',
+                    'India': 'Asia',
+                    'Korea': 'Asia',
+                    'Vietnam': 'Asia',
+                    'Thailand': 'Asia',
+                    'Myanmar': 'Asia',
+                    'Afghanistan': 'Asia',
+                    'Iran': 'Asia',
+                    'Iraq': 'Asia',
+                    'Pakistan': 'Asia',
+                    'Bangladesh': 'Asia',
+                    'Sri Lanka': 'Asia',
+                    'Cambodia': 'Asia',
+                    'Laos': 'Asia',
+                    'Indonesia': 'Asia',
+                    'Malaysia': 'Asia',
+                    'Philippines': 'Asia',
+                    'Taiwan': 'Asia',
+                    'Mongolia': 'Asia',
+
+                    // Middle East
+                    'Saudi Arabia': 'Middle East',
+                    'Egypt': 'Middle East',
+                    'Syria': 'Middle East',
+                    'Lebanon': 'Middle East',
+                    'Jordan': 'Middle East',
+                    'Israel': 'Middle East',
+                    'Kuwait': 'Middle East',
+
+                    // Africa
+                    'South Africa': 'Africa',
+                    'Nigeria': 'Africa',
+                    'Ethiopia': 'Africa',
+                    'Sudan': 'Africa',
+                    'Morocco': 'Africa',
+                    'Algeria': 'Africa',
+                    'Tunisia': 'Africa',
+                    'Libya': 'Africa',
+                    'Kenya': 'Africa',
+                    'Tanzania': 'Africa',
+                    'Uganda': 'Africa',
+                    'Ghana': 'Africa',
+                    'Congo': 'Africa',
+                    'Zimbabwe': 'Africa',
+                    'Angola': 'Africa',
+                    'Mozambique': 'Africa',
+                    'Somalia': 'Africa',
+                    'Chad': 'Africa',
+                    'Rwanda': 'Africa',
+                    'Burundi': 'Africa',
+                    'Liberia': 'Africa',
+                    'Sierra Leone': 'Africa',
+
+                    // Americas
+                    'United States': 'Americas',
+                    'Mexico': 'Americas',
+                    'Brazil': 'Americas',
+                    'Argentina': 'Americas',
+                    'Chile': 'Americas',
+                    'Peru': 'Americas',
+                    'Colombia': 'Americas',
+                    'Venezuela': 'Americas',
+                    'Bolivia': 'Americas',
+                    'Uruguay': 'Americas',
+                    'Paraguay': 'Americas',
+                    'Ecuador': 'Americas',
+                    'Guatemala': 'Americas',
+                    'Nicaragua': 'Americas',
+                    'Cuba': 'Americas',
+                    'Haiti': 'Americas',
+                    'Dominican Republic': 'Americas',
+                    'Costa Rica': 'Americas',
+                    'El Salvador': 'Americas',
+                    'Honduras': 'Americas',
+
+                    // Oceania
+                    'Australia': 'Oceania',
+                    'New Zealand': 'Oceania'
+                };
+
+                return regionMap[country] || 'Other';
+            }
+
+            createColorScale() {
+                // Create a color scale for regions using the website's color palette
+                const colors = [
+                    '#667eea', // Primary blue
+                    '#764ba2', // Primary purple
+                    '#f093fb', // Light pink
+                    '#f5576c', // Red
+                    '#4facfe', // Light blue
+                    '#43e97b', // Green
+                    '#fa709a', // Pink
+                    '#feca57', // Yellow
+                    '#ff9ff3', // Light purple
+                    '#54a0ff'  // Blue
+                ];
+                
+                this.colorScale = d3.scaleOrdinal()
+                    .domain(this.regions)
+                    .range(colors);
+            }
+
+            createVisualization() {
+                // Create SVG
+                const container = d3.select('#chart-container');
+                
+                // Calculate total height including mobile legend space
+                const isMobile = window.innerWidth < 768;
+                const totalHeight = this.height + this.margin.top + this.margin.bottom + (isMobile ? 60 : 0);
+                
+                this.svg = container
+                    .append('svg')
+                    .attr('width', this.width + this.margin.left + this.margin.right)
+                    .attr('height', totalHeight)
+                    .attr('class', 'chart-svg')
+                    .attr('viewBox', `0 0 ${this.width + this.margin.left + this.margin.right} ${totalHeight}`)
+                    .attr('preserveAspectRatio', 'xMidYMid meet');
+
+                const g = this.svg.append('g')
+                    .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+
+                // Create tooltip
+                this.tooltip = d3.select('body').append('div')
+                    .attr('class', 'tooltip');
+
+                // Create scales
+                const xScale = d3.scaleBand()
+                    .domain(this.processedData.map(d => d.decade))
+                    .range([0, this.width])
+                    .padding(0.1);
+
+                const yScale = d3.scaleLinear()
+                    .domain([0, 100]) // Percentage scale
+                    .range([this.height, 0]);
+
+                // Create and draw bars
+                this.drawBars(g, xScale, yScale);
+                
+                // Create axes
+                this.drawAxes(g, xScale, yScale);
+                
+                // Create legend
+                this.drawLegend(g);
+                
+                // Add title
+                this.addTitle(g);
+            }
+
+            drawBars(g, xScale, yScale) {
+                const barGroups = g.selectAll('.bar-group')
+                    .data(this.processedData)
+                    .enter()
+                    .append('g')
+                    .attr('class', 'bar-group')
+                    .attr('transform', d => `translate(${xScale(d.decade)}, 0)`);
+
+                // Stack the data for each decade
+                barGroups.each((d, i, nodes) => {
+                    const group = d3.select(nodes[i]);
+                    let yOffset = yScale(0);
+                    
+                    d.regions.forEach((region, index) => {
+                        const segmentHeight = yScale(0) - yScale(region.percentage);
+                        
+                        group.append('rect')
+                            .attr('class', 'bar-segment')
+                            .attr('x', 0)
+                            .attr('y', yOffset - segmentHeight)
+                            .attr('width', xScale.bandwidth())
+                            .attr('height', segmentHeight)
+                            .attr('fill', this.colorScale(region.region))
+                            .on('mouseover', (event) => {
+                                this.showTooltip(event, region, d.decade, d.totalConflicts);
+                            })
+                            .on('mouseout', () => {
+                                this.hideTooltip();
+                            });
+                        
+                        yOffset -= segmentHeight;
+                    });
+                });
+            }
+
+            drawAxes(g, xScale, yScale) {
+                // X-axis
+                g.append('g')
+                    .attr('class', 'axis')
+                    .attr('transform', `translate(0, ${this.height})`)
+                    .call(d3.axisBottom(xScale))
+                    .selectAll('text')
+                    .style('text-anchor', 'end')
+                    .attr('dx', '-.8em')
+                    .attr('dy', '.15em')
+                    .attr('transform', 'rotate(-45)');
+
+                // Y-axis
+                g.append('g')
+                    .attr('class', 'axis')
+                    .call(d3.axisLeft(yScale).tickFormat(d => d + '%'));
+
+                // Axis labels
+                g.append('text')
+                    .attr('class', 'axis-label')
+                    .attr('x', this.width / 2)
+                    .attr('y', this.height + 70)
+                    .style('text-anchor', 'middle')
+                    .text('Decade');
+
+                g.append('text')
+                    .attr('class', 'axis-label')
+                    .attr('transform', 'rotate(-90)')
+                    .attr('x', -this.height / 2)
+                    .attr('y', -50)
+                    .style('text-anchor', 'middle')
+                    .text('Percentage of Total Conflicts (%)');
+            }
+
+            drawLegend(g) {
+                const isMobile = window.innerWidth < 768;
+                
+                if (isMobile) {
+                    // Mobile legend - horizontal layout below chart
+                    const legend = g.append('g')
+                        .attr('class', 'legend')
+                        .attr('transform', `translate(0, ${this.height + 60})`);
+
+                    const legendItems = legend.selectAll('.legend-item')
+                        .data(this.regions.slice(0, 6)) // Limit to top 6 regions on mobile
+                        .enter()
+                        .append('g')
+                        .attr('class', 'legend-item')
+                        .attr('transform', (d, i) => {
+                            const col = i % 3;
+                            const row = Math.floor(i / 3);
+                            return `translate(${col * (this.width / 3)}, ${row * 20})`;
+                        });
+
+                    legendItems.append('rect')
+                        .attr('class', 'legend-rect')
+                        .attr('width', 12)
+                        .attr('height', 12)
+                        .attr('fill', d => this.colorScale(d));
+
+                    legendItems.append('text')
+                        .attr('x', 16)
+                        .attr('y', 10)
+                        .text(d => d)
+                        .style('font-size', '10px')
+                        .style('fill', '#333');
+                } else {
+                    // Desktop legend - vertical layout on right side
+                    const legend = g.append('g')
+                        .attr('class', 'legend')
+                        .attr('transform', `translate(${this.width + 20}, 20)`);
+
+                    const legendItems = legend.selectAll('.legend-item')
+                        .data(this.regions)
+                        .enter()
+                        .append('g')
+                        .attr('class', 'legend-item')
+                        .attr('transform', (d, i) => `translate(0, ${i * 25})`);
+
+                    legendItems.append('rect')
+                        .attr('class', 'legend-rect')
+                        .attr('width', 15)
+                        .attr('height', 15)
+                        .attr('fill', d => this.colorScale(d));
+
+                    legendItems.append('text')
+                        .attr('x', 20)
+                        .attr('y', 12)
+                        .text(d => d)
+                        .style('font-size', '12px')
+                        .style('fill', '#333');
+                }
+            }
+
+            addTitle(g) {
+                g.append('text')
+                    .attr('class', 'chart-title')
+                    .attr('x', this.width / 2)
+                    .attr('y', -30)
+                    .style('text-anchor', 'middle')
+                    .style('font-size', '18px')
+                    .style('font-weight', 'bold')
+                    .style('fill', '#2c3e50')
+                    .text('Top 3 Regions by Conflict Percentage per Decade');
+            }
+
+            showTooltip(event, region, decade, totalConflicts) {
+                this.tooltip.transition()
+                    .duration(200)
+                    .style('opacity', .9);
+                
+                this.tooltip.html(`
+                    <strong>${region.region}</strong><br/>
+                    Decade: ${decade}<br/>
+                    Conflicts: ${region.count} of ${totalConflicts}<br/>
+                    Percentage: ${region.percentage.toFixed(1)}%
+                `)
+                    .style('left', (event.pageX + 10) + 'px')
+                    .style('top', (event.pageY - 28) + 'px');
+            }
+
+            hideTooltip() {
+                this.tooltip.transition()
+                    .duration(500)
+                    .style('opacity', 0);
+            }
+
+            hideLoading() {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('chart-container').style.display = 'block';
+            }
+        }
+
+        // Initialize the visualization when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const chart = new RegionalConflictsChart();
+            
+            // Handle window resize for responsive design
+            let resizeTimeout;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(function() {
+                    // Recreate chart with new dimensions
+                    if (chart.processedData && chart.processedData.length > 0) {
+                        d3.select('#chart-container').selectAll('*').remove();
+                        chart.setDimensions();
+                        chart.createVisualization();
+                    }
+                }, 250);
+            });
+        });
+    </script>
+</body>
+</html>

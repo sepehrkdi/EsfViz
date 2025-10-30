@@ -367,6 +367,17 @@ p {
     margin-bottom: 0;                       /* No margin on last paragraph */
 }
 
+/* Regional conflicts chart specific styles */
+.regional-conflicts-chart {
+    width: 100%;                            /* Full width container */
+    overflow-x: auto;                       /* Horizontal scroll if needed */
+}
+
+.regional-conflicts-chart svg {
+    min-width: 800px;                       /* Minimum width for chart */
+    height: auto;                           /* Maintain aspect ratio */
+}
+
 /* 
 ====================================
 8. LIST STYLES
@@ -577,6 +588,24 @@ Mobile-first approach for different screen sizes
     
     .scroll-arrow {
         font-size: 1.5rem;                  /* Smaller arrow on mobile */
+    }
+    
+    /* Mobile adjustments for regional conflicts chart */
+    .visualization-container {
+        padding: 1rem;                      /* Reduced padding on mobile */
+    }
+    
+    .regional-conflicts-chart svg {
+        min-width: 600px;                   /* Smaller minimum width on mobile */
+    }
+    
+    /* Chart description adjustments */
+    .viz-description {
+        padding: 1rem;                      /* Reduced padding on mobile */
+    }
+    
+    .viz-description h2 {
+        font-size: 1.5rem;                  /* Smaller heading on mobile */
     }
 }
 

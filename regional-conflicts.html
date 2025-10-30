@@ -6,104 +6,7 @@
     <title>Regional Conflicts by Decade - EsfViz Project</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <style>
-        /* Additional styles specific to regional conflicts visualization */
-        .tooltip {
-            position: absolute;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            border-radius: 5px;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s;
-            font-family: 'Fira Sans', sans-serif;
-            font-size: 12px;
-            max-width: 200px;
-            z-index: 1000;
-        }
-        
-        .legend {
-            font-family: 'Fira Sans', sans-serif;
-            font-size: 12px;
-        }
-        
-        .legend-item {
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-        
-        .legend-item:hover {
-            opacity: 0.7;
-        }
-        
-        .legend-rect {
-            stroke: #fff;
-            stroke-width: 1;
-        }
-        
-        .bar-segment {
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-        
-        .bar-segment:hover {
-            opacity: 0.8;
-            stroke: #333;
-            stroke-width: 1;
-        }
-
-        .chart-caption {
-            font-family: 'Fira Sans', sans-serif;
-            font-size: 14px;
-            color: #666;
-            text-align: center;
-            margin-top: 1rem;
-            font-style: italic;
-        }
-
-        .loading-message {
-            text-align: center;
-            font-family: 'Fira Sans', sans-serif;
-            color: #666;
-            padding: 2rem;
-        }
-
-        /* Styles specific to ethnic vs nationalist chart */
-        .ethnic-nationalist-bar-group .bar-segment {
-            transition: opacity 0.2s, stroke 0.2s;
-        }
-
-        .ethnic-nationalist-bar-group .bar-segment:hover {
-            opacity: 0.8;
-            stroke: #333;
-            stroke-width: 2;
-        }
-
-        .chart-info {
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 5px;
-            margin: 1rem 0;
-            border-left: 4px solid #667eea;
-        }
-
-        .chart-info p {
-            margin: 0.5rem 0;
-            font-size: 14px;
-        }
-
-        .axis {
-            font-family: 'Fira Sans', sans-serif;
-            font-size: 11px;
-        }
-
-        .axis-label {
-            font-family: 'Fira Sans', sans-serif;
-            font-weight: 500;
-            fill: #555;
-        }
-    </style>
+    <link rel="stylesheet" href="regional-conflicts-styles.css">
 </head>
 <body>
     <!-- Navigation Bar -->
@@ -111,6 +14,7 @@
         <div class="nav-container">
             <a href="index.html" class="nav-back">← Back to Home</a>
             <h1 class="nav-title">Regional Conflicts Analysis</h1>
+            <img src="nav-icon.png" alt="Regional Conflicts logo" class="nav-logo" width="20px" height="20px">
         </div>
     </nav>
 
@@ -581,21 +485,22 @@
             createColorScale() {
                 // Create a color scale for regions using the website's color palette
                 const colors = [
-                    '#667eea', // Primary blue
-                    '#764ba2', // Primary purple
-                    '#f093fb', // Light pink
-                    '#f5576c', // Red
-                    '#4facfe', // Light blue
-                    '#43e97b', // Green
-                    '#fa709a', // Pink
-                    '#feca57', // Yellow
-                    '#ff9ff3', // Light purple
-                    '#54a0ff'  // Blue
+                    '#001219', // Primary blue
+                    '#005F73', // Primary purple
+                    '#0A9396', // Light pink
+                    '#94D2BD', // Red
+                    '#E9D8A6', // Light blue
+                    '#EE9B00', // Green
+                    '#CA6702', // Pink
+                    '#BB3E03', // Yellow
+                    '#AE2012', // Light purple
+                    '#841317'  // Blue
+                    
                 ];
                 
                 this.colorScale = d3.scaleOrdinal()
                     .domain(this.regions)
-                    .range(colors);
+                    .range(['#002D40','#991332','#FF7747','#FFC76E','#0097AB']);
             }
 
             createVisualization() {
@@ -925,7 +830,7 @@
                 // Create color scale
                 this.colorScale = d3.scaleOrdinal()
                     .domain(['ethnic', 'nationalist'])
-                    .range(['#f5576c', '#667eea']); // Red for ethnic, blue for nationalist
+                    .range(['#AD1332', '#002D40']); // Red for ethnic, blue for nationalist
 
                 console.log('Processed regional data:', this.processedData);
             }

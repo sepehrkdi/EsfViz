@@ -92,7 +92,7 @@
                     the highest concentration of conflicts in each decade.
                 </p>
                 <p>
-                    The stacked bar chart shows the percentage distribution of conflicts among the top three most 
+                    The stacked bar chart shows the number of conflicts among the top three most 
                     conflict-prone regions in each 10-year period. This approach reveals shifting patterns of global 
                     instability and helps identify periods of regional concentration versus global dispersion of conflicts.
                 </p>
@@ -113,7 +113,7 @@
                     <!-- Chart will be inserted here by D3.js -->
                 </div>
                 <div class="chart-caption">
-                    Each bar shows the percentage share of the top three regions experiencing conflicts in each decade, based on available war data.
+                    Each bar shows the number of conflicts for the top three regions experiencing conflicts in each decade, based on available war data.
                 </div>
             </section>
 
@@ -181,7 +181,7 @@
                 // Group by decades and count conflicts per region
                 const decades = this.groupByDecades(processedWars);
                 
-                // Get top 3 regions per decade with percentages
+                // Get top 3 regions per decade with counts
                 this.processedData = this.getTop3RegionsPerDecade(decades);
                 
                 // Get all unique regions for color scale
@@ -298,109 +298,208 @@
             }
 
             getRegionFromCountry(country) {
-                // Map countries to broader regions
+                // Map countries to broader regions based on the comprehensive mapping
                 const regionMap = {
                     // Europe
-                    'Britain': 'Europe',
-                    'France': 'Europe',
-                    'Germany': 'Europe',
-                    'Spain': 'Europe',
-                    'Italy': 'Europe',
+                    'Albania': 'Europe',
                     'Austria': 'Europe',
                     'Austria-Hungary': 'Europe',
-                    'Russia/USSR': 'Europe/Asia',
-                    'Poland': 'Europe',
-                    'Netherlands': 'Europe',
-                    'Portugal': 'Europe',
-                    'Greece': 'Europe',
-                    'Turkey': 'Europe/Asia',
-                    'Yugoslavia': 'Europe',
+                    'Baden': 'Europe',
+                    'Bavaria': 'Europe',
+                    'Belgium': 'Europe',
+                    'Bosnia and Herzegovina': 'Europe',
                     'Bosnia': 'Europe',
-                    'Romania': 'Europe',
-                    'Hungary': 'Europe',
                     'Bulgaria': 'Europe',
+                    'Croatia': 'Europe',
+                    'Cyprus': 'Europe',
+                    'Czech Rep': 'Europe',
+                    'Czech Republic': 'Europe',
                     'Czechoslovakia': 'Europe',
-                    'Finland': 'Europe',
-                    'Norway': 'Europe',
                     'Denmark': 'Europe',
+                    'Estonia': 'Europe',
+                    'Finland': 'Europe',
+                    'France': 'Europe',
+                    'Germany': 'Europe',
+                    'Great Britain': 'Europe',
+                    'Britain': 'Europe',
+                    'Greece': 'Europe',
+                    'Hanover': 'Europe',
+                    'Hesse Electoral': 'Europe',
+                    'Hesse Grand Ducal': 'Europe',
+                    'Hungary': 'Europe',
+                    'Iceland': 'Europe',
+                    'Italy': 'Europe',
+                    'Latvia': 'Europe',
+                    'Lithuania': 'Europe',
+                    'Luxembourg': 'Europe',
+                    'Macedonia': 'Europe',
+                    'Mecklenburg Schwerin': 'Europe',
+                    'Modena': 'Europe',
+                    'Netherlands': 'Europe',
+                    'Norway': 'Europe',
+                    'Papal States': 'Europe',
+                    'Poland': 'Europe',
+                    'Portugal': 'Europe',
+                    'Romania': 'Europe',
+                    'Russia': 'Europe',
+                    'Russia/USSR': 'Europe',
+                    'Saxony': 'Europe',
+                    'Slovakia': 'Europe',
+                    'Spain': 'Europe',
                     'Sweden': 'Europe',
+                    'Tuscany': 'Europe',
+                    'Two Sicilies': 'Europe',
+                    'Ukraine': 'Europe',
+                    'United Kingdom': 'Europe',
+                    'Wuerttemburg': 'Europe',
+                    'Yugoslavia': 'Europe',
 
                     // Asia
-                    'China': 'Asia',
-                    'Japan': 'Asia',
-                    'India': 'Asia',
-                    'Korea': 'Asia',
-                    'Vietnam': 'Asia',
-                    'Thailand': 'Asia',
-                    'Myanmar': 'Asia',
-                    'Afghanistan': 'Asia',
-                    'Iran': 'Asia',
-                    'Iraq': 'Asia',
-                    'Pakistan': 'Asia',
+                    'Aceh Sultanate': 'Asia',
+                    'Armenia': 'Asia',
+                    'Azerbaijan': 'Asia',
+                    'Balinese Kingdom of Lombok': 'Asia',
                     'Bangladesh': 'Asia',
-                    'Sri Lanka': 'Asia',
+                    'Bhutan': 'Asia',
                     'Cambodia': 'Asia',
-                    'Laos': 'Asia',
+                    'China': 'Asia',
+                    'Georgia': 'Asia',
+                    'India': 'Asia',
                     'Indonesia': 'Asia',
+                    'Japan': 'Asia',
+                    'Kazakhstan': 'Asia',
+                    'Khanate of Kiva': 'Asia',
+                    'Khanates of Kokand and Bokhara': 'Asia',
+                    'Kingdom of Bharatpur': 'Asia',
+                    'Kingdom of Lahore': 'Asia',
+                    'Kingdom of Sindh': 'Asia',
+                    'Korea': 'Asia',
+                    'North Korea': 'Asia',
+                    'South Korea': 'Asia',
+                    'Kyrgystan': 'Asia',
+                    'Laos': 'Asia',
                     'Malaysia': 'Asia',
-                    'Philippines': 'Asia',
-                    'Taiwan': 'Asia',
+                    'Maratha Empire': 'Asia',
                     'Mongolia': 'Asia',
+                    'Myanmar': 'Asia',
+                    'Nepal': 'Asia',
+                    'Pakistan': 'Asia',
+                    'Philippines': 'Asia',
+                    'Principality of Jammu': 'Asia',
+                    'Republic of Vietnam': 'Asia',
+                    'Sri Lanka': 'Asia',
+                    'Taiwan': 'Asia',
+                    'Tajikistan': 'Asia',
+                    'Thailand': 'Asia',
+                    'Tibet': 'Asia',
+                    'Turkmenistan': 'Asia',
+                    'Uzbekistan': 'Asia',
+                    'Vietnam': 'Asia',
 
                     // Middle East
-                    'Saudi Arabia': 'Middle East',
+                    'Afghanistan': 'Middle East',
                     'Egypt': 'Middle East',
-                    'Syria': 'Middle East',
-                    'Lebanon': 'Middle East',
-                    'Jordan': 'Middle East',
+                    'Iran': 'Middle East',
+                    'Iraq': 'Middle East',
                     'Israel': 'Middle East',
+                    'Jordan': 'Middle East',
                     'Kuwait': 'Middle East',
+                    'Lebanon': 'Middle East',
+                    'Oman': 'Middle East',
+                    'Qatar': 'Middle East',
+                    'Saudi Arabia': 'Middle East',
+                    'Syria': 'Middle East',
+                    'Turkey': 'Middle East',
+                    'United Arab Emirates': 'Middle East',
+                    'Yemen': 'Middle East',
+                    'Yemen Arab Republic': 'Middle East',
+                    'Yemen People\'s Republic': 'Middle East',
 
                     // Africa
-                    'South Africa': 'Africa',
-                    'Nigeria': 'Africa',
-                    'Ethiopia': 'Africa',
-                    'Sudan': 'Africa',
-                    'Morocco': 'Africa',
                     'Algeria': 'Africa',
-                    'Tunisia': 'Africa',
-                    'Libya': 'Africa',
-                    'Kenya': 'Africa',
-                    'Tanzania': 'Africa',
-                    'Uganda': 'Africa',
-                    'Ghana': 'Africa',
-                    'Congo': 'Africa',
-                    'Zimbabwe': 'Africa',
                     'Angola': 'Africa',
-                    'Mozambique': 'Africa',
-                    'Somalia': 'Africa',
-                    'Chad': 'Africa',
-                    'Rwanda': 'Africa',
+                    'Ashanti Kingdom': 'Africa',
+                    'Bambara Empire': 'Africa',
+                    'Benin': 'Africa',
+                    'Benin Empire': 'Africa',
+                    'Boer state': 'Africa',
+                    'Bornu': 'Africa',
+                    'Buganda': 'Africa',
                     'Burundi': 'Africa',
+                    'Cameroon': 'Africa',
+                    'Chad': 'Africa',
+                    'Congo': 'Africa',
+                    'Dem. Rep.': 'Africa',
+                    'Democratic Republic of the Congo': 'Africa',
+                    'Emirates of Kano': 'Africa',
+                    'Eritrea': 'Africa',
+                    'Ethiopia': 'Africa',
+                    'Ghana': 'Africa',
+                    'Guinea': 'Africa',
+                    'Guinea-Bissau': 'Africa',
+                    'Kenya': 'Africa',
+                    'Kingdom of Waalo': 'Africa',
+                    'Lesotho': 'Africa',
                     'Liberia': 'Africa',
+                    'Libya': 'Africa',
+                    'Madagascar': 'Africa',
+                    'Mali': 'Africa',
+                    'Mandingo Empire': 'Africa',
+                    'Mauritania': 'Africa',
+                    'Morocco': 'Africa',
+                    'Mozambique': 'Africa',
+                    'Namibia': 'Africa',
+                    'Ndebele Kingdom': 'Africa',
+                    'Nigeria': 'Africa',
+                    'Orange Free State': 'Africa',
+                    'Oyo': 'Africa',
+                    'Rwanda': 'Africa',
+                    'Sanusi Empire': 'Africa',
+                    'Senegal': 'Africa',
                     'Sierra Leone': 'Africa',
+                    'Sokoto': 'Africa',
+                    'Somalia': 'Africa',
+                    'South Africa': 'Africa',
+                    'South African Republic': 'Africa',
+                    'Sudan': 'Africa',
+                    'Tanzania': 'Africa',
+                    'Transvaal': 'Africa',
+                    'Tukolor Empire': 'Africa',
+                    'Tunisia': 'Africa',
+                    'Uganda': 'Africa',
+                    'Xhosa': 'Africa',
+                    'Zimbabwe': 'Africa',
+                    'Zulu': 'Africa',
+                    'Zulu Kingdom': 'Africa',
 
-                    // Americas
-                    'United States': 'Americas',
-                    'Mexico': 'Americas',
-                    'Brazil': 'Americas',
-                    'Argentina': 'Americas',
-                    'Chile': 'Americas',
-                    'Peru': 'Americas',
-                    'Colombia': 'Americas',
-                    'Venezuela': 'Americas',
-                    'Bolivia': 'Americas',
-                    'Uruguay': 'Americas',
-                    'Paraguay': 'Americas',
-                    'Ecuador': 'Americas',
-                    'Guatemala': 'Americas',
-                    'Nicaragua': 'Americas',
-                    'Cuba': 'Americas',
-                    'Haiti': 'Americas',
-                    'Dominican Republic': 'Americas',
-                    'Costa Rica': 'Americas',
-                    'El Salvador': 'Americas',
-                    'Honduras': 'Americas',
+                    // North America
+                    'Canada': 'North America',
+                    'Cuba': 'North America',
+                    'Dominican Republic': 'North America',
+                    'Haiti': 'North America',
+                    'Mexico': 'North America',
+                    'United States': 'North America',
+                    'United States of America': 'North America',
+
+                    // Central America
+                    'Costa Rica': 'Central America',
+                    'El Salvador': 'Central America',
+                    'Guatemala': 'Central America',
+                    'Honduras': 'Central America',
+                    'Nicaragua': 'Central America',
+
+                    // South America
+                    'Argentina': 'South America',
+                    'Bolivia': 'South America',
+                    'Brazil': 'South America',
+                    'Chile': 'South America',
+                    'Colombia': 'South America',
+                    'Ecuador': 'South America',
+                    'Paraguay': 'South America',
+                    'Peru': 'South America',
+                    'Peru-Bolivia': 'South America',
+                    'Uruguay': 'South America',
+                    'Venezuela': 'South America',
 
                     // Oceania
                     'Australia': 'Oceania',
@@ -459,8 +558,13 @@
                     .range([0, this.width])
                     .padding(0.1);
 
+                // Calculate max count for Y-scale domain
+                const maxCount = d3.max(this.processedData, d => 
+                    d3.sum(d.regions, r => r.count)
+                );
+
                 const yScale = d3.scaleLinear()
-                    .domain([0, 100]) // Percentage scale
+                    .domain([0, maxCount]) // Count scale
                     .range([this.height, 0]);
 
                 // Create and draw bars
@@ -490,7 +594,7 @@
                     let yOffset = yScale(0);
                     
                     d.regions.forEach((region, index) => {
-                        const segmentHeight = yScale(0) - yScale(region.percentage);
+                        const segmentHeight = yScale(0) - yScale(region.count);
                         
                         group.append('rect')
                             .attr('class', 'bar-segment')
@@ -526,7 +630,7 @@
                 // Y-axis
                 g.append('g')
                     .attr('class', 'axis')
-                    .call(d3.axisLeft(yScale).tickFormat(d => d + '%'));
+                    .call(d3.axisLeft(yScale));
 
                 // Axis labels
                 g.append('text')
@@ -542,7 +646,7 @@
                     .attr('x', -this.height / 2)
                     .attr('y', -50)
                     .style('text-anchor', 'middle')
-                    .text('Percentage of Total Conflicts (%)');
+                    .text('Number of Conflicts');
             }
 
             drawLegend(g) {
@@ -614,7 +718,7 @@
                     .style('font-size', '18px')
                     .style('font-weight', 'bold')
                     .style('fill', '#2c3e50')
-                    .text('Top 3 Regions by Conflict Percentage per Decade');
+                    .text('Top 3 Regions by Number of Conflicts per Decade');
             }
 
             showTooltip(event, region, decade, totalConflicts) {
@@ -625,7 +729,8 @@
                 this.tooltip.html(`
                     <strong>${region.region}</strong><br/>
                     Decade: ${decade}<br/>
-                    Conflicts: ${region.count} of ${totalConflicts}<br/>
+                    Conflicts: ${region.count}<br/>
+                    Total in decade: ${totalConflicts}<br/>
                     Percentage: ${region.percentage.toFixed(1)}%
                 `)
                     .style('left', (event.pageX + 10) + 'px')

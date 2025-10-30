@@ -68,6 +68,41 @@
             color: #666;
             padding: 2rem;
         }
+
+        /* Styles specific to ethnic vs nationalist chart */
+        .ethnic-nationalist-bar-group .bar-segment {
+            transition: opacity 0.2s, stroke 0.2s;
+        }
+
+        .ethnic-nationalist-bar-group .bar-segment:hover {
+            opacity: 0.8;
+            stroke: #333;
+            stroke-width: 2;
+        }
+
+        .chart-info {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .chart-info p {
+            margin: 0.5rem 0;
+            font-size: 14px;
+        }
+
+        .axis {
+            font-family: 'Fira Sans', sans-serif;
+            font-size: 11px;
+        }
+
+        .axis-label {
+            font-family: 'Fira Sans', sans-serif;
+            font-weight: 500;
+            fill: #555;
+        }
     </style>
 </head>
 <body>
@@ -114,6 +149,40 @@
                 </div>
                 <div class="chart-caption">
                     Each bar shows the number of conflicts for the top three regions experiencing conflicts in each decade, based on available war data.
+                </div>
+            </section>
+
+            <!-- New Ethnic vs Nationalist Wars Analysis -->
+            <section class="viz-description" style="margin-top: 3rem;">
+                <h2>Ethnic vs Nationalist Wars by Region (1816-Present)</h2>
+                <p>
+                    This visualization analyzes the distribution of ethnic and nationalist conflicts across different regions 
+                    throughout modern history. Using comprehensive historical war data, we examine how different types of internal conflicts 
+                    have been distributed geographically over time.
+                </p>
+                <p>
+                    The vertically stacked bar chart shows the proportion of ethnic wars (Type 6) versus nationalist wars (Type 4) 
+                    for each region. Wars involving multiple regions are counted for all regions involved, providing insights 
+                    into which regions experienced higher concentrations of specific conflict types across the entire historical period.
+                </p>
+                
+                <div class="chart-info">
+                    <p><strong>Ethnic Wars (Type 6):</strong> Internal conflicts based on ethnic, tribal, or clan divisions</p>
+                    <p><strong>Nationalist Wars (Type 4):</strong> Wars of independence and national liberation movements</p>
+                    <p><strong>Time Period:</strong> Complete historical coverage (1816-Present)</p>
+                </div>
+            </section>
+
+            <!-- Ethnic vs Nationalist Chart Container -->
+            <section class="visualization-container" style="margin-top: 2rem;">
+                <div id="ethnic-nationalist-loading" class="loading-message">
+                    Loading ethnic and nationalist war data...
+                </div>
+                <div id="ethnic-nationalist-chart" style="display: none;">
+                    <!-- Chart will be inserted here by D3.js -->
+                </div>
+                <div class="chart-caption">
+                    Each region shows the proportional distribution of ethnic vs nationalist wars, with interactive tooltips displaying specific war details.
                 </div>
             </section>
 
@@ -749,20 +818,605 @@
             }
         }
 
-        // Initialize the visualization when the page loads
+        // Ethnic vs Nationalist Wars Visualization
+        class EthnicNationalistChart {
+            constructor() {
+                this.data = [];
+                this.processedData = [];
+                this.svg = null;
+                this.tooltip = null;
+                this.colorScale = null;
+                
+                // Chart dimensions - responsive
+                this.setDimensions();
+            }
+            
+            setDimensions() {
+                // Responsive dimensions based on screen size
+                const containerWidth = Math.min(window.innerWidth - 100, 1000);
+                const isMobile = window.innerWidth < 768;
+                
+                this.margin = isMobile 
+                    ? { top: 40, right: 20, bottom: 120, left: 80 }
+                    : { top: 60, right: 200, bottom: 80, left: 100 };
+                    
+                this.width = containerWidth - this.margin.left - this.margin.right;
+                this.height = isMobile ? 500 : 600;
+                this.height = this.height - this.margin.top - this.margin.bottom;
+                
+                this.init();
+            }
+
+            async init() {
+                try {
+                    console.log('Starting EthnicNationalistChart initialization...');
+                    await this.loadData();
+                    console.log('Data loaded successfully, processing...');
+                    this.processData();
+                    console.log('Data processed successfully, creating visualization...');
+                    this.createVisualization();
+                    console.log('Visualization created successfully');
+                    this.hideLoading();
+                } catch (error) {
+                    console.error('Error initializing ethnic vs nationalist chart:', error);
+                    console.error('Error stack:', error.stack);
+                    document.getElementById('ethnic-nationalist-loading').innerHTML = 'Error loading data. Please try again.';
+                }
+            }
+
+            async loadData() {
+                // Load war data only
+                this.data = await d3.csv('WarList.csv');
+                console.log('Loaded ethnic/nationalist data:', this.data.length, 'wars');
+            }
+
+            processData() {
+                // Filter for ethnic (Type 6) and nationalist (Type 4) wars across full timeframe
+                const relevantWars = this.data
+                    .filter(d => d['Main type'] === 'INTRA' && 
+                               (d['Type Number'] === '4' || d['Type Number'] === '6') &&
+                               d['War Name'] && d['Time Span'] && d['Locations'])
+                    .map(d => this.cleanWarData(d))
+                    .filter(d => d.startYear >= 1816); // Start from first year in dataset
+
+                console.log('Relevant wars (full timeframe):', relevantWars.length);
+
+                // Group wars by region and type
+                const regionWarCounts = {};
+                
+                relevantWars.forEach(war => {
+                    war.regions.forEach(region => {
+                        if (!regionWarCounts[region]) {
+                            regionWarCounts[region] = {
+                                ethnic: [],
+                                nationalist: []
+                            };
+                        }
+                        
+                        if (war.type === '6') {
+                            regionWarCounts[region].ethnic.push(war);
+                        } else if (war.type === '4') {
+                            regionWarCounts[region].nationalist.push(war);
+                        }
+                    });
+                });
+
+                // Convert to array format for visualization
+                this.processedData = Object.entries(regionWarCounts)
+                    .map(([region, wars]) => {
+                        const ethnicCount = wars.ethnic.length;
+                        const nationalistCount = wars.nationalist.length;
+                        const total = ethnicCount + nationalistCount;
+                        
+                        return {
+                            region: region,
+                            ethnicCount: ethnicCount,
+                            nationalistCount: nationalistCount,
+                            ethnicPercentage: total > 0 ? (ethnicCount / total) * 100 : 0,
+                            nationalistPercentage: total > 0 ? (nationalistCount / total) * 100 : 0,
+                            totalWars: total,
+                            ethnicWars: wars.ethnic,
+                            nationalistWars: wars.nationalist
+                        };
+                    })
+                    .filter(d => d.totalWars > 0)
+                    .sort((a, b) => b.totalWars - a.totalWars);
+
+                // Create color scale
+                this.colorScale = d3.scaleOrdinal()
+                    .domain(['ethnic', 'nationalist'])
+                    .range(['#f5576c', '#667eea']); // Red for ethnic, blue for nationalist
+
+                console.log('Processed regional data:', this.processedData);
+            }
+
+            cleanWarData(war) {
+                const timeSpan = war['Time Span'];
+                const startYear = parseInt(timeSpan.split('-')[0]);
+                
+                // Parse locations and map to regions
+                const locations = war['Locations']
+                    .split(',')
+                    .map(loc => loc.trim())
+                    .map(loc => loc.replace(/\s*\([^)]*\)/g, ''))
+                    .filter(loc => loc.length > 0);
+
+                // Map locations to regions using the existing getRegionFromCountry function
+                const regions = [...new Set(locations.map(loc => 
+                    this.getRegionFromCountry(loc)
+                ))].filter(region => region !== 'Other');
+
+                return {
+                    warName: war['War Name'],
+                    startYear: startYear,
+                    type: war['Type Number'],
+                    locations: locations,
+                    regions: regions.length > 0 ? regions : ['Other'],
+                    timeSpan: timeSpan
+                };
+            }
+
+            getRegionFromCountry(country) {
+                // Map countries to broader regions based on the comprehensive mapping
+                const regionMap = {
+                    // Europe
+                    'Albania': 'Europe',
+                    'Austria': 'Europe',
+                    'Austria-Hungary': 'Europe',
+                    'Baden': 'Europe',
+                    'Bavaria': 'Europe',
+                    'Belgium': 'Europe',
+                    'Bosnia and Herzegovina': 'Europe',
+                    'Bosnia': 'Europe',
+                    'Bulgaria': 'Europe',
+                    'Croatia': 'Europe',
+                    'Cyprus': 'Europe',
+                    'Czech Rep': 'Europe',
+                    'Czech Republic': 'Europe',
+                    'Czechoslovakia': 'Europe',
+                    'Denmark': 'Europe',
+                    'Estonia': 'Europe',
+                    'Finland': 'Europe',
+                    'France': 'Europe',
+                    'Germany': 'Europe',
+                    'Great Britain': 'Europe',
+                    'Britain': 'Europe',
+                    'Greece': 'Europe',
+                    'Hanover': 'Europe',
+                    'Hesse Electoral': 'Europe',
+                    'Hesse Grand Ducal': 'Europe',
+                    'Hungary': 'Europe',
+                    'Iceland': 'Europe',
+                    'Italy': 'Europe',
+                    'Latvia': 'Europe',
+                    'Lithuania': 'Europe',
+                    'Luxembourg': 'Europe',
+                    'Macedonia': 'Europe',
+                    'Mecklenburg Schwerin': 'Europe',
+                    'Modena': 'Europe',
+                    'Netherlands': 'Europe',
+                    'Norway': 'Europe',
+                    'Papal States': 'Europe',
+                    'Poland': 'Europe',
+                    'Portugal': 'Europe',
+                    'Romania': 'Europe',
+                    'Russia': 'Europe',
+                    'Russia/USSR': 'Europe',
+                    'Saxony': 'Europe',
+                    'Slovakia': 'Europe',
+                    'Spain': 'Europe',
+                    'Sweden': 'Europe',
+                    'Tuscany': 'Europe',
+                    'Two Sicilies': 'Europe',
+                    'Ukraine': 'Europe',
+                    'United Kingdom': 'Europe',
+                    'Wuerttemburg': 'Europe',
+                    'Yugoslavia': 'Europe',
+
+                    // Asia
+                    'Aceh Sultanate': 'Asia',
+                    'Armenia': 'Asia',
+                    'Azerbaijan': 'Asia',
+                    'Balinese Kingdom of Lombok': 'Asia',
+                    'Bangladesh': 'Asia',
+                    'Bhutan': 'Asia',
+                    'Cambodia': 'Asia',
+                    'China': 'Asia',
+                    'Georgia': 'Asia',
+                    'India': 'Asia',
+                    'Indonesia': 'Asia',
+                    'Japan': 'Asia',
+                    'Kazakhstan': 'Asia',
+                    'Khanate of Kiva': 'Asia',
+                    'Khanates of Kokand and Bokhara': 'Asia',
+                    'Kingdom of Bharatpur': 'Asia',
+                    'Kingdom of Lahore': 'Asia',
+                    'Kingdom of Sindh': 'Asia',
+                    'Korea': 'Asia',
+                    'North Korea': 'Asia',
+                    'South Korea': 'Asia',
+                    'Kyrgystan': 'Asia',
+                    'Laos': 'Asia',
+                    'Malaysia': 'Asia',
+                    'Maratha Empire': 'Asia',
+                    'Mongolia': 'Asia',
+                    'Myanmar': 'Asia',
+                    'Nepal': 'Asia',
+                    'Pakistan': 'Asia',
+                    'Philippines': 'Asia',
+                    'Principality of Jammu': 'Asia',
+                    'Republic of Vietnam': 'Asia',
+                    'Sri Lanka': 'Asia',
+                    'Taiwan': 'Asia',
+                    'Tajikistan': 'Asia',
+                    'Thailand': 'Asia',
+                    'Tibet': 'Asia',
+                    'Turkmenistan': 'Asia',
+                    'Uzbekistan': 'Asia',
+                    'Vietnam': 'Asia',
+
+                    // Middle East
+                    'Afghanistan': 'Middle East',
+                    'Egypt': 'Middle East',
+                    'Iran': 'Middle East',
+                    'Iraq': 'Middle East',
+                    'Israel': 'Middle East',
+                    'Jordan': 'Middle East',
+                    'Kuwait': 'Middle East',
+                    'Lebanon': 'Middle East',
+                    'Oman': 'Middle East',
+                    'Qatar': 'Middle East',
+                    'Saudi Arabia': 'Middle East',
+                    'Syria': 'Middle East',
+                    'Turkey': 'Middle East',
+                    'United Arab Emirates': 'Middle East',
+                    'Yemen': 'Middle East',
+                    'Yemen Arab Republic': 'Middle East',
+                    'Yemen People\'s Republic': 'Middle East',
+
+                    // Africa
+                    'Algeria': 'Africa',
+                    'Angola': 'Africa',
+                    'Ashanti Kingdom': 'Africa',
+                    'Bambara Empire': 'Africa',
+                    'Benin': 'Africa',
+                    'Benin Empire': 'Africa',
+                    'Boer state': 'Africa',
+                    'Bornu': 'Africa',
+                    'Buganda': 'Africa',
+                    'Burundi': 'Africa',
+                    'Cameroon': 'Africa',
+                    'Chad': 'Africa',
+                    'Congo': 'Africa',
+                    'Dem. Rep.': 'Africa',
+                    'Democratic Republic of the Congo': 'Africa',
+                    'Emirates of Kano': 'Africa',
+                    'Eritrea': 'Africa',
+                    'Ethiopia': 'Africa',
+                    'Ghana': 'Africa',
+                    'Guinea': 'Africa',
+                    'Guinea-Bissau': 'Africa',
+                    'Kenya': 'Africa',
+                    'Kingdom of Waalo': 'Africa',
+                    'Lesotho': 'Africa',
+                    'Liberia': 'Africa',
+                    'Libya': 'Africa',
+                    'Madagascar': 'Africa',
+                    'Mali': 'Africa',
+                    'Mandingo Empire': 'Africa',
+                    'Mauritania': 'Africa',
+                    'Morocco': 'Africa',
+                    'Mozambique': 'Africa',
+                    'Namibia': 'Africa',
+                    'Ndebele Kingdom': 'Africa',
+                    'Nigeria': 'Africa',
+                    'Orange Free State': 'Africa',
+                    'Oyo': 'Africa',
+                    'Rwanda': 'Africa',
+                    'Sanusi Empire': 'Africa',
+                    'Senegal': 'Africa',
+                    'Sierra Leone': 'Africa',
+                    'Sokoto': 'Africa',
+                    'Somalia': 'Africa',
+                    'South Africa': 'Africa',
+                    'South African Republic': 'Africa',
+                    'Sudan': 'Africa',
+                    'Tanzania': 'Africa',
+                    'Transvaal': 'Africa',
+                    'Tukolor Empire': 'Africa',
+                    'Tunisia': 'Africa',
+                    'Uganda': 'Africa',
+                    'Xhosa': 'Africa',
+                    'Zimbabwe': 'Africa',
+                    'Zulu': 'Africa',
+                    'Zulu Kingdom': 'Africa',
+
+                    // North America
+                    'Canada': 'North America',
+                    'Cuba': 'North America',
+                    'Dominican Republic': 'North America',
+                    'Haiti': 'North America',
+                    'Mexico': 'North America',
+                    'United States': 'North America',
+                    'United States of America': 'North America',
+
+                    // Central America
+                    'Costa Rica': 'Central America',
+                    'El Salvador': 'Central America',
+                    'Guatemala': 'Central America',
+                    'Honduras': 'Central America',
+                    'Nicaragua': 'Central America',
+
+                    // South America
+                    'Argentina': 'South America',
+                    'Bolivia': 'South America',
+                    'Brazil': 'South America',
+                    'Chile': 'South America',
+                    'Colombia': 'South America',
+                    'Ecuador': 'South America',
+                    'Paraguay': 'South America',
+                    'Peru': 'South America',
+                    'Peru-Bolivia': 'South America',
+                    'Uruguay': 'South America',
+                    'Venezuela': 'South America',
+
+                    // Oceania
+                    'Australia': 'Oceania',
+                    'New Zealand': 'Oceania'
+                };
+
+                return regionMap[country] || 'Other';
+            }
+
+            createVisualization() {
+                const container = d3.select('#ethnic-nationalist-chart');
+                
+                // Create SVG
+                const totalHeight = this.height + this.margin.top + this.margin.bottom;
+                
+                this.svg = container
+                    .append('svg')
+                    .attr('width', this.width + this.margin.left + this.margin.right)
+                    .attr('height', totalHeight)
+                    .attr('viewBox', `0 0 ${this.width + this.margin.left + this.margin.right} ${totalHeight}`)
+                    .attr('preserveAspectRatio', 'xMidYMid meet');
+
+                const g = this.svg.append('g')
+                    .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+
+                // Create tooltip
+                this.tooltip = d3.select('body').append('div')
+                    .attr('class', 'tooltip')
+                    .style('z-index', '1001');
+
+                // Create scales
+                const xScale = d3.scaleBand()
+                    .domain(this.processedData.map(d => d.region))
+                    .range([0, this.width])
+                    .padding(0.1);
+
+                const yScale = d3.scaleLinear()
+                    .domain([0, 100]) // Percentage scale
+                    .range([this.height, 0]);
+
+                // Create stacked bars
+                this.drawStackedBars(g, xScale, yScale);
+                
+                // Create axes
+                this.drawAxes(g, xScale, yScale);
+                
+                // Create legend
+                this.drawLegend(g);
+                
+                // Add title
+                this.addTitle(g);
+            }
+
+            drawStackedBars(g, xScale, yScale) {
+                const barGroups = g.selectAll('.ethnic-nationalist-bar-group')
+                    .data(this.processedData)
+                    .enter()
+                    .append('g')
+                    .attr('class', 'ethnic-nationalist-bar-group')
+                    .attr('transform', d => `translate(${xScale(d.region)}, 0)`);
+
+                // Draw stacked bars
+                barGroups.each((d, i, nodes) => {
+                    const group = d3.select(nodes[i]);
+                    
+                    // Nationalist wars bar (bottom)
+                    if (d.nationalistPercentage > 0) {
+                        group.append('rect')
+                            .attr('class', 'bar-segment nationalist')
+                            .attr('x', 0)
+                            .attr('y', yScale(d.nationalistPercentage))
+                            .attr('width', xScale.bandwidth())
+                            .attr('height', yScale(0) - yScale(d.nationalistPercentage))
+                            .attr('fill', this.colorScale('nationalist'))
+                            .style('cursor', 'pointer')
+                            .on('mouseover', (event) => {
+                                this.showTooltip(event, d, 'nationalist');
+                            })
+                            .on('mouseout', () => {
+                                this.hideTooltip();
+                            });
+                    }
+                    
+                    // Ethnic wars bar (top)
+                    if (d.ethnicPercentage > 0) {
+                        group.append('rect')
+                            .attr('class', 'bar-segment ethnic')
+                            .attr('x', 0)
+                            .attr('y', yScale(100))
+                            .attr('width', xScale.bandwidth())
+                            .attr('height', yScale(100 - d.ethnicPercentage) - yScale(100))
+                            .attr('fill', this.colorScale('ethnic'))
+                            .style('cursor', 'pointer')
+                            .on('mouseover', (event) => {
+                                this.showTooltip(event, d, 'ethnic');
+                            })
+                            .on('mouseout', () => {
+                                this.hideTooltip();
+                            });
+                    }
+                });
+            }
+
+            drawAxes(g, xScale, yScale) {
+                // X-axis
+                g.append('g')
+                    .attr('class', 'axis')
+                    .attr('transform', `translate(0, ${this.height})`)
+                    .call(d3.axisBottom(xScale))
+                    .selectAll('text')
+                    .style('text-anchor', 'end')
+                    .attr('dx', '-.8em')
+                    .attr('dy', '.15em')
+                    .attr('transform', 'rotate(-45)')
+                    .style('font-size', '11px');
+
+                // Y-axis
+                g.append('g')
+                    .attr('class', 'axis')
+                    .call(d3.axisLeft(yScale).tickFormat(d => d + '%'));
+
+                // Axis labels
+                g.append('text')
+                    .attr('class', 'axis-label')
+                    .attr('x', this.width / 2)
+                    .attr('y', this.height + 70)
+                    .style('text-anchor', 'middle')
+                    .style('font-size', '12px')
+                    .text('Region');
+
+                g.append('text')
+                    .attr('class', 'axis-label')
+                    .attr('transform', 'rotate(-90)')
+                    .attr('x', -this.height / 2)
+                    .attr('y', -60)
+                    .style('text-anchor', 'middle')
+                    .style('font-size', '12px')
+                    .text('Percentage of Wars by Type');
+            }
+
+            drawLegend(g) {
+                const isMobile = window.innerWidth < 768;
+                
+                const legend = g.append('g')
+                    .attr('class', 'legend')
+                    .attr('transform', isMobile ? 
+                        `translate(20, ${this.height + 90})` : 
+                        `translate(${this.width + 20}, 20)`);
+
+                const legendData = [
+                    { type: 'ethnic', label: 'Ethnic Wars (Type 6)', color: this.colorScale('ethnic') },
+                    { type: 'nationalist', label: 'Nationalist Wars (Type 4)', color: this.colorScale('nationalist') }
+                ];
+
+                const legendItems = legend.selectAll('.legend-item')
+                    .data(legendData)
+                    .enter()
+                    .append('g')
+                    .attr('class', 'legend-item')
+                    .attr('transform', (d, i) => isMobile ? 
+                        `translate(${i * 200}, 0)` : 
+                        `translate(0, ${i * 25})`);
+
+                legendItems.append('rect')
+                    .attr('width', 15)
+                    .attr('height', 15)
+                    .attr('fill', d => d.color)
+                    .attr('stroke', '#333')
+                    .attr('stroke-width', 1);
+
+                legendItems.append('text')
+                    .attr('x', 20)
+                    .attr('y', 12)
+                    .text(d => d.label)
+                    .style('font-size', '12px')
+                    .style('fill', '#333');
+            }
+
+            addTitle(g) {
+                g.append('text')
+                    .attr('class', 'chart-title')
+                    .attr('x', this.width / 2)
+                    .attr('y', -30)
+                    .style('text-anchor', 'middle')
+                    .style('font-size', '16px')
+                    .style('font-weight', 'bold')
+                    .style('fill', '#2c3e50')
+                    .text('Ethnic vs Nationalist Wars by Region (1816-Present)');
+            }
+
+            showTooltip(event, regionData, warType) {
+                const wars = warType === 'ethnic' ? regionData.ethnicWars : regionData.nationalistWars;
+                const count = warType === 'ethnic' ? regionData.ethnicCount : regionData.nationalistCount;
+                const percentage = warType === 'ethnic' ? regionData.ethnicPercentage : regionData.nationalistPercentage;
+                
+                let tooltipContent = `
+                    <strong>${regionData.region}</strong><br/>
+                    <strong>${warType === 'ethnic' ? 'Ethnic' : 'Nationalist'} Wars:</strong> ${count} (${percentage.toFixed(1)}%)<br/>
+                    <strong>Total Wars:</strong> ${regionData.totalWars}<br/>
+                    <hr style="margin: 5px 0; border: 1px solid #ccc;">
+                `;
+
+                // Add war details (limit to first 5 wars)
+                const displayWars = wars.slice(0, 5);
+                displayWars.forEach(war => {
+                    tooltipContent += `
+                        <strong>${war.warName}</strong><br/>
+                        <em>${war.timeSpan}</em><br/>
+                        <small>Locations: ${war.locations.join(', ')}</small><br/><br/>
+                    `;
+                });
+
+                if (wars.length > 5) {
+                    tooltipContent += `<small>... and ${wars.length - 5} more wars</small>`;
+                }
+
+                this.tooltip.transition()
+                    .duration(200)
+                    .style('opacity', .95);
+                
+                this.tooltip.html(tooltipContent)
+                    .style('left', (event.pageX + 10) + 'px')
+                    .style('top', (event.pageY - 28) + 'px');
+            }
+
+            hideTooltip() {
+                this.tooltip.transition()
+                    .duration(500)
+                    .style('opacity', 0);
+            }
+
+            hideLoading() {
+                document.getElementById('ethnic-nationalist-loading').style.display = 'none';
+                document.getElementById('ethnic-nationalist-chart').style.display = 'block';
+            }
+        }
+
+        // Initialize the visualizations when the page loads
         document.addEventListener('DOMContentLoaded', function() {
             const chart = new RegionalConflictsChart();
+            const ethnicNationalistChart = new EthnicNationalistChart();
             
             // Handle window resize for responsive design
             let resizeTimeout;
             window.addEventListener('resize', function() {
                 clearTimeout(resizeTimeout);
                 resizeTimeout = setTimeout(function() {
-                    // Recreate chart with new dimensions
+                    // Recreate charts with new dimensions
                     if (chart.processedData && chart.processedData.length > 0) {
                         d3.select('#chart-container').selectAll('*').remove();
                         chart.setDimensions();
                         chart.createVisualization();
+                    }
+                    
+                    if (ethnicNationalistChart.processedData && ethnicNationalistChart.processedData.length > 0) {
+                        d3.select('#ethnic-nationalist-chart').selectAll('*').remove();
+                        ethnicNationalistChart.setDimensions();
+                        ethnicNationalistChart.createVisualization();
                     }
                 }, 250);
             });

@@ -125,6 +125,41 @@
                 </div>
             </section>
 
+            <!-- New War Duration Heatmap Analysis -->
+            <section class="viz-description" style="margin-top: 3rem;">
+                <h2>War Duration Heatmap by Region and Decade</h2>
+                <p>
+                    This interactive heatmap visualizes the sum of war durations across different regions and time periods. 
+                    Each war's duration is calculated as the number of years it lasted and is split equally among all 
+                    unique locations involved in the conflict.
+                </p>
+                <p>
+                    The heatmap shows aggregated war durations by region and decade, where each war is assigned to the 
+                    decade based on its start year. Wars spanning multiple locations contribute proportionally to each 
+                    affected region, providing insights into the intensity and geographical distribution of prolonged conflicts.
+                </p>
+                
+                <div class="chart-info">
+                    <p><strong>Duration Calculation:</strong> End year - Start year + 1, split equally among unique locations</p>
+                    <p><strong>Region Mapping:</strong> Locations mapped to canonical regions; unmapped locations assigned to "Other"</p>
+                    <p><strong>Time Binning:</strong> Wars grouped by start decade (e.g., 1810s, 1820s, etc.)</p>
+                    <p><strong>Interactive Features:</strong> Hover for detailed war information and duration contributions</p>
+                </div>
+            </section>
+
+            <!-- War Duration Heatmap Container -->
+            <section class="visualization-container" style="margin-top: 2rem;">
+                <div id="region-start-duration-heatmap-loading" class="loading-message">
+                    Loading war duration heatmap data...
+                </div>
+                <div id="region-start-duration-heatmap" class="chart-container" style="display: none;">
+                    <!-- Heatmap will be inserted here by D3.js -->
+                </div>
+                <div class="chart-caption">
+                    Each cell represents the total allocated war duration (in years) for a specific region and decade, with interactive tooltips showing contributing wars.
+                </div>
+            </section>
+
         </div>
     </div>
 
@@ -1888,11 +1923,548 @@
             }
         }
 
+        // War Duration Heatmap Visualization
+        class WarDurationHeatmap {
+            constructor() {
+                this.data = [];
+                this.processedData = [];
+                this.svg = null;
+                this.tooltip = null;
+                this.colorScale = null;
+                this.regions = [];
+                this.decades = [];
+                this.regionsMap = {};
+                
+                // Chart dimensions - responsive
+                this.setDimensions();
+            }
+            
+            setDimensions() {
+                // Fixed dimensions for 1000x600 total size with vertical legend
+                const totalWidth = 1000;
+                const totalHeight = 600;
+                const legendWidth = 100;
+                
+                this.margin = { top: 60, right: 20, bottom: 80, left: 120 };
+                
+                // Reserve space for vertical legend on the right
+                this.width = totalWidth - this.margin.left - this.margin.right - legendWidth - 20;
+                this.height = totalHeight - this.margin.top - this.margin.bottom;
+                this.legendWidth = legendWidth;
+                this.totalWidth = totalWidth;
+                this.totalHeight = totalHeight;
+                
+                this.init();
+            }
+
+            async init() {
+                try {
+                    console.log('Starting WarDurationHeatmap initialization...');
+                    this.createRegionsMap();
+                    await this.loadData();
+                    console.log('Data loaded successfully, processing...');
+                    this.processData();
+                    console.log('Data processed successfully, creating visualization...');
+                    this.createVisualization();
+                    console.log('Heatmap visualization created successfully');
+                    this.hideLoading();
+                } catch (error) {
+                    console.error('Error initializing heatmap:', error);
+                    document.getElementById('region-start-duration-heatmap-loading').innerHTML = 'Error loading data. Please try again.';
+                }
+            }
+
+            createRegionsMap() {
+                // Create inline regions mapping based on the existing region mapping function
+                this.regionsMap = {
+                    // Europe
+                    'Albania': 'Europe', 'Austria': 'Europe', 'Austria-Hungary': 'Europe', 'Baden': 'Europe', 'Bavaria': 'Europe',
+                    'Belgium': 'Europe', 'Bosnia and Herzegovina': 'Europe', 'Bosnia': 'Europe', 'Bulgaria': 'Europe', 'Croatia': 'Europe',
+                    'Cyprus': 'Europe', 'Czech Rep': 'Europe', 'Czech Republic': 'Europe', 'Czechoslovakia': 'Europe', 'Denmark': 'Europe',
+                    'Estonia': 'Europe', 'Finland': 'Europe', 'France': 'Europe', 'Germany': 'Europe', 'Great Britain': 'Europe',
+                    'Britain': 'Europe', 'Greece': 'Europe', 'Hanover': 'Europe', 'Hesse Electoral': 'Europe', 'Hesse Grand Ducal': 'Europe',
+                    'Hungary': 'Europe', 'Iceland': 'Europe', 'Italy': 'Europe', 'Latvia': 'Europe', 'Lithuania': 'Europe',
+                    'Luxembourg': 'Europe', 'Macedonia': 'Europe', 'Mecklenburg Schwerin': 'Europe', 'Modena': 'Europe', 'Netherlands': 'Europe',
+                    'Norway': 'Europe', 'Papal States': 'Europe', 'Poland': 'Europe', 'Portugal': 'Europe', 'Romania': 'Europe',
+                    'Russia': 'Europe', 'Russia/USSR': 'Europe', 'Saxony': 'Europe', 'Slovakia': 'Europe', 'Spain': 'Europe',
+                    'Sweden': 'Europe', 'Tuscany': 'Europe', 'Two Sicilies': 'Europe', 'Ukraine': 'Europe', 'United Kingdom': 'Europe',
+                    'Wuerttemburg': 'Europe', 'Yugoslavia': 'Europe',
+
+                    // Asia
+                    'Aceh Sultanate': 'Asia', 'Armenia': 'Asia', 'Azerbaijan': 'Asia', 'Balinese Kingdom of Lombok': 'Asia',
+                    'Bangladesh': 'Asia', 'Bhutan': 'Asia', 'Cambodia': 'Asia', 'China': 'Asia', 'Georgia': 'Asia', 'India': 'Asia',
+                    'Indonesia': 'Asia', 'Japan': 'Asia', 'Kazakhstan': 'Asia', 'Khanate of Kiva': 'Asia', 'Khanates of Kokand and Bokhara': 'Asia',
+                    'Kingdom of Bharatpur': 'Asia', 'Kingdom of Lahore': 'Asia', 'Kingdom of Sindh': 'Asia', 'Korea': 'Asia',
+                    'North Korea': 'Asia', 'South Korea': 'Asia', 'Kyrgystan': 'Asia', 'Laos': 'Asia', 'Malaysia': 'Asia',
+                    'Maratha Empire': 'Asia', 'Mongolia': 'Asia', 'Myanmar': 'Asia', 'Nepal': 'Asia', 'Pakistan': 'Asia',
+                    'Philippines': 'Asia', 'Principality of Jammu': 'Asia', 'Republic of Vietnam': 'Asia', 'Sri Lanka': 'Asia',
+                    'Taiwan': 'Asia', 'Tajikistan': 'Asia', 'Thailand': 'Asia', 'Tibet': 'Asia', 'Turkmenistan': 'Asia',
+                    'Uzbekistan': 'Asia', 'Vietnam': 'Asia',
+
+                    // Middle East
+                    'Afghanistan': 'Middle East', 'Egypt': 'Middle East', 'Iran': 'Middle East', 'Iraq': 'Middle East',
+                    'Israel': 'Middle East', 'Jordan': 'Middle East', 'Kuwait': 'Middle East', 'Lebanon': 'Middle East',
+                    'Oman': 'Middle East', 'Qatar': 'Middle East', 'Saudi Arabia': 'Middle East', 'Syria': 'Middle East',
+                    'Turkey': 'Middle East', 'United Arab Emirates': 'Middle East', 'Yemen': 'Middle East',
+                    'Yemen Arab Republic': 'Middle East', 'Yemen People\'s Republic': 'Middle East',
+
+                    // Africa
+                    'Algeria': 'Africa', 'Angola': 'Africa', 'Ashanti Kingdom': 'Africa', 'Bambara Empire': 'Africa',
+                    'Benin': 'Africa', 'Benin Empire': 'Africa', 'Boer state': 'Africa', 'Bornu': 'Africa', 'Buganda': 'Africa',
+                    'Burundi': 'Africa', 'Cameroon': 'Africa', 'Chad': 'Africa', 'Congo': 'Africa', 'Dem. Rep.': 'Africa',
+                    'Democratic Republic of the Congo': 'Africa', 'Emirates of Kano': 'Africa', 'Eritrea': 'Africa', 'Ethiopia': 'Africa',
+                    'Ghana': 'Africa', 'Guinea': 'Africa', 'Guinea-Bissau': 'Africa', 'Kenya': 'Africa', 'Kingdom of Waalo': 'Africa',
+                    'Lesotho': 'Africa', 'Liberia': 'Africa', 'Libya': 'Africa', 'Madagascar': 'Africa', 'Mali': 'Africa',
+                    'Mandingo Empire': 'Africa', 'Mauritania': 'Africa', 'Morocco': 'Africa', 'Mozambique': 'Africa', 'Namibia': 'Africa',
+                    'Ndebele Kingdom': 'Africa', 'Nigeria': 'Africa', 'Orange Free State': 'Africa', 'Oyo': 'Africa', 'Rwanda': 'Africa',
+                    'Sanusi Empire': 'Africa', 'Senegal': 'Africa', 'Sierra Leone': 'Africa', 'Sokoto': 'Africa', 'Somalia': 'Africa',
+                    'South Africa': 'Africa', 'South African Republic': 'Africa', 'Sudan': 'Africa', 'Tanzania': 'Africa',
+                    'Transvaal': 'Africa', 'Tukolor Empire': 'Africa', 'Tunisia': 'Africa', 'Uganda': 'Africa', 'Xhosa': 'Africa',
+                    'Zimbabwe': 'Africa', 'Zulu': 'Africa', 'Zulu Kingdom': 'Africa',
+
+                    // North America
+                    'Canada': 'North America', 'Cuba': 'North America', 'Dominican Republic': 'North America',
+                    'Haiti': 'North America', 'Mexico': 'North America', 'United States': 'North America',
+                    'United States of America': 'North America',
+
+                    // Central America
+                    'Costa Rica': 'Central America', 'El Salvador': 'Central America', 'Guatemala': 'Central America',
+                    'Honduras': 'Central America', 'Nicaragua': 'Central America',
+
+                    // South America
+                    'Argentina': 'South America', 'Bolivia': 'South America', 'Brazil': 'South America',
+                    'Chile': 'South America', 'Colombia': 'South America', 'Ecuador': 'South America',
+                    'Paraguay': 'South America', 'Peru': 'South America', 'Peru-Bolivia': 'South America',
+                    'Uruguay': 'South America', 'Venezuela': 'South America',
+
+                    // Oceania
+                    'Australia': 'Oceania', 'New Zealand': 'Oceania'
+                };
+            }
+
+            async loadData() {
+                this.data = await d3.csv('WarList.csv');
+                console.log('Loaded heatmap data:', this.data.length, 'wars');
+            }
+
+            processData() {
+                // Clean and process the data according to specification
+                const cleanWars = this.data
+                    .filter(d => d['War Name'] && d['Time Span'] && d['Locations'])
+                    .map(d => this.cleanWarData(d))
+                    .filter(d => d !== null); // Remove unparsable wars
+
+                console.log('Clean wars for heatmap:', cleanWars.length);
+
+                // Aggregate by region and decade
+                const aggregation = {};
+                const warDetails = {}; // Store war details for tooltips
+
+                cleanWars.forEach(war => {
+                    const startBin = (Math.floor(war.startYear / 10) * 10).toString();
+                    
+                    war.allocatedLocations.forEach(({location, allocation}) => {
+                        const region = this.regionsMap[location] || 'Other';
+                        
+                        const key = `${region}-${startBin}`;
+                        if (!aggregation[key]) {
+                            aggregation[key] = 0;
+                            warDetails[key] = [];
+                        }
+                        
+                        aggregation[key] += allocation;
+                        warDetails[key].push({
+                            warName: war.warName,
+                            warNumber: war.warNumber,
+                            timeSpan: war.timeSpan,
+                            allLocations: war.originalLocations,
+                            stateParticipants: war.stateParticipants,
+                            allocation: allocation,
+                            region: region
+                        });
+                    });
+                });
+
+                // Convert to array format for heatmap
+                this.processedData = [];
+                const regionTotals = {};
+
+                // Get all unique regions and decades
+                // Keep regions in original order (unsorted) as specified in requirements
+                const regionOrder = {};
+                let orderIndex = 0;
+                
+                Object.keys(aggregation).forEach(key => {
+                    const region = key.split('-')[0];
+                    if (!(region in regionOrder)) {
+                        regionOrder[region] = orderIndex++;
+                    }
+                });
+                
+                this.regions = Object.keys(regionOrder).sort((a, b) => regionOrder[a] - regionOrder[b]);
+                this.decades = [...new Set(Object.keys(aggregation).map(key => key.split('-')[1]))].sort();
+
+                // Create data structure with region objects
+                this.regions.forEach(region => {
+                    const regionData = {
+                        region: region,
+                        bins: {},
+                        TOTAL_DURATION: 0
+                    };
+
+                    this.decades.forEach(decade => {
+                        const key = `${region}-${decade}`;
+                        const value = aggregation[key] || 0;
+                        regionData.bins[decade] = value;
+                        regionData.TOTAL_DURATION += value;
+                    });
+
+                    // Add war details for tooltips
+                    regionData.warDetails = {};
+                    this.decades.forEach(decade => {
+                        const key = `${region}-${decade}`;
+                        regionData.warDetails[decade] = warDetails[key] || [];
+                    });
+
+                    this.processedData.push(regionData);
+                });
+
+                // Create color scale - using consistent colors with other charts
+                const maxValue = d3.max(this.processedData, d => d3.max(Object.values(d.bins)));
+                this.colorScale = d3.scaleSequential()
+                    .domain([0, maxValue])
+                    .interpolator(d3.interpolateOrRd); // Using OrRd for consistency with website theme
+
+                console.log('Processed heatmap data:', this.processedData);
+                console.log('Decades:', this.decades);
+                console.log('Max value:', maxValue);
+            }
+
+            cleanWarData(war) {
+                try {
+                    // Normalize headers - remove newlines
+                    const timeSpan = war['Time Span'];
+                    const warName = war['War Name'];
+                    const locations = war['Locations'];
+                    const stateParticipants = war['State Participants'] || '';
+                    const warNumber = war['War\nNumber'] || war['War Number'] || war['"War\nNumber"'] || '';
+
+                    // Parse start and end year
+                    let startYear, endYear;
+                    
+                    if (timeSpan.includes('-')) {
+                        const years = timeSpan.split('-');
+                        startYear = parseInt(years[0]);
+                        endYear = parseInt(years[1]);
+                    } else {
+                        // Single year
+                        startYear = endYear = parseInt(timeSpan);
+                    }
+
+                    if (isNaN(startYear) || isNaN(endYear)) {
+                        console.warn(`Unparsable time span: ${timeSpan} for war: ${warName}`);
+                        return null;
+                    }
+
+                    // Calculate duration
+                    const duration = endYear - startYear + 1;
+
+                    // Parse and clean locations
+                    const parsedLocations = locations
+                        .split(',')
+                        .map(loc => loc.trim())
+                        .map(loc => loc.replace(/^["']|["']$/g, '')) // Remove surrounding quotes
+                        .map(loc => loc.replace(/\s*\([^)]*\)/g, '')) // Remove parenthetical content
+                        .filter(loc => loc.length > 0);
+
+                    // Deduplicate locations
+                    const uniqueLocations = [...new Set(parsedLocations)];
+                    
+                    // Split duration equally among locations
+                    const allocationPerLocation = duration / uniqueLocations.length;
+                    
+                    const allocatedLocations = uniqueLocations.map(location => ({
+                        location: location,
+                        allocation: allocationPerLocation
+                    }));
+
+                    return {
+                        warName: warName,
+                        warNumber: warNumber,
+                        timeSpan: timeSpan,
+                        startYear: startYear,
+                        endYear: endYear,
+                        duration: duration,
+                        originalLocations: parsedLocations,
+                        allocatedLocations: allocatedLocations,
+                        stateParticipants: stateParticipants
+                    };
+                } catch (error) {
+                    console.warn(`Error processing war data for ${war['War Name']}:`, error);
+                    return null;
+                }
+            }
+
+            createVisualization() {
+                const container = d3.select('#region-start-duration-heatmap');
+                
+                // Clear any existing content
+                container.selectAll('*').remove();
+                
+                // Create SVG with fixed 1000x600 size
+                this.svg = container
+                    .append('svg')
+                    .attr('width', this.totalWidth)
+                    .attr('height', this.totalHeight)
+                    .attr('viewBox', `0 0 ${this.totalWidth} ${this.totalHeight}`)
+                    .attr('preserveAspectRatio', 'xMidYMid meet');
+
+                const g = this.svg.append('g')
+                    .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+
+                // Create tooltip
+                this.tooltip = d3.select('body').append('div')
+                    .attr('class', 'tooltip')
+                    .style('z-index', '1001');
+
+                // Create scales
+                const xScale = d3.scaleBand()
+                    .domain(this.decades)
+                    .range([0, this.width])
+                    .padding(0.05);
+
+                const yScale = d3.scaleBand()
+                    .domain(this.regions)
+                    .range([0, this.height])
+                    .padding(0.05);
+
+                // Draw heatmap cells
+                this.drawHeatmapCells(g, xScale, yScale);
+                
+                // Create axes
+                this.drawAxes(g, xScale, yScale);
+                
+                // Add color legend
+                this.drawColorLegend(g);
+                
+                // Add title
+                this.addTitle(g);
+            }
+
+            drawHeatmapCells(g, xScale, yScale) {
+                // Create heatmap data for D3
+                const heatmapData = [];
+                this.processedData.forEach(regionData => {
+                    this.decades.forEach(decade => {
+                        heatmapData.push({
+                            region: regionData.region,
+                            decade: decade,
+                            value: regionData.bins[decade],
+                            warDetails: regionData.warDetails[decade]
+                        });
+                    });
+                });
+
+                const cells = g.selectAll('.heatmap-cell')
+                    .data(heatmapData)
+                    .enter()
+                    .append('rect')
+                    .attr('class', 'heatmap-cell')
+                    .attr('x', d => xScale(d.decade))
+                    .attr('y', d => yScale(d.region))
+                    .attr('width', xScale.bandwidth())
+                    .attr('height', yScale.bandwidth())
+                    .attr('fill', d => d.value > 0 ? this.colorScale(d.value) : '#f0f0f0')
+                    .attr('stroke', '#fff')
+                    .attr('stroke-width', 1)
+                    .style('cursor', 'pointer')
+                    .on('mouseover', (event, d) => {
+                        this.showTooltip(event, d);
+                    })
+                    .on('mouseout', () => {
+                        this.hideTooltip();
+                    });
+
+                // Add text labels for non-zero values
+                g.selectAll('.cell-text')
+                    .data(heatmapData.filter(d => d.value > 0))
+                    .enter()
+                    .append('text')
+                    .attr('class', 'cell-text')
+                    .attr('x', d => xScale(d.decade) + xScale.bandwidth() / 2)
+                    .attr('y', d => yScale(d.region) + yScale.bandwidth() / 2)
+                    .attr('text-anchor', 'middle')
+                    .attr('dominant-baseline', 'middle')
+                    .style('font-size', '9px')
+                    .style('font-weight', 'bold')
+                    .style('fill', d => d.value > this.colorScale.domain()[1] * 0.5 ? 'white' : 'black')
+                    .text(d => d.value >= 10 ? d.value.toFixed(0) : d.value.toFixed(1))
+                    .style('pointer-events', 'none');
+            }
+
+            drawAxes(g, xScale, yScale) {
+                // X-axis (decades)
+                g.append('g')
+                    .attr('class', 'axis')
+                    .attr('transform', `translate(0, ${this.height})`)
+                    .call(d3.axisBottom(xScale))
+                    .selectAll('text')
+                    .style('font-size', '11px')
+                    .style('text-anchor', 'middle');
+
+                // Y-axis (regions)
+                g.append('g')
+                    .attr('class', 'axis')
+                    .call(d3.axisLeft(yScale))
+                    .selectAll('text')
+                    .style('font-size', '11px');
+
+                // Axis labels
+                g.append('text')
+                    .attr('class', 'axis-label')
+                    .attr('x', this.width / 2)
+                    .attr('y', this.height + 50)
+                    .style('text-anchor', 'middle')
+                    .style('font-size', '14px')
+                    .style('font-weight', 'bold')
+                    .text('Decade (Start Year)');
+
+                g.append('text')
+                    .attr('class', 'axis-label')
+                    .attr('transform', 'rotate(-90)')
+                    .attr('x', -this.height / 2)
+                    .attr('y', -80)
+                    .style('text-anchor', 'middle')
+                    .style('font-size', '14px')
+                    .style('font-weight', 'bold')
+                    .text('Region');
+            }
+
+            drawColorLegend(g) {
+                const legendHeight = this.height - 80; // Leave some margin at top and bottom
+                const legendBarWidth = 20;
+                
+                const legendData = d3.range(0, 1.01, 0.01);
+                const legendScale = d3.scaleLinear()
+                    .domain([0, 1])
+                    .range([legendHeight, 0]); // Inverted for vertical legend
+
+                const legend = g.append('g')
+                    .attr('class', 'color-legend')
+                    .attr('transform', `translate(${this.width + 30}, 40)`);
+
+                // Draw vertical color gradient
+                legend.selectAll('.legend-rect')
+                    .data(legendData)
+                    .enter()
+                    .append('rect')
+                    .attr('class', 'legend-rect')
+                    .attr('x', 0)
+                    .attr('y', d => legendScale(d))
+                    .attr('width', legendBarWidth)
+                    .attr('height', legendHeight / legendData.length + 1)
+                    .attr('fill', d => this.colorScale(d * this.colorScale.domain()[1]));
+
+                // Add legend scale (vertical)
+                const legendAxis = d3.scaleLinear()
+                    .domain(this.colorScale.domain())
+                    .range([legendHeight, 0]);
+
+                legend.append('g')
+                    .attr('transform', `translate(${legendBarWidth}, 0)`)
+                    .call(d3.axisRight(legendAxis)
+                        .ticks(6)
+                        .tickFormat(d3.format('.1f')));
+
+                // Add legend title (vertical)
+                legend.append('text')
+                    .attr('transform', 'rotate(-90)')
+                    .attr('x', -legendHeight / 2)
+                    .attr('y', -15)
+                    .style('text-anchor', 'middle')
+                    .style('font-size', '12px')
+                    .style('font-weight', 'bold')
+                    .text('Total Duration (Years)');
+            }
+
+            addTitle(g) {
+                g.append('text')
+                    .attr('class', 'chart-title')
+                    .attr('x', this.width / 2)
+                    .attr('y', -50)
+                    .style('text-anchor', 'middle')
+                    .style('font-size', '18px')
+                    .style('font-weight', 'bold')
+                    .style('fill', '#2c3e50')
+                    .text('War Duration Heatmap by Region and Decade');
+
+                g.append('text')
+                    .attr('class', 'chart-subtitle')
+                    .attr('x', this.width / 2)
+                    .attr('y', -30)
+                    .style('text-anchor', 'middle')
+                    .style('font-size', '12px')
+                    .style('fill', '#666')
+                    .text('Sum of war durations allocated to regions based on start decade');
+            }
+
+            showTooltip(event, d) {
+                let tooltipContent = `
+                    <strong>Region:</strong> ${d.region}<br/>
+                    <strong>Decade:</strong> ${d.decade}s<br/>
+                    <strong>Total Duration:</strong> ${d.value.toFixed(2)} years<br/>
+                    <strong>Number of Wars:</strong> ${d.warDetails.length}<br/>
+                `;
+
+                if (d.warDetails.length > 0) {
+                    tooltipContent += '<hr style="margin: 5px 0; border: 1px solid #ccc;">';
+                    tooltipContent += '<strong>Contributing Wars:</strong><br/>';
+                    
+                    // Show up to 5 wars in detail as per specification
+                    const displayWars = d.warDetails.slice(0, 5);
+                    displayWars.forEach(war => {
+                        tooltipContent += `
+                            <strong>War Name:</strong> ${war.warName}<br/>
+                            <strong>War Number:</strong> ${war.warNumber}<br/>
+                            <strong>State Participants:</strong> ${war.stateParticipants}<br/>
+                            <strong>All Locations:</strong> ${war.allLocations.join(', ')}<br/>
+                            <strong>Duration Contribution:</strong> ${war.allocation.toFixed(2)} years to ${war.region}<br/>
+                            <hr style="margin: 3px 0; border: 0.5px solid #ddd;">
+                        `;
+                    });
+
+                    if (d.warDetails.length > 5) {
+                        tooltipContent += `<em>... and ${d.warDetails.length - 5} more wars</em>`;
+                    }
+                }
+
+                this.tooltip.transition()
+                    .duration(200)
+                    .style('opacity', .95);
+                
+                this.tooltip.html(tooltipContent)
+                    .style('left', (event.pageX + 10) + 'px')
+                    .style('top', (event.pageY - 28) + 'px');
+            }
+
+            hideTooltip() {
+                this.tooltip.transition()
+                    .duration(500)
+                    .style('opacity', 0);
+            }
+
+            hideLoading() {
+                document.getElementById('region-start-duration-heatmap-loading').style.display = 'none';
+                document.getElementById('region-start-duration-heatmap').style.display = 'block';
+            }
+        }
+
         // Initialize the visualizations when the page loads
         document.addEventListener('DOMContentLoaded', function() {
             const interIntraChart = new InterIntraChart();
             const chart = new RegionalConflictsChart();
             const ethnicNationalistChart = new EthnicNationalistChart();
+            const warDurationHeatmap = new WarDurationHeatmap();
             
             // Handle window resize for responsive design
             let resizeTimeout;
@@ -1916,6 +2488,11 @@
                         d3.select('#ethnic-nationalist-chart').selectAll('*').remove();
                         ethnicNationalistChart.setDimensions();
                         ethnicNationalistChart.createVisualization();
+                    }
+                    
+                    if (warDurationHeatmap.processedData && warDurationHeatmap.processedData.length > 0) {
+                        d3.select('#region-start-duration-heatmap').selectAll('*').remove();
+                        warDurationHeatmap.createVisualization(); // Skip setDimensions() since we want fixed size
                     }
                 }, 250);
             });

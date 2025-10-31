@@ -95,3 +95,38 @@
             font-weight: 500;
             fill: #555;
         }
+
+        /* Styles specific to inter-intra chart */
+        .inter-intra-bar-group .bar-segment {
+            transition: opacity 0.2s, stroke 0.2s;
+        }
+
+        .inter-intra-bar-group .bar-segment:hover {
+            opacity: 0.8;
+            stroke: #333;
+            stroke-width: 2;
+        }
+
+        .chart-title {
+            font-family: 'Fira Sans', sans-serif;
+            font-weight: bold;
+            fill: #2c3e50;
+        }
+
+        .chart-subtitle {
+            font-family: 'Fira Sans', sans-serif;
+            fill: #666;
+        }
+
+        /* Enhanced tooltip styles for the new chart */
+        .tooltip {
+            max-width: 300px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+        }
+
+        .tooltip hr {
+            border: none;
+            border-top: 1px solid #ccc;
+            margin: 5px 0;
+        }

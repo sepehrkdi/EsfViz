@@ -22,8 +22,43 @@
     <div class="visualization-page">
         <div class="container">
             
-            <!-- Page Description -->
+            <!-- New Inter vs Intra-political Conflicts Analysis -->
             <section class="viz-description">
+                <h2>Inter-political vs. Intra-political Conflicts by Region</h2>
+                <p>
+                    This visualization analyzes the percentage distribution of inter-political and intra-political conflicts 
+                    across different regions throughout modern history. Using comprehensive historical war data, we examine 
+                    how different conflict types have been distributed geographically across the entire timeframe.
+                </p>
+                <p>
+                    The grouped stacked bar chart shows, for each region, two bars representing the percentage distribution 
+                    of inter-political (Type 1-2) vs. intra-political (Type 3-6) conflicts. Each bar is further subdivided 
+                    by conflict subtype, providing insights into the nature of conflicts within each broad category.
+                </p>
+                
+                <div class="chart-info">
+                    <p><strong>Inter-political Conflicts:</strong> Wars between different political entities (conquest, balance of power)</p>
+                    <p><strong>Intra-political Conflicts:</strong> Internal wars within political entities (civil wars, secessions)</p>
+                    <p><strong>Multi-region wars:</strong> Count toward all regions involved</p>
+                    <p><strong>Visualization:</strong> Grouped stacked bars with interactive tooltips and embedded legend</p>
+                </div>
+            </section>
+
+            <!-- Inter vs Intra-political Chart Container -->
+            <section class="visualization-container">
+                <div id="inter-intra-loading" class="loading-message">
+                    Loading inter-political vs. intra-political conflict data...
+                </div>
+                <div id="inter-intra-chart" style="display: none;">
+                    <!-- Chart will be inserted here by D3.js -->
+                </div>
+                <div class="chart-caption">
+                    Each region displays two grouped bars showing the percentage distribution of conflict types, with subtypes color-coded within each category.
+                </div>
+            </section>
+
+            <!-- Page Description -->
+            <section class="viz-description" style="margin-top: 3rem;">
                 <h2>Top Regions by Conflict Frequency per Decade</h2>
                 <p>
                     This visualization explores how global conflicts have evolved across different regions over time. 
@@ -723,6 +758,558 @@
             }
         }
 
+        // Inter-political vs Intra-political Wars Visualization
+        class InterIntraChart {
+            constructor() {
+                this.data = [];
+                this.processedData = [];
+                this.svg = null;
+                this.tooltip = null;
+                this.colorScale = null;
+                
+                // Chart dimensions - responsive
+                this.setDimensions();
+            }
+            
+            setDimensions() {
+                // Responsive dimensions based on screen size
+                const containerWidth = Math.min(window.innerWidth - 100, 1100);
+                const isMobile = window.innerWidth < 768;
+                
+                this.margin = isMobile 
+                    ? { top: 40, right: 20, bottom: 140, left: 80 }
+                    : { top: 80, right: 250, bottom: 100, left: 100 };
+                    
+                this.width = containerWidth - this.margin.left - this.margin.right;
+                this.height = isMobile ? 500 : 650;
+                this.height = this.height - this.margin.top - this.margin.bottom;
+                
+                this.init();
+            }
+
+            async init() {
+                try {
+                    console.log('Starting InterIntraChart initialization...');
+                    await this.loadData();
+                    console.log('Data loaded successfully, processing...');
+                    this.processData();
+                    console.log('Data processed successfully, creating visualization...');
+                    this.createVisualization();
+                    console.log('InterIntra visualization created successfully');
+                    this.hideLoading();
+                } catch (error) {
+                    console.error('Error initializing inter-intra chart:', error);
+                    document.getElementById('inter-intra-loading').innerHTML = 'Error loading data. Please try again.';
+                }
+            }
+
+            async loadData() {
+                this.data = await d3.csv('WarList.csv');
+                console.log('Loaded inter-intra data:', this.data.length, 'wars');
+            }
+
+            processData() {
+                // Filter and clean wars data
+                const cleanWars = this.data
+                    .filter(d => d['War Name'] && d['Time Span'] && d['Locations'] && d['Type Number'])
+                    .map(d => this.cleanWarData(d))
+                    .filter(d => d.startYear >= 1810 && d.typeNumber >= 1 && d.typeNumber <= 6);
+
+                console.log('Clean wars count:', cleanWars.length);
+
+                // Group wars by region and type category
+                const regionData = {};
+                
+                cleanWars.forEach(war => {
+                    war.regions.forEach(region => {
+                        if (!regionData[region]) {
+                            regionData[region] = {
+                                inter: { 1: [], 2: [] },
+                                intra: { 3: [], 4: [], 5: [], 6: [] }
+                            };
+                        }
+                        
+                        if (war.typeNumber >= 1 && war.typeNumber <= 2) {
+                            regionData[region].inter[war.typeNumber].push(war);
+                        } else if (war.typeNumber >= 3 && war.typeNumber <= 6) {
+                            regionData[region].intra[war.typeNumber].push(war);
+                        }
+                    });
+                });
+
+                // Convert to array format for visualization
+                this.processedData = Object.entries(regionData)
+                    .map(([region, data]) => {
+                        const interCount = Object.values(data.inter).flat().length;
+                        const intraCount = Object.values(data.intra).flat().length;
+                        const total = interCount + intraCount;
+                        
+                        if (total === 0) return null;
+
+                        // Calculate percentages and type distributions
+                        const interPercentage = (interCount / total) * 100;
+                        const intraPercentage = (intraCount / total) * 100;
+
+                        // Calculate subtype distributions within each category
+                        const interSubtypes = {};
+                        const intraSubtypes = {};
+                        
+                        [1, 2].forEach(type => {
+                            const count = data.inter[type].length;
+                            interSubtypes[type] = {
+                                count: count,
+                                percentage: interCount > 0 ? (count / interCount) * 100 : 0,
+                                wars: data.inter[type]
+                            };
+                        });
+
+                        [3, 4, 5, 6].forEach(type => {
+                            const count = data.intra[type].length;
+                            intraSubtypes[type] = {
+                                count: count,
+                                percentage: intraCount > 0 ? (count / intraCount) * 100 : 0,
+                                wars: data.intra[type]
+                            };
+                        });
+
+                        return {
+                            region: region,
+                            interCount: interCount,
+                            intraCount: intraCount,
+                            totalCount: total,
+                            interPercentage: interPercentage,
+                            intraPercentage: intraPercentage,
+                            interSubtypes: interSubtypes,
+                            intraSubtypes: intraSubtypes
+                        };
+                    })
+                    .filter(d => d !== null)
+                    .sort((a, b) => b.totalCount - a.totalCount); // Sort by total conflicts
+
+                console.log('Processed inter-intra data:', this.processedData);
+                
+                // Create color scales
+                this.createColorScale();
+            }
+
+            cleanWarData(war) {
+                const timeSpan = war['Time Span'];
+                const startYear = parseInt(timeSpan.split('-')[0]);
+                const typeNumber = parseInt(war['Type Number']);
+                
+                // Parse locations and map to regions
+                const locations = war['Locations']
+                    .split(',')
+                    .map(loc => loc.trim())
+                    .map(loc => loc.replace(/\s*\([^)]*\)/g, ''))
+                    .filter(loc => loc.length > 0);
+
+                const regions = [...new Set(locations.map(loc => 
+                    this.getRegionFromCountry(loc)
+                ))].filter(region => region !== 'Other');
+
+                return {
+                    warName: war['War Name'],
+                    startYear: startYear,
+                    typeNumber: typeNumber,
+                    locations: locations,
+                    regions: regions.length > 0 ? regions : ['Other'],
+                    timeSpan: timeSpan
+                };
+            }
+
+            getRegionFromCountry(country) {
+                // Use the same comprehensive region mapping as the other charts
+                const regionMap = {
+                    // Europe
+                    'Albania': 'Europe', 'Austria': 'Europe', 'Austria-Hungary': 'Europe', 'Baden': 'Europe', 'Bavaria': 'Europe',
+                    'Belgium': 'Europe', 'Bosnia and Herzegovina': 'Europe', 'Bosnia': 'Europe', 'Bulgaria': 'Europe', 'Croatia': 'Europe',
+                    'Cyprus': 'Europe', 'Czech Rep': 'Europe', 'Czech Republic': 'Europe', 'Czechoslovakia': 'Europe', 'Denmark': 'Europe',
+                    'Estonia': 'Europe', 'Finland': 'Europe', 'France': 'Europe', 'Germany': 'Europe', 'Great Britain': 'Europe',
+                    'Britain': 'Europe', 'Greece': 'Europe', 'Hanover': 'Europe', 'Hesse Electoral': 'Europe', 'Hesse Grand Ducal': 'Europe',
+                    'Hungary': 'Europe', 'Iceland': 'Europe', 'Italy': 'Europe', 'Latvia': 'Europe', 'Lithuania': 'Europe',
+                    'Luxembourg': 'Europe', 'Macedonia': 'Europe', 'Mecklenburg Schwerin': 'Europe', 'Modena': 'Europe', 'Netherlands': 'Europe',
+                    'Norway': 'Europe', 'Papal States': 'Europe', 'Poland': 'Europe', 'Portugal': 'Europe', 'Romania': 'Europe',
+                    'Russia': 'Europe', 'Russia/USSR': 'Europe', 'Saxony': 'Europe', 'Slovakia': 'Europe', 'Spain': 'Europe',
+                    'Sweden': 'Europe', 'Tuscany': 'Europe', 'Two Sicilies': 'Europe', 'Ukraine': 'Europe', 'United Kingdom': 'Europe',
+                    'Wuerttemburg': 'Europe', 'Yugoslavia': 'Europe',
+
+                    // Asia
+                    'Aceh Sultanate': 'Asia', 'Armenia': 'Asia', 'Azerbaijan': 'Asia', 'Balinese Kingdom of Lombok': 'Asia',
+                    'Bangladesh': 'Asia', 'Bhutan': 'Asia', 'Cambodia': 'Asia', 'China': 'Asia', 'Georgia': 'Asia', 'India': 'Asia',
+                    'Indonesia': 'Asia', 'Japan': 'Asia', 'Kazakhstan': 'Asia', 'Khanate of Kiva': 'Asia', 'Khanates of Kokand and Bokhara': 'Asia',
+                    'Kingdom of Bharatpur': 'Asia', 'Kingdom of Lahore': 'Asia', 'Kingdom of Sindh': 'Asia', 'Korea': 'Asia',
+                    'North Korea': 'Asia', 'South Korea': 'Asia', 'Kyrgystan': 'Asia', 'Laos': 'Asia', 'Malaysia': 'Asia',
+                    'Maratha Empire': 'Asia', 'Mongolia': 'Asia', 'Myanmar': 'Asia', 'Nepal': 'Asia', 'Pakistan': 'Asia',
+                    'Philippines': 'Asia', 'Principality of Jammu': 'Asia', 'Republic of Vietnam': 'Asia', 'Sri Lanka': 'Asia',
+                    'Taiwan': 'Asia', 'Tajikistan': 'Asia', 'Thailand': 'Asia', 'Tibet': 'Asia', 'Turkmenistan': 'Asia',
+                    'Uzbekistan': 'Asia', 'Vietnam': 'Asia',
+
+                    // Middle East
+                    'Afghanistan': 'Middle East', 'Egypt': 'Middle East', 'Iran': 'Middle East', 'Iraq': 'Middle East',
+                    'Israel': 'Middle East', 'Jordan': 'Middle East', 'Kuwait': 'Middle East', 'Lebanon': 'Middle East',
+                    'Oman': 'Middle East', 'Qatar': 'Middle East', 'Saudi Arabia': 'Middle East', 'Syria': 'Middle East',
+                    'Turkey': 'Middle East', 'United Arab Emirates': 'Middle East', 'Yemen': 'Middle East',
+                    'Yemen Arab Republic': 'Middle East', 'Yemen People\'s Republic': 'Middle East',
+
+                    // Africa
+                    'Algeria': 'Africa', 'Angola': 'Africa', 'Ashanti Kingdom': 'Africa', 'Bambara Empire': 'Africa',
+                    'Benin': 'Africa', 'Benin Empire': 'Africa', 'Boer state': 'Africa', 'Bornu': 'Africa', 'Buganda': 'Africa',
+                    'Burundi': 'Africa', 'Cameroon': 'Africa', 'Chad': 'Africa', 'Congo': 'Africa', 'Dem. Rep.': 'Africa',
+                    'Democratic Republic of the Congo': 'Africa', 'Emirates of Kano': 'Africa', 'Eritrea': 'Africa', 'Ethiopia': 'Africa',
+                    'Ghana': 'Africa', 'Guinea': 'Africa', 'Guinea-Bissau': 'Africa', 'Kenya': 'Africa', 'Kingdom of Waalo': 'Africa',
+                    'Lesotho': 'Africa', 'Liberia': 'Africa', 'Libya': 'Africa', 'Madagascar': 'Africa', 'Mali': 'Africa',
+                    'Mandingo Empire': 'Africa', 'Mauritania': 'Africa', 'Morocco': 'Africa', 'Mozambique': 'Africa', 'Namibia': 'Africa',
+                    'Ndebele Kingdom': 'Africa', 'Nigeria': 'Africa', 'Orange Free State': 'Africa', 'Oyo': 'Africa', 'Rwanda': 'Africa',
+                    'Sanusi Empire': 'Africa', 'Senegal': 'Africa', 'Sierra Leone': 'Africa', 'Sokoto': 'Africa', 'Somalia': 'Africa',
+                    'South Africa': 'Africa', 'South African Republic': 'Africa', 'Sudan': 'Africa', 'Tanzania': 'Africa',
+                    'Transvaal': 'Africa', 'Tukolor Empire': 'Africa', 'Tunisia': 'Africa', 'Uganda': 'Africa', 'Xhosa': 'Africa',
+                    'Zimbabwe': 'Africa', 'Zulu': 'Africa', 'Zulu Kingdom': 'Africa',
+
+                    // North America
+                    'Canada': 'North America', 'Cuba': 'North America', 'Dominican Republic': 'North America',
+                    'Haiti': 'North America', 'Mexico': 'North America', 'United States': 'North America',
+                    'United States of America': 'North America',
+
+                    // Central America
+                    'Costa Rica': 'Central America', 'El Salvador': 'Central America', 'Guatemala': 'Central America',
+                    'Honduras': 'Central America', 'Nicaragua': 'Central America',
+
+                    // South America
+                    'Argentina': 'South America', 'Bolivia': 'South America', 'Brazil': 'South America',
+                    'Chile': 'South America', 'Colombia': 'South America', 'Ecuador': 'South America',
+                    'Paraguay': 'South America', 'Peru': 'South America', 'Peru-Bolivia': 'South America',
+                    'Uruguay': 'South America', 'Venezuela': 'South America',
+
+                    // Oceania
+                    'Australia': 'Oceania', 'New Zealand': 'Oceania'
+                };
+
+                return regionMap[country] || 'Other';
+            }
+
+            createColorScale() {
+                // Define color scales for different conflict types
+                const typeColors = {
+                    1: '#001219', // Inter-political: War of conquest - darkest blue
+                    2: '#005F73', // Inter-political: Balance of power - medium blue
+                    3: '#0A9396', // Intra-political: Civil war (secessionist, non-nationalist) - teal
+                    4: '#94D2BD', // Intra-political: Civil war (secessionist, nationalist) - light teal
+                    5: '#E9D8A6', // Intra-political: Civil war (non-secessionist, ethnic) - beige
+                    6: '#EE9B00'  // Intra-political: Civil war (non-secessionist, non-ethnic) - orange
+                };
+                
+                this.colorScale = d3.scaleOrdinal()
+                    .domain([1, 2, 3, 4, 5, 6])
+                    .range([typeColors[1], typeColors[2], typeColors[3], typeColors[4], typeColors[5], typeColors[6]]);
+            }
+
+            createVisualization() {
+                const container = d3.select('#inter-intra-chart');
+                
+                // Create SVG
+                const totalHeight = this.height + this.margin.top + this.margin.bottom;
+                
+                this.svg = container
+                    .append('svg')
+                    .attr('width', this.width + this.margin.left + this.margin.right)
+                    .attr('height', totalHeight)
+                    .attr('viewBox', `0 0 ${this.width + this.margin.left + this.margin.right} ${totalHeight}`)
+                    .attr('preserveAspectRatio', 'xMidYMid meet');
+
+                const g = this.svg.append('g')
+                    .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+
+                // Create tooltip
+                this.tooltip = d3.select('body').append('div')
+                    .attr('class', 'tooltip')
+                    .style('z-index', '1001');
+
+                // Create scales
+                const xScale = d3.scaleBand()
+                    .domain(this.processedData.map(d => d.region))
+                    .range([0, this.width])
+                    .padding(0.1);
+
+                const yScale = d3.scaleLinear()
+                    .domain([0, 100]) // Percentage scale
+                    .range([this.height, 0]);
+
+                // Create grouped bars
+                this.drawGroupedBars(g, xScale, yScale);
+                
+                // Create axes
+                this.drawAxes(g, xScale, yScale);
+                
+                // Create legend
+                this.drawLegend(g);
+                
+                // Add title
+                this.addTitle(g);
+            }
+
+            drawGroupedBars(g, xScale, yScale) {
+                const barGroups = g.selectAll('.inter-intra-bar-group')
+                    .data(this.processedData)
+                    .enter()
+                    .append('g')
+                    .attr('class', 'inter-intra-bar-group')
+                    .attr('transform', d => `translate(${xScale(d.region)}, 0)`);
+
+                const barWidth = xScale.bandwidth() * 0.4; // Each bar takes 40% of the band
+                const barGap = xScale.bandwidth() * 0.1; // 10% gap between bars
+
+                barGroups.each((d, i, nodes) => {
+                    const group = d3.select(nodes[i]);
+                    
+                    // Draw Inter-political bar (left side)
+                    if (d.interPercentage > 0) {
+                        this.drawStackedBar(group, 0, d, 'inter', barWidth, yScale);
+                    }
+                    
+                    // Draw Intra-political bar (right side)  
+                    if (d.intraPercentage > 0) {
+                        this.drawStackedBar(group, barWidth + barGap, d, 'intra', barWidth, yScale);
+                    }
+                });
+            }
+
+            drawStackedBar(group, xOffset, regionData, barType, barWidth, yScale) {
+                const subtypes = barType === 'inter' ? regionData.interSubtypes : regionData.intraSubtypes;
+                const totalPercentage = barType === 'inter' ? regionData.interPercentage : regionData.intraPercentage;
+                
+                let yOffset = yScale(0);
+                
+                Object.entries(subtypes).forEach(([typeNum, typeData]) => {
+                    if (typeData.count > 0) {
+                        const segmentHeight = (typeData.percentage / 100) * (yScale(0) - yScale(totalPercentage));
+                        
+                        group.append('rect')
+                            .attr('class', `bar-segment type-${typeNum}`)
+                            .attr('x', xOffset)
+                            .attr('y', yOffset - segmentHeight)
+                            .attr('width', barWidth)
+                            .attr('height', segmentHeight)
+                            .attr('fill', this.colorScale(typeNum))
+                            .style('cursor', 'pointer')
+                            .on('mouseover', (event) => {
+                                this.showTooltip(event, regionData, barType, typeNum, typeData);
+                                // Highlight both bars of the region
+                                group.selectAll('.bar-segment')
+                                    .style('opacity', 0.7)
+                                    .style('stroke', '#333')
+                                    .style('stroke-width', '1px');
+                            })
+                            .on('mouseout', () => {
+                                this.hideTooltip();
+                                // Remove highlight
+                                group.selectAll('.bar-segment')
+                                    .style('opacity', 1)
+                                    .style('stroke', 'none');
+                            });
+                        
+                        yOffset -= segmentHeight;
+                    }
+                });
+            }
+
+            drawAxes(g, xScale, yScale) {
+                // X-axis
+                g.append('g')
+                    .attr('class', 'axis')
+                    .attr('transform', `translate(0, ${this.height})`)
+                    .call(d3.axisBottom(xScale))
+                    .selectAll('text')
+                    .style('text-anchor', 'end')
+                    .attr('dx', '-.8em')
+                    .attr('dy', '.15em')
+                    .attr('transform', 'rotate(-45)')
+                    .style('font-size', '11px');
+
+                // Y-axis
+                g.append('g')
+                    .attr('class', 'axis')
+                    .call(d3.axisLeft(yScale).tickFormat(d => d + '%'));
+
+                // Axis labels
+                g.append('text')
+                    .attr('class', 'axis-label')
+                    .attr('x', this.width / 2)
+                    .attr('y', this.height + 80)
+                    .style('text-anchor', 'middle')
+                    .style('font-size', '12px')
+                    .text('Region');
+
+                g.append('text')
+                    .attr('class', 'axis-label')
+                    .attr('transform', 'rotate(-90)')
+                    .attr('x', -this.height / 2)
+                    .attr('y', -60)
+                    .style('text-anchor', 'middle')
+                    .style('font-size', '12px')
+                    .text('Percentage of Total Regional Conflicts');
+            }
+
+            drawLegend(g) {
+                const isMobile = window.innerWidth < 768;
+                
+                const legend = g.append('g')
+                    .attr('class', 'legend')
+                    .attr('transform', isMobile ? 
+                        `translate(10, ${this.height + 100})` : 
+                        `translate(${this.width + 20}, 20)`);
+
+                // Legend data with descriptions
+                const legendData = [
+                    { type: 1, category: 'Inter-political', label: 'Type 1: War of conquest', color: this.colorScale(1) },
+                    { type: 2, category: 'Inter-political', label: 'Type 2: Balance of power war', color: this.colorScale(2) },
+                    { type: 3, category: 'Intra-political', label: 'Type 3: Civil war (secessionist, non-nationalist)', color: this.colorScale(3) },
+                    { type: 4, category: 'Intra-political', label: 'Type 4: Civil war (secessionist, nationalist)', color: this.colorScale(4) },
+                    { type: 5, category: 'Intra-political', label: 'Type 5: Civil war (non-secessionist, ethnic)', color: this.colorScale(5) },
+                    { type: 6, category: 'Intra-political', label: 'Type 6: Civil war (non-secessionist, non-ethnic)', color: this.colorScale(6) }
+                ];
+
+                if (isMobile) {
+                    // Mobile legend - more compact
+                    legendData.forEach((d, i) => {
+                        const legendItem = legend.append('g')
+                            .attr('class', 'legend-item')
+                            .attr('transform', `translate(0, ${i * 18})`);
+
+                        legendItem.append('rect')
+                            .attr('width', 12)
+                            .attr('height', 12)
+                            .attr('fill', d.color)
+                            .attr('stroke', '#333')
+                            .attr('stroke-width', 0.5);
+
+                        legendItem.append('text')
+                            .attr('x', 16)
+                            .attr('y', 10)
+                            .text(`Type ${d.type}`)
+                            .style('font-size', '10px')
+                            .style('fill', '#333');
+                    });
+                } else {
+                    // Desktop legend - with category headers
+                    let yOffset = 0;
+                    let currentCategory = '';
+                    
+                    legendData.forEach((d, i) => {
+                        if (d.category !== currentCategory) {
+                            // Add category header
+                            legend.append('text')
+                                .attr('x', 0)
+                                .attr('y', yOffset + 12)
+                                .text(d.category)
+                                .style('font-size', '14px')
+                                .style('font-weight', 'bold')
+                                .style('fill', '#333');
+                            
+                            yOffset += 25;
+                            currentCategory = d.category;
+                        }
+                        
+                        const legendItem = legend.append('g')
+                            .attr('class', 'legend-item')
+                            .attr('transform', `translate(15, ${yOffset})`);
+
+                        legendItem.append('rect')
+                            .attr('width', 15)
+                            .attr('height', 15)
+                            .attr('fill', d.color)
+                            .attr('stroke', '#333')
+                            .attr('stroke-width', 1);
+
+                        legendItem.append('text')
+                            .attr('x', 20)
+                            .attr('y', 12)
+                            .text(d.label)
+                            .style('font-size', '11px')
+                            .style('fill', '#333');
+                        
+                        yOffset += 20;
+                    });
+                }
+            }
+
+            addTitle(g) {
+                g.append('text')
+                    .attr('class', 'chart-title')
+                    .attr('x', this.width / 2)
+                    .attr('y', -50)
+                    .style('text-anchor', 'middle')
+                    .style('font-size', '16px')
+                    .style('font-weight', 'bold')
+                    .style('fill', '#2c3e50')
+                    .text('Inter-political vs. Intra-political Conflicts by Region');
+                
+                // Add subtitle
+                g.append('text')
+                    .attr('class', 'chart-subtitle')
+                    .attr('x', this.width / 2)
+                    .attr('y', -30)
+                    .style('text-anchor', 'middle')
+                    .style('font-size', '12px')
+                    .style('fill', '#666')
+                    .text('Percentage distribution with conflict type breakdown');
+            }
+
+            showTooltip(event, regionData, barType, typeNum, typeData) {
+                const typeNames = {
+                    1: 'War of conquest',
+                    2: 'Balance of power war',
+                    3: 'Civil war (secessionist, non-nationalist)',
+                    4: 'Civil war (secessionist, nationalist)',
+                    5: 'Civil war (non-secessionist, ethnic)',
+                    6: 'Civil war (non-secessionist, non-ethnic)'
+                };
+
+                const category = barType === 'inter' ? 'Inter-political' : 'Intra-political';
+                const categoryPercentage = barType === 'inter' ? regionData.interPercentage : regionData.intraPercentage;
+                
+                let tooltipContent = `
+                    <strong>${regionData.region}</strong><br/>
+                    <strong>${category} Conflicts</strong><br/>
+                    Category total: ${categoryPercentage.toFixed(1)}% of regional conflicts<br/>
+                    <hr style="margin: 5px 0; border: 1px solid #ccc;">
+                    <strong>Type ${typeNum}: ${typeNames[typeNum]}</strong><br/>
+                    Wars: ${typeData.count} (${typeData.percentage.toFixed(1)}% of ${category.toLowerCase()})<br/>
+                    Regional contribution: ${((typeData.percentage / 100) * categoryPercentage).toFixed(1)}%<br/>
+                    <hr style="margin: 5px 0; border: 1px solid #ccc;">
+                `;
+
+                // Add war details (limit to first 3)
+                const displayWars = typeData.wars.slice(0, 3);
+                displayWars.forEach(war => {
+                    tooltipContent += `<strong>${war.warName}</strong><br/>`;
+                });
+
+                if (typeData.wars.length > 3) {
+                    tooltipContent += `<small>... and ${typeData.wars.length - 3} more wars</small>`;
+                }
+
+                this.tooltip.transition()
+                    .duration(200)
+                    .style('opacity', .95);
+                
+                this.tooltip.html(tooltipContent)
+                    .style('left', (event.pageX + 10) + 'px')
+                    .style('top', (event.pageY - 28) + 'px');
+            }
+
+            hideTooltip() {
+                this.tooltip.transition()
+                    .duration(500)
+                    .style('opacity', 0);
+            }
+
+            hideLoading() {
+                document.getElementById('inter-intra-loading').style.display = 'none';
+                document.getElementById('inter-intra-chart').style.display = 'block';
+            }
+        }
+
         // Ethnic vs Nationalist Wars Visualization
         class EthnicNationalistChart {
             constructor() {
@@ -1303,6 +1890,7 @@
 
         // Initialize the visualizations when the page loads
         document.addEventListener('DOMContentLoaded', function() {
+            const interIntraChart = new InterIntraChart();
             const chart = new RegionalConflictsChart();
             const ethnicNationalistChart = new EthnicNationalistChart();
             
@@ -1312,6 +1900,12 @@
                 clearTimeout(resizeTimeout);
                 resizeTimeout = setTimeout(function() {
                     // Recreate charts with new dimensions
+                    if (interIntraChart.processedData && interIntraChart.processedData.length > 0) {
+                        d3.select('#inter-intra-chart').selectAll('*').remove();
+                        interIntraChart.setDimensions();
+                        interIntraChart.createVisualization();
+                    }
+                    
                     if (chart.processedData && chart.processedData.length > 0) {
                         d3.select('#chart-container').selectAll('*').remove();
                         chart.setDimensions();

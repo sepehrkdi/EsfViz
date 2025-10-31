@@ -160,6 +160,42 @@
                 </div>
             </section>
 
+            <!-- New Waffle Chart for War Participation -->
+            <section class="viz-description" style="margin-top: 3rem;">
+                <h2>Wars by Number of Participants (1810-2001)</h2>
+                <p>
+                    This waffle chart visualizes the distribution of wars based on the number of participating states 
+                    from 1810 to 2001. Each square represents 5 wars, providing a clear visual 
+                    representation of how conflicts varied in scale and scope across nearly two centuries of modern warfare.
+                </p>
+                <p>
+                    Wars are categorized into four groups based on participant count: single participant conflicts 
+                    (typically civil wars or independence movements), small-scale wars with 2-3 participants, 
+                    medium-scale conflicts involving 3-5 participants, and large-scale wars with more than 5 participants. 
+                    This categorization helps identify patterns in conflict escalation and international involvement.
+                </p>
+                
+                <div class="chart-info">
+                    <p><strong>Time Period:</strong> 1810-2001 (Full Historical Dataset)</p>
+                    <p><strong>Each Square:</strong> Represents 5 wars</p>
+                    <p><strong>Layout:</strong> Column-first filling with dynamic sizing to fit 1000x400px container</p>
+                    <p><strong>Interactive:</strong> Hover tooltip shows exact war count for each square</p>
+                </div>
+            </section>
+
+            <!-- Waffle Chart Container -->
+            <section class="visualization-container" style="margin-top: 2rem;">
+                <div id="waffle-loading" class="loading-message">
+                    Loading war participation data...
+                </div>
+                <div id="waffle-chart" class="chart-container" style="display: none; width: 1000px; height: 400px; margin: 0 auto;"></div>
+                    <!-- Waffle chart will be inserted here by D3.js -->
+                </div>
+                <div class="chart-caption">
+                    Each square represents 5 wars, organized by number of participating states. Hover over squares for detailed war counts.
+                </div>
+            </section>
+
         </div>
     </div>
 
@@ -2459,12 +2495,373 @@
             }
         }
 
+        // Waffle Chart for War Participants Visualization
+        class WaffleChart {
+            constructor() {
+                this.data = [];
+                this.processedData = [];
+                this.svg = null;
+                this.tooltip = null;
+                this.colorScale = null;
+                
+                // Fixed chart dimensions to fit within 1000x400px container with tight legend spacing
+                this.containerWidth = 1000;
+                this.containerHeight = 400;
+                this.margin = { top: 80, right: 30, bottom: 120, left: 30 };
+                
+                this.width = this.containerWidth - this.margin.left - this.margin.right;
+                this.height = this.containerHeight - this.margin.top - this.margin.bottom;
+                
+                // Waffle chart specific settings - much larger squares
+                this.squareSize = 35; // Much larger base square size
+                this.gap = 4; // Larger gap between squares for better separation
+                this.warsPerSquare = 5; // Each square represents 5 wars
+                
+                this.init();
+            }
+
+            async init() {
+                try {
+                    console.log('Starting WaffleChart initialization...');
+                    await this.loadData();
+                    console.log('Data loaded successfully, processing...');
+                    this.processData();
+                    console.log('Data processed successfully, creating visualization...');
+                    this.createVisualization();
+                    console.log('Waffle chart created successfully');
+                    this.hideLoading();
+                } catch (error) {
+                    console.error('Error initializing waffle chart:', error);
+                    document.getElementById('waffle-loading').innerHTML = 'Error loading data. Please try again.';
+                }
+            }
+
+            async loadData() {
+                this.data = await d3.csv('WarList.csv');
+                console.log('Loaded waffle chart data:', this.data.length, 'wars');
+            }
+
+            processData() {
+                // Filter wars for full dataset (1810-2001) and count participants
+                const filteredWars = this.data
+                    .filter(d => d['War Name'] && d['Time Span'] && d['State Participants'])
+                    .map(d => this.cleanWarData(d))
+                    .filter(d => d.startYear >= 1810 && d.startYear <= 2001);
+
+                console.log('Filtered wars (1810-2001):', filteredWars.length);
+
+                // Categorize wars by participant count
+                const categories = {
+                    'One participant': { count: 0, wars: [], color: '#001219' },
+                    '2-3 participants': { count: 0, wars: [], color: '#005F73' },
+                    '3-5 participants': { count: 0, wars: [], color: '#0A9396' },
+                    'More than 5 participants': { count: 0, wars: [], color: '#94D2BD' }
+                };
+
+                filteredWars.forEach(war => {
+                    const participantCount = war.participantCount;
+                    
+                    if (participantCount === 1) {
+                        categories['One participant'].count++;
+                        categories['One participant'].wars.push(war);
+                    } else if (participantCount >= 2 && participantCount <= 3) {
+                        categories['2-3 participants'].count++;
+                        categories['2-3 participants'].wars.push(war);
+                    } else if (participantCount >= 4 && participantCount <= 5) { // Adjusted to avoid overlap
+                        categories['3-5 participants'].count++;
+                        categories['3-5 participants'].wars.push(war);
+                    } else if (participantCount > 5) {
+                        categories['More than 5 participants'].count++;
+                        categories['More than 5 participants'].wars.push(war);
+                    }
+                });
+
+                console.log('War categories:', categories);
+
+                // Convert to array and calculate squares needed
+                this.processedData = Object.entries(categories).map(([category, data]) => {
+                    const squaresNeeded = Math.ceil(data.count / this.warsPerSquare);
+                    return {
+                        category: category,
+                        warCount: data.count,
+                        squaresNeeded: squaresNeeded,
+                        color: data.color,
+                        wars: data.wars
+                    };
+                });
+
+                // Calculate total squares and layout
+                const totalSquares = this.processedData.reduce((sum, d) => sum + d.squaresNeeded, 0);
+                
+                // Calculate optimal grid dimensions that fit within container
+                const availableWidth = this.width - 10; // Minimal margin
+                const availableHeight = this.height - 10; // Minimal margin
+                
+                // Calculate how many columns we can fit with large squares
+                const maxCols = Math.floor(availableWidth / (this.squareSize + this.gap));
+                const neededRows = Math.ceil(totalSquares / maxCols);
+                
+                // Calculate what square size would optimally fill the space
+                const optimalSquareWidth = Math.floor((availableWidth / maxCols) - this.gap);
+                const optimalSquareHeight = Math.floor((availableHeight / neededRows) - this.gap);
+                
+                // Use the larger of the two to maximize chart size while maintaining proportions
+                this.squareSize = Math.max(20, Math.min(optimalSquareWidth, optimalSquareHeight, 45));
+
+                this.cols = maxCols;
+                this.rows = neededRows;
+
+                console.log('Grid layout:', { cols: this.cols, rows: this.rows, totalSquares: totalSquares });
+                console.log('Processed waffle data:', this.processedData);
+            }
+
+            cleanWarData(war) {
+                const timeSpan = war['Time Span'];
+                const startYear = parseInt(timeSpan.split('-')[0]);
+                
+                // Count state participants - handle multi-participant wars
+                const stateParticipants = war['State Participants'];
+                let participantCount = 0;
+                
+                if (stateParticipants && stateParticipants.trim()) {
+                    // Split by comma and count unique participants
+                    const participants = stateParticipants
+                        .split(',')
+                        .map(p => p.trim())
+                        .filter(p => p.length > 0);
+                    
+                    participantCount = participants.length;
+                } else {
+                    // If no state participants listed, assume 1 (likely internal conflict)
+                    participantCount = 1;
+                }
+
+                return {
+                    warName: war['War Name'],
+                    startYear: startYear,
+                    timeSpan: timeSpan,
+                    participantCount: participantCount,
+                    participants: stateParticipants,
+                    locations: war['Locations']
+                };
+            }
+
+            createVisualization() {
+                const container = d3.select('#waffle-chart');
+                
+                // Create SVG with fixed dimensions
+                this.svg = container
+                    .append('svg')
+                    .attr('width', this.containerWidth)
+                    .attr('height', this.containerHeight)
+                    .attr('viewBox', `0 0 ${this.containerWidth} ${this.containerHeight}`)
+                    .attr('preserveAspectRatio', 'xMidYMid meet');
+
+                const g = this.svg.append('g')
+                    .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+
+                // Create tooltip
+                this.tooltip = d3.select('body').append('div')
+                    .attr('class', 'tooltip')
+                    .style('z-index', '1001');
+
+                // Draw waffle squares
+                this.drawWaffleSquares(g);
+                
+                // Create legend
+                this.drawLegend(g);
+                
+                // Add title
+                this.addTitle(g);
+            }
+
+            drawWaffleSquares(g) {
+                const squareData = [];
+                let currentCol = 0;
+                let currentRow = 0;
+                let squareIndex = 0;
+
+                // Generate square data with column-first layout
+                this.processedData.forEach(categoryData => {
+                    for (let i = 0; i < categoryData.squaresNeeded; i++) {
+                        // Calculate wars represented by this square
+                        const warsInThisSquare = Math.min(
+                            this.warsPerSquare,
+                            categoryData.warCount - (i * this.warsPerSquare)
+                        );
+
+                        squareData.push({
+                            category: categoryData.category,
+                            color: categoryData.color,
+                            col: currentCol,
+                            row: currentRow,
+                            warsRepresented: warsInThisSquare,
+                            totalWarsInCategory: categoryData.warCount,
+                            categoryWars: categoryData.wars
+                        });
+
+                        // Move to next position (column-first)
+                        currentRow++;
+                        if (currentRow >= this.rows) {
+                            currentRow = 0;
+                            currentCol++;
+                        }
+                        squareIndex++;
+                    }
+                });
+
+                // Draw squares
+                const squares = g.selectAll('.waffle-square')
+                    .data(squareData)
+                    .enter()
+                    .append('rect')
+                    .attr('class', 'waffle-square')
+                    .attr('x', d => d.col * (this.squareSize + this.gap))
+                    .attr('y', d => d.row * (this.squareSize + this.gap))
+                    .attr('width', this.squareSize)
+                    .attr('height', this.squareSize)
+                    .attr('fill', d => d.color)
+                    .attr('stroke', '#fff')
+                    .attr('stroke-width', 1)
+                    .style('cursor', 'pointer')
+                    .on('mouseover', (event, d) => {
+                        this.showTooltip(event, d);
+                        // Highlight all squares of the same category
+                        g.selectAll('.waffle-square')
+                            .style('opacity', square => square.category === d.category ? 1 : 0.3);
+                    })
+                    .on('mouseout', () => {
+                        this.hideTooltip();
+                        // Remove highlight
+                        g.selectAll('.waffle-square').style('opacity', 1);
+                    });
+            }
+
+            drawLegend(g) {
+                // Place legend directly underneath the chart with minimal spacing
+                const legend = g.append('g')
+                    .attr('class', 'legend')
+                    .attr('transform', `translate(20, ${this.height + 15})`);
+
+                // Legend title - centered with minimal top spacing
+                legend.append('text')
+                    .attr('x', this.width / 2 - 20)
+                    .attr('y', 0)
+                    .style('text-anchor', 'middle')
+                    .style('font-size', '14px')
+                    .style('font-weight', 'bold')
+                    .style('fill', '#333')
+                    .text('Participant Categories');
+
+                // Create 2x2 grid layout for legend items with tighter spacing
+                const legendItems = legend.selectAll('.legend-item')
+                    .data(this.processedData)
+                    .enter()
+                    .append('g')
+                    .attr('class', 'legend-item')
+                    .attr('transform', (d, i) => `translate(${(i % 2) * 280}, ${Math.floor(i / 2) * 50 + 20})`);
+
+                // Legend color squares
+                legendItems.append('rect')
+                    .attr('width', 18)
+                    .attr('height', 18)
+                    .attr('fill', d => d.color)
+                    .attr('stroke', '#333')
+                    .attr('stroke-width', 1);
+
+                // Legend labels - compact
+                legendItems.append('text')
+                    .attr('x', 25)
+                    .attr('y', 13)
+                    .style('font-size', '12px')
+                    .style('font-weight', 'bold')
+                    .style('fill', '#333')
+                    .text(d => d.category);
+
+                // Legend war counts - compact
+                legendItems.append('text')
+                    .attr('x', 25)
+                    .attr('y', 28)
+                    .style('font-size', '10px')
+                    .style('fill', '#666')
+                    .text(d => `${d.warCount} wars (${d.squaresNeeded} squares)`);
+
+                // Add legend explanation at the bottom with minimal spacing
+                legend.append('text')
+                    .attr('x', this.width / 2 - 20)
+                    .attr('y', Math.ceil(this.processedData.length / 2) * 50 + 45)
+                    .style('text-anchor', 'middle')
+                    .style('font-size', '12px')
+                    .style('font-weight', 'bold')
+                    .style('fill', '#2c3e50')
+                    .text('Each square represents 5 wars');
+            }
+
+            addTitle(g) {
+                g.append('text')
+                    .attr('class', 'chart-title')
+                    .attr('x', this.width / 2)
+                    .attr('y', -50)
+                    .style('text-anchor', 'middle')
+                    .style('font-size', '16px')
+                    .style('font-weight', 'bold')
+                    .style('fill', '#2c3e50')
+                    .text('Wars by Number of Participants (1810-2001)');
+                
+                g.append('text')
+                    .attr('class', 'chart-subtitle')
+                    .attr('x', this.width / 2)
+                    .attr('y', -30)
+                    .style('text-anchor', 'middle')
+                    .style('font-size', '12px')
+                    .style('fill', '#666')
+                    .text('Each square represents 5 wars, organized by participant count');
+                
+                g.append('text')
+                    .attr('class', 'chart-subtitle')
+                    .attr('x', this.width / 2)
+                    .attr('y', -10)
+                    .style('text-anchor', 'middle')
+                    .style('font-size', '10px')
+                    .style('fill', '#888')
+                    .text('Column-first layout • Hover for details');
+            }
+
+            showTooltip(event, d) {
+                let tooltipContent = `
+                    <strong>Category:</strong> ${d.category}<br/>
+                    <strong>Wars in this square:</strong> ${d.warsRepresented}<br/>
+                    <strong>Total wars in category:</strong> ${d.totalWarsInCategory}<br/>
+                `;
+
+                this.tooltip.transition()
+                    .duration(200)
+                    .style('opacity', .95);
+                
+                this.tooltip.html(tooltipContent)
+                    .style('left', (event.pageX + 10) + 'px')
+                    .style('top', (event.pageY - 28) + 'px');
+            }
+
+            hideTooltip() {
+                this.tooltip.transition()
+                    .duration(500)
+                    .style('opacity', 0);
+            }
+
+            hideLoading() {
+                document.getElementById('waffle-loading').style.display = 'none';
+                document.getElementById('waffle-chart').style.display = 'block';
+            }
+        }
+
         // Initialize the visualizations when the page loads
         document.addEventListener('DOMContentLoaded', function() {
             const interIntraChart = new InterIntraChart();
             const chart = new RegionalConflictsChart();
             const ethnicNationalistChart = new EthnicNationalistChart();
             const warDurationHeatmap = new WarDurationHeatmap();
+            const waffleChart = new WaffleChart();
             
             // Handle window resize for responsive design
             let resizeTimeout;
@@ -2494,6 +2891,8 @@
                         d3.select('#region-start-duration-heatmap').selectAll('*').remove();
                         warDurationHeatmap.createVisualization(); // Skip setDimensions() since we want fixed size
                     }
+                    
+                    // Waffle chart has fixed dimensions, no need to resize
                 }, 250);
             });
         });

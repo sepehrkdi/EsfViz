@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEDEvent Histogram - EsfViz Project</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="gedevents.css">
+    <style>
+        /* Centered container with subtle grey hue */
+        .histogram-container {
+            background-color: #f5f5f5; /* subtle grey */
+            padding: 30px;
+            margin: 40px auto;
+            width: 1100px; /* slightly wider than svg */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .box-container {
+            background-color: #f5f5f5; /* subtle grey */
+            padding: 30px;
+            margin: 40px auto;
+            width: 1100px; /* slightly wider than svg */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .violin-container {
+            background-color: #f5f5f5; /* subtle grey */
+            padding: 30px;
+            margin: 40px auto;
+            width: 1100px; /* slightly wider than svg */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .histogram-description {
+            margin-top: 20px;
+            font-size: 18px;
+            line-height: 1.5;
+            color: #333;
+            text-align: left;
+            padding: 20px;
+        }
+        .violin-description {
+            margin-top: 20px;
+            font-size: 18px;
+            line-height: 1.5;
+            color: #333;
+            text-align: left;
+            padding: 20px;
+        }
+        .box-description {
+            margin-top: 20px;
+            font-size: 18px;
+            line-height: 1.5;
+            color: #333;
+            text-align: left;
+            padding: 20px;
+        }
+
+        .bar {
+            fill: #7e1e1c;
+        }
+
+        .bar:hover {
+            fill: #ff7e00;
+        }
+
+        .axis-label {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .tooltip {
+            position: absolute;
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            pointer-events: none;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="visualization-nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-back">← Back to Home</a>
+            <h1 class="nav-title">Regional Conflicts Analysis</h1>
+            <img src="nav-icon.png" alt="Histogram logo" class="nav-logo" width="20px" height="20px">
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="visualization-page">
+        <div class="histogram-container">
+            <h2>Event Count by Fatality Bin</h2>
+             <p class="histogram-description">
+                Most events in the GEDEvent dataset result in relatively low fatalities, with the vast majority 
+                falling in the 5–6 fatality range. As fatality counts increase, the number of events decreases 
+                steadily, showing that moderate-fatality events (10–49 fatalities) are less common but still significant. 
+                High-fatality events (100+ fatalities) are rare, and extreme catastrophes with thousands of fatalities 
+                occur only occasionally. This distribution highlights that while most global events are relatively 
+                contained in scale, a small number of highly deadly events disproportionately shape global impact and risk.
+            </p>
+            <svg id="histogram" width="900" height="400"></svg>
+        </div>
+        <div class="box-container">
+                <h2>Number of Sources by Region</h2>
+                <p class="box-description">
+                This box plot visualizes how the number of sources varies across different world regions. Overall, it highlights clear differences in reporting intensity and data spread between regions.
+                The Americas show an extremely tight distribution with very little variation, suggesting consistent reporting across events. In contrast, Europe displays the widest range and the highest maximum value. Asia and the Middle East have moderate variability, reflecting mixed reporting patterns, while Africa shows a lower median and limited range, implying fewer sources per event on average.
+                Together, these distributions suggest that global media and reporting networks are unevenly distributed.
+                <svg id="boxplot" width="900" height="600"></svg>
+        </div>
+        <div class="violin-container">
+                <h2>Distribution of Best-Capped Values by Year Bin</h2>
+                <p class="violin-description">
+                This violin plot visualizes the distribution of the "best-capped" values across different five-year intervals.
+                 Wider sections of the violin indicate higher density of events with similar values, while narrower sections
+                indicate sparser occurrences. It allows us to see not only the median and range but also the shape of the 
+                distribution, highlighting clusters and potential outliers within each year bin.
+                </p>
+                <svg id="violinplot" width="900" height="500"></svg>
+        </div>
+    </div>
+
+    <!-- D3 Script -->
+    <script>
+        // Load CSV data
+        d3.csv("histogram_bins_summary_fine.csv").then(data => {
+            data.forEach(d => d.event_count = +d.event_count);
+
+            const svg = d3.select("#histogram"),
+                  width = +svg.attr("width"),
+                  height = +svg.attr("height"),
+                  margin = {top: 30, right: 30, bottom: 50, left: 60};
+
+            const x = d3.scaleBand()
+                        .domain(data.map(d => d.fatality_bin_fine))
+                        .range([margin.left, width - margin.right])
+                        .padding(0.2);
+
+            const y = d3.scaleLinear()
+                        .domain([0, d3.max(data, d => d.event_count)]).nice()
+                        .range([height - margin.bottom, margin.top]);
+
+            const xAxis = g => g
+                .attr("transform", `translate(0,${height - margin.bottom})`)
+                .call(d3.axisBottom(x))
+                .selectAll("text")
+                .attr("transform", "rotate(-40)")
+                .style("text-anchor", "end");
+
+            const yAxis = g => g
+                .attr("transform", `translate(${margin.left},0)`)
+                .call(d3.axisLeft(y));
+
+            svg.append("g").call(xAxis);
+            svg.append("g").call(yAxis);
+
+            // Tooltip
+            const tooltip = d3.select("body").append("div")
+                              .attr("class", "tooltip")
+                              .style("opacity", 0);
+
+            // Bars
+            svg.selectAll(".bar")
+               .data(data)
+               .enter()
+               .append("rect")
+               .attr("class", "bar")
+               .attr("x", d => x(d.fatality_bin_fine))
+               .attr("y", d => y(d.event_count))
+               .attr("width", x.bandwidth())
+               .attr("height", d => y(0) - y(d.event_count))
+               .on("mouseover", (event, d) => {
+                   tooltip.transition().duration(200).style("opacity", 0.9);
+                   tooltip.html(`Fatality Bin: ${d.fatality_bin_fine}<br>Count: ${d.event_count}`)
+                          .style("left", (event.pageX + 5) + "px")
+                          .style("top", (event.pageY - 28) + "px");
+               })
+               .on("mouseout", () => {
+                   tooltip.transition().duration(500).style("opacity", 0);
+               });
+
+            // Axis labels
+            svg.append("text")
+               .attr("class", "axis-label")
+               .attr("x", width / 2)
+               .attr("y", height - 5)
+               .attr("text-anchor", "middle")
+               .text("Fatality Bin");
+
+            svg.append("text")
+               .attr("class", "axis-label")
+               .attr("transform", "rotate(-90)")
+               .attr("x", -height / 2)
+               .attr("y", 15)
+               .attr("text-anchor", "middle")
+               .text("Event Count");
+        });
+
+        //box plot script would go here
+        // Load Boxplot data
+    d3.csv("region_boxplot_data.csv").then(data => {
+    data.forEach(d => {
+        d.min = +d.min;
+        d.q1 = +d.q1;
+        d.median = +d.median;
+        d.q3 = +d.q3;
+        d.max = +d.max;
+    });
+
+    const svg = d3.select("#boxplot"),
+          width = +svg.attr("width"),
+          height = +svg.attr("height"),
+          margin = {top: 30, right: 30, bottom: 50, left: 60};
+
+    const x = d3.scaleBand()
+                .domain(data.map(d => d.region))
+                .range([margin.left, width - margin.right])
+                .padding(0.4);
+
+    const y = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.max)]).nice()
+                .range([height - margin.bottom, margin.top]);
+
+    const xAxis = g => g
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(x))
+        .selectAll("text")
+        .attr("transform", "rotate(-40)")
+        .style("text-anchor", "end");
+
+    const yAxis = g => g
+        .attr("transform", `translate(${margin.left},0)`)
+        .call(d3.axisLeft(y));
+
+    svg.append("g").call(xAxis);
+    svg.append("g").call(yAxis);
+
+    // Tooltip
+    const tooltip = d3.select("body").append("div")
+                      .attr("class", "tooltip")
+                      .style("opacity", 0);
+
+    // Draw box plot elements
+    svg.selectAll(".box")
+       .data(data)
+       .enter()
+       .append("rect")
+       .attr("class", "box")
+       .attr("x", d => x(d.region))
+       .attr("y", d => y(d.q3))
+       .attr("height", d => y(d.q1) - y(d.q3))
+       .attr("width", x.bandwidth())
+       .attr("fill", "#0097AB")
+       .attr("stroke", "black")
+       .on("mouseover", (event, d) => {
+            tooltip.transition().duration(200).style("opacity", 0.9);
+            tooltip.html(`
+                <strong>${d.region}</strong><br>
+                Min: ${d.min}<br>
+                Q1: ${d.q1}<br>
+                Median: ${d.median}<br>
+                Q3: ${d.q3}<br>
+                Max: ${d.max}
+            `)
+            .style("left", (event.pageX + 5) + "px")
+            .style("top", (event.pageY - 28) + "px");
+        })
+       .on("mouseout", () => tooltip.transition().duration(500).style("opacity", 0));
+
+    // Median line
+    svg.selectAll(".medianLine")
+       .data(data)
+       .enter()
+       .append("line")
+       .attr("class", "medianLine")
+       .attr("x1", d => x(d.region))
+       .attr("x2", d => x(d.region) + x.bandwidth())
+       .attr("y1", d => y(d.median))
+       .attr("y2", d => y(d.median))
+       .attr("stroke", "black")
+       .attr("stroke-width", 2);
+
+    // Whiskers
+    svg.selectAll(".whisker-line")
+       .data(data)
+       .enter()
+       .append("line")
+       .attr("class", "whisker-line")
+       .attr("x1", d => x(d.region) + x.bandwidth()/2)
+       .attr("x2", d => x(d.region) + x.bandwidth()/2)
+       .attr("y1", d => y(d.min))
+       .attr("y2", d => y(d.max))
+       .attr("stroke", "black");
+
+    // Horizontal caps on whiskers
+    const capWidth = x.bandwidth() * 0.4;
+    svg.selectAll(".whisker-cap-min")
+       .data(data)
+       .enter()
+       .append("line")
+       .attr("x1", d => x(d.region) + x.bandwidth()/2 - capWidth/2)
+       .attr("x2", d => x(d.region) + x.bandwidth()/2 + capWidth/2)
+       .attr("y1", d => y(d.min))
+       .attr("y2", d => y(d.min))
+       .attr("stroke", "black");
+
+    svg.selectAll(".whisker-cap-max")
+       .data(data)
+       .enter()
+       .append("line")
+       .attr("x1", d => x(d.region) + x.bandwidth()/2 - capWidth/2)
+       .attr("x2", d => x(d.region) + x.bandwidth()/2 + capWidth/2)
+       .attr("y1", d => y(d.max))
+       .attr("y2", d => y(d.max))
+       .attr("stroke", "black");
+
+    // Axis labels
+    svg.append("text")
+       .attr("class", "axis-label")
+       .attr("x", width / 2)
+       .attr("y", height - 5)
+       .attr("text-anchor", "middle")
+       .text("Region");
+
+    svg.append("text")
+       .attr("class", "axis-label")
+       .attr("transform", "rotate(-90)")
+       .attr("x", -height / 2)
+       .attr("y", 15)
+       .attr("text-anchor", "middle")
+       .text("Number of Sources");
+});
+        //violin plot script would go here  
+        d3.csv("violin_data.csv").then(data => {
+    // Convert numbers
+    data.forEach(d => d.best_capped = +d.best_capped);
+
+    const svg = d3.select("#violinplot"),
+          width = +svg.attr("width"),
+          height = +svg.attr("height"),
+          margin = {top: 30, right: 30, bottom: 50, left: 60};
+
+    const x = d3.scaleBand()
+                .domain([...new Set(data.map(d => d.year_bin_label))])
+                .range([margin.left, width - margin.right])
+                .padding(0.3);
+
+    const y = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.best_capped)]).nice()
+                .range([height - margin.bottom, margin.top]);
+
+    // X and Y axes
+    svg.append("g")
+       .attr("transform", `translate(0,${height - margin.bottom})`)
+       .call(d3.axisBottom(x))
+       .selectAll("text")
+       .attr("transform", "rotate(-40)")
+       .style("text-anchor", "end");
+
+    svg.append("g")
+       .attr("transform", `translate(${margin.left},0)`)
+       .call(d3.axisLeft(y));
+
+    // Axis labels
+    svg.append("text")
+       .attr("class", "axis-label")
+       .attr("x", width / 2)
+       .attr("y", height - 5)
+       .attr("text-anchor", "middle")
+       .text("Year Bin");
+
+    svg.append("text")
+       .attr("class", "axis-label")
+       .attr("transform", "rotate(-90)")
+       .attr("x", -height / 2)
+       .attr("y", 15)
+       .attr("text-anchor", "middle")
+       .text("Best-Capped Value");
+
+    // Tooltip
+    const tooltip = d3.select("body").append("div")
+                      .attr("class", "tooltip")
+                      .style("opacity", 0);
+
+    // Compute density for each year_bin_label
+    const kde = kernelDensityEstimator(kernelEpanechnikov(0.5), y.ticks(40));
+
+    const sumstat = d3.groups(data, d => d.year_bin_label)
+                      .map(([key, values]) => {
+                          return { 
+                              key: key,
+                              density: kde(values.map(d => d.best_capped))
+                          };
+                      });
+
+    const maxDensity = d3.max(sumstat, d => d3.max(d.density, dd => dd[1]));
+
+    const xNum = d3.scaleLinear()
+                   .range([0, x.bandwidth()])
+                   .domain([-maxDensity, maxDensity]);
+
+    // Draw violins
+    svg.selectAll(".violin")
+       .data(sumstat)
+       .enter()
+       .append("g")
+       .attr("transform", d => `translate(${x(d.key)},0)`)
+       .append("path")
+       .datum(d => d.density)
+       .attr("fill", "#ff7e00")
+       .attr("stroke", "black")
+       .attr("d", d3.area()
+           .x0(d => xNum(-d[1]))
+           .x1(d => xNum(d[1]))
+           .y(d => y(d[0]))
+           .curve(d3.curveCatmullRom));
+
+    // KDE function
+    function kernelDensityEstimator(kernel, X) {
+        return function(V) {
+            return X.map(x => [x, d3.mean(V, v => kernel(x - v))]);
+        };
+    }
+    function kernelEpanechnikov(k) {
+        return function(v) {
+            return Math.abs(v /= k) <= 1 ? 0.75 * (1 - v * v) / k : 0;
+        };
+    }
+});
+
+    </script>
+</body>
+</html>

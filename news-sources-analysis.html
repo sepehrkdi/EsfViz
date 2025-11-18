@@ -495,11 +495,10 @@
                     .nice()
                     .range([this.height, 0]);
 
-                // Create line generator with smooth curves
+                // Create line generator with straight lines
                 this.line = d3.line()
                     .x(d => this.xScale(d.year))
-                    .y(d => this.yScale(d.sources_per_conflict))
-                    .curve(d3.curveCardinal);
+                    .y(d => this.yScale(d.sources_per_conflict));
             }
 
             createAxes(g) {

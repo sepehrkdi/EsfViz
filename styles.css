@@ -470,6 +470,11 @@ li {
     box-shadow: 0 5px 20px rgba(0,0,0,0.1); /* Shadow on hover */
 }
 
+/* Force new line in grid layout */
+.page-card-new-line {
+    grid-column: 1 / -1;                   /* Span full width to force new line */
+}
+
 /* Card title styling */
 .page-card h3 {
     color: #b82f2f;                         /* Accent color for card titles */

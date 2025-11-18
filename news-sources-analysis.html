@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Sources per Conflict by Region - EsfViz Project</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* Container styling consistent with other visualizations */
+        .timeline-container {
+            background-color: #f5f5f5;
+            padding: 30px;
+            margin: 40px auto;
+            width: 1200px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .timeline-description {
+            margin-top: 20px;
+            font-size: 18px;
+            line-height: 1.5;
+            color: #333;
+            text-align: left;
+            padding: 20px;
+        }
+
+        /* Line chart styling */
+        .line {
+            fill: none;
+            stroke-width: 3px;
+            opacity: 0.8;
+            transition: all 0.2s ease;
+        }
+
+        .line:hover {
+            stroke-width: 4px;
+            opacity: 1.0;
+        }
+
+        .dot {
+            fill-opacity: 0.7;
+            stroke-width: 2px;
+            stroke: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dot:hover {
+            r: 6;
+            fill-opacity: 1.0;
+            stroke-width: 3px;
+        }
+
+        /* Axis styling */
+        .axis {
+            font-size: 12px;
+        }
+
+        .axis-label {
+            font-size: 14px;
+            font-weight: bold;
+            fill: #333;
+        }
+
+        /* Grid lines */
+        .grid line {
+            stroke: #e0e0e0;
+            stroke-dasharray: 2,2;
+            stroke-width: 1;
+        }
+
+        .grid path {
+            stroke-width: 0;
+        }
+
+        /* Tooltip styling */
+        .tooltip {
+            position: absolute;
+            background-color: rgba(0,0,0,0.85);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            pointer-events: none;
+            font-size: 13px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            max-width: 300px;
+            line-height: 1.4;
+        }
+
+        /* Legend styling */
+        .legend {
+            font-size: 12px;
+        }
+
+        .legend-item {
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .legend-item:hover .legend-text {
+            font-weight: bold;
+        }
+
+        .legend-rect {
+            stroke: #333;
+            stroke-width: 1px;
+            transition: all 0.2s ease;
+        }
+
+        .legend-item.inactive {
+            opacity: 0.3;
+        }
+
+        /* Controls styling */
+        .controls {
+            margin: 25px 0;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .control-group {
+            display: inline-block;
+            margin: 0 30px;
+            vertical-align: top;
+        }
+
+        .control-label {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .slider-container {
+            margin: 15px 0;
+        }
+
+        .year-range-slider {
+            width: 280px;
+            margin: 0 10px;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .year-range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #002D40;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .year-range-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #002D40;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .year-display {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        /* Filter buttons */
+        .filter-buttons {
+            margin: 15px 0;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .region-filter {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            padding: 8px 14px;
+            margin: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: inline-block;
+            position: relative;
+        }
+
+        .region-filter.active {
+            background: #002D40;
+            color: white;
+            border-color: #002D40;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,45,64,0.3);
+        }
+
+        .region-filter:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(102,126,234,0.3);
+        }
+
+        .region-filter.all-button {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+            font-weight: bold;
+        }
+
+        .region-filter.all-button.active {
+            background: #218838;
+            border-color: #218838;
+        }
+
+        .region-filter.all-button:hover {
+            background: #1e7e34;
+            border-color: #1e7e34;
+        }
+
+        /* Chart styling */
+        .chart-title {
+            font-size: 22px;
+            font-weight: bold;
+            fill: #2c3e50;
+            text-anchor: middle;
+        }
+
+        .chart-subtitle {
+            font-size: 14px;
+            fill: #666;
+            text-anchor: middle;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .timeline-container {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .control-group {
+                display: block;
+                margin: 20px 0;
+            }
+            
+            .year-range-slider {
+                width: 200px;
+            }
+            
+            .filter-buttons {
+                max-width: none;
+            }
+        }
+
+        /* Annotation styles for significant events */
+        .annotation {
+            pointer-events: none;
+        }
+
+        .annotation-line {
+            stroke: #999;
+            stroke-width: 1;
+            stroke-dasharray: 3,3;
+            opacity: 0.7;
+        }
+
+        .annotation-text {
+            font-size: 11px;
+            fill: #666;
+            text-anchor: middle;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="visualization-nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-back">← Back to Home</a>
+            <h1 class="nav-title">News Sources per Conflict Analysis</h1>
+            <img src="nav-icon.png" alt="Timeline logo" class="nav-logo" width="20px" height="20px">
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="visualization-page">
+        <div class="timeline-container">
+            <h2>News Sources per Conflict by Region (1989-2024)</h2>
+            <p class="timeline-description">
+                This interactive timeline visualization tracks the evolution of media coverage patterns across global conflict regions from 1989 to 2024. 
+                Each colored line represents a different world region, showing how the average number of news sources reporting on conflicts 
+                has changed over time. The visualization reveals significant shifts in media attention, with notable spikes during major 
+                international events and conflicts such as the Arab Spring, Syrian Civil War, and recent conflicts in Europe and the Middle East. 
+                Use the timeline controls below to focus on specific periods and the region filters to highlight particular areas of interest.
+            </p>
+
+            <!-- Interactive Controls -->
+            <div class="controls">
+                <div class="control-group">
+                    <span class="control-label">📅 Time Period Selection</span>
+                    <div class="slider-container">
+                        <div style="margin-bottom: 8px; font-size: 12px; color: #666;">
+                            Start Year: <input type="range" id="startYearSlider" class="year-range-slider" min="1989" max="2024" value="1989">
+                        </div>
+                        <div style="font-size: 12px; color: #666;">
+                            End Year: <input type="range" id="endYearSlider" class="year-range-slider" min="1989" max="2024" value="2024">
+                        </div>
+                    </div>
+                    <div class="year-display">
+                        <span id="yearDisplay">1989 - 2024</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <span class="control-label">🌍 Region Filters</span>
+                    <div class="filter-buttons" id="regionFilters">
+                        <!-- Region filter buttons will be dynamically generated -->
+                    </div>
+                    <div style="margin-top: 10px; font-size: 11px; color: #666;">
+                        Click regions to toggle visibility
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart SVG -->
+            <svg id="timeline-chart" width="1140" height="650"></svg>
+        </div>
+    </div>
+
+    <!-- D3.js Timeline Visualization Script -->
+    <script>
+        class NewsSourcesTimeline {
+            constructor() {
+                this.data = [];
+                this.processedData = [];
+                this.svg = null;
+                this.tooltip = null;
+                this.colorScale = null;
+                this.regions = [];
+                this.activeRegions = new Set();
+                
+                // Chart dimensions
+                this.margin = { top: 100, right: 220, bottom: 80, left: 80 };
+                this.width = 1140 - this.margin.left - this.margin.right;
+                this.height = 650 - this.margin.top - this.margin.bottom;
+                
+                // Current filter state
+                this.currentStartYear = 1989;
+                this.currentEndYear = 2024;
+                
+                this.init();
+            }
+
+            async init() {
+                try {
+                    await this.loadData();
+                    this.processData();
+                    this.createVisualization();
+                    this.setupControls();
+                } catch (error) {
+                    console.error('Error initializing timeline:', error);
+                    this.showError('Failed to load data. Please check that numOfSourcesPerYearPerRegion.csv is available.');
+                }
+            }
+
+            async loadData() {
+                this.data = await d3.csv('numOfSourcesPerYearPerRegion.csv');
+                console.log('Loaded news sources data:', this.data.length, 'records');
+                
+                if (this.data.length === 0) {
+                    throw new Error('No data loaded from CSV file');
+                }
+            }
+
+            processData() {
+                // Convert string values to numbers and calculate sources per conflict
+                this.data.forEach(d => {
+                    d.year = +d.year;
+                    d.source_count = +d.source_count;
+                    d.unique_dyads = +d.unique_dyads;
+                    // Calculate sources per conflict, handling division by zero
+                    d.sources_per_conflict = d.unique_dyads > 0 ? d.source_count / d.unique_dyads : 0;
+                });
+
+                // Get unique regions and sort them
+                this.regions = [...new Set(this.data.map(d => d.region))].sort();
+                this.activeRegions = new Set(this.regions);
+                
+                console.log('Available regions:', this.regions);
+                
+                // Group data by region and sort by year
+                this.processedData = this.regions.map(region => {
+                    const regionData = this.data
+                        .filter(d => d.region === region)
+                        .sort((a, b) => a.year - b.year);
+                    
+                    return {
+                        region: region,
+                        values: regionData,
+                        totalSources: d3.sum(regionData, d => d.source_count),
+                        totalConflicts: d3.sum(regionData, d => d.unique_dyads),
+                        avgSourcesPerConflict: d3.mean(regionData, d => d.sources_per_conflict)
+                    };
+                });
+
+                // Create color scale using the project's established palette
+                this.colorScale = d3.scaleOrdinal()
+                    .domain(this.regions)
+                    .range(['#002D40', '#991332', '#FF7747', '#FFC76E', '#0097AB', '#667eea']);
+
+                console.log('Processed data by region:', this.processedData.map(d => ({
+                    region: d.region,
+                    dataPoints: d.values.length,
+                    avgSources: d.avgSourcesPerConflict.toFixed(2)
+                })));
+            }
+
+            createVisualization() {
+                // Create main SVG with responsive viewBox
+                this.svg = d3.select('#timeline-chart')
+                    .attr('viewBox', `0 0 1140 650`)
+                    .attr('preserveAspectRatio', 'xMidYMid meet');
+
+                const g = this.svg.append('g')
+                    .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+
+                // Create tooltip
+                this.tooltip = d3.select('body').append('div')
+                    .attr('class', 'tooltip')
+                    .style('opacity', 0);
+
+                // Initialize scales and create initial visualization
+                this.updateScales();
+                this.createAxes(g);
+                this.createGridLines(g);
+                this.createLines(g);
+                this.createDots(g);
+                this.createLegend(g);
+                this.addTitle(g);
+                this.addAnnotations(g);
+            }
+
+            updateScales() {
+                // Filter data based on current year range and active regions
+                const filteredData = this.processedData
+                    .filter(d => this.activeRegions.has(d.region))
+                    .map(regionData => ({
+                        ...regionData,
+                        values: regionData.values.filter(d => 
+                            d.year >= this.currentStartYear && d.year <= this.currentEndYear
+                        )
+                    }))
+                    .filter(d => d.values.length > 0);
+
+                // Get all values for scale domains
+                const allYears = [];
+                const allValues = [];
+                
+                filteredData.forEach(regionData => {
+                    regionData.values.forEach(d => {
+                        allYears.push(d.year);
+                        allValues.push(d.sources_per_conflict);
+                    });
+                });
+
+                // Create scales
+                this.xScale = d3.scaleLinear()
+                    .domain([this.currentStartYear, this.currentEndYear])
+                    .range([0, this.width]);
+
+                this.yScale = d3.scaleLinear()
+                    .domain([0, d3.max(allValues) * 1.1 || 1])
+                    .nice()
+                    .range([this.height, 0]);
+
+                // Create line generator with smooth curves
+                this.line = d3.line()
+                    .x(d => this.xScale(d.year))
+                    .y(d => this.yScale(d.sources_per_conflict))
+                    .curve(d3.curveCardinal);
+            }
+
+            createAxes(g) {
+                // Remove existing axes
+                g.selectAll('.axis').remove();
+
+                // X-axis
+                const xAxis = g.append('g')
+                    .attr('class', 'axis')
+                    .attr('transform', `translate(0, ${this.height})`)
+                    .call(d3.axisBottom(this.xScale)
+                        .tickFormat(d3.format('d'))
+                        .ticks(Math.min(12, Math.max(5, this.currentEndYear - this.currentStartYear))));
+
+                // Y-axis
+                const yAxis = g.append('g')
+                    .attr('class', 'axis')
+                    .call(d3.axisLeft(this.yScale)
+                        .tickFormat(d3.format('.1f'))
+                        .ticks(8));
+
+                // Axis labels
+                g.selectAll('.axis-label').remove();
+                
+                g.append('text')
+                    .attr('class', 'axis-label')
+                    .attr('x', this.width / 2)
+                    .attr('y', this.height + 50)
+                    .style('text-anchor', 'middle')
+                    .text('Year');
+
+                g.append('text')
+                    .attr('class', 'axis-label')
+                    .attr('transform', 'rotate(-90)')
+                    .attr('x', -this.height / 2)
+                    .attr('y', -50)
+                    .style('text-anchor', 'middle')
+                    .text('Average News Sources per Conflict');
+            }
+
+            createGridLines(g) {
+                // Remove existing grid
+                g.selectAll('.grid').remove();
+
+                // X-axis grid
+                g.append('g')
+                    .attr('class', 'grid')
+                    .attr('transform', `translate(0, ${this.height})`)
+                    .call(d3.axisBottom(this.xScale)
+                        .tickSize(-this.height)
+                        .tickFormat('')
+                        .ticks(Math.min(12, Math.max(5, this.currentEndYear - this.currentStartYear)))
+                    );
+
+                // Y-axis grid
+                g.append('g')
+                    .attr('class', 'grid')
+                    .call(d3.axisLeft(this.yScale)
+                        .tickSize(-this.width)
+                        .tickFormat('')
+                        .ticks(8)
+                    );
+            }
+
+            createLines(g) {
+                // Remove existing lines
+                g.selectAll('.region-line').remove();
+
+                // Filter data for current time range and active regions
+                const filteredData = this.processedData
+                    .filter(d => this.activeRegions.has(d.region))
+                    .map(regionData => ({
+                        ...regionData,
+                        values: regionData.values.filter(d => 
+                            d.year >= this.currentStartYear && d.year <= this.currentEndYear
+                        )
+                    }))
+                    .filter(d => d.values.length > 1); // Need at least 2 points for a line
+
+                // Create lines
+                const lines = g.selectAll('.region-line')
+                    .data(filteredData)
+                    .enter()
+                    .append('path')
+                    .attr('class', 'region-line')
+                    .attr('d', d => this.line(d.values))
+                    .style('stroke', d => this.colorScale(d.region))
+                    .style('fill', 'none')
+                    .style('stroke-width', '3px')
+                    .style('opacity', 0.8)
+                    .on('mouseover', (event, d) => {
+                        // Highlight line
+                        d3.select(event.target)
+                            .style('stroke-width', '5px')
+                            .style('opacity', 1.0);
+                        
+                        this.showRegionTooltip(event, d);
+                    })
+                    .on('mouseout', (event, d) => {
+                        // Reset line
+                        d3.select(event.target)
+                            .style('stroke-width', '3px')
+                            .style('opacity', 0.8);
+                        
+                        this.hideTooltip();
+                    });
+            }
+
+            createDots(g) {
+                // Remove existing dots
+                g.selectAll('.dot-group').remove();
+
+                // Filter data for current time range and active regions
+                const filteredData = this.processedData
+                    .filter(d => this.activeRegions.has(d.region))
+                    .map(regionData => ({
+                        ...regionData,
+                        values: regionData.values.filter(d => 
+                            d.year >= this.currentStartYear && d.year <= this.currentEndYear
+                        )
+                    }))
+                    .filter(d => d.values.length > 0);
+
+                // Create dot groups for each region
+                const dotGroups = g.selectAll('.dot-group')
+                    .data(filteredData)
+                    .enter()
+                    .append('g')
+                    .attr('class', 'dot-group');
+
+                // Create dots for each data point
+                dotGroups.selectAll('.dot')
+                    .data(d => d.values.map(v => ({...v, region: d.region})))
+                    .enter()
+                    .append('circle')
+                    .attr('class', 'dot')
+                    .attr('cx', d => this.xScale(d.year))
+                    .attr('cy', d => this.yScale(d.sources_per_conflict))
+                    .attr('r', 4)
+                    .style('fill', d => this.colorScale(d.region))
+                    .style('stroke', '#fff')
+                    .style('stroke-width', '2px')
+                    .style('fill-opacity', 0.7)
+                    .on('mouseover', (event, d) => {
+                        d3.select(event.target)
+                            .attr('r', 7)
+                            .style('fill-opacity', 1.0)
+                            .style('stroke-width', '3px');
+                        
+                        this.showDotTooltip(event, d);
+                    })
+                    .on('mouseout', (event, d) => {
+                        d3.select(event.target)
+                            .attr('r', 4)
+                            .style('fill-opacity', 0.7)
+                            .style('stroke-width', '2px');
+                        
+                        this.hideTooltip();
+                    });
+            }
+
+            createLegend(g) {
+                // Remove existing legend
+                g.selectAll('.legend').remove();
+
+                const legend = g.append('g')
+                    .attr('class', 'legend')
+                    .attr('transform', `translate(${this.width + 30}, 20)`);
+
+                // Add legend title
+                legend.append('text')
+                    .attr('x', 0)
+                    .attr('y', -5)
+                    .style('font-weight', 'bold')
+                    .style('font-size', '14px')
+                    .style('fill', '#333')
+                    .text('Regions');
+
+                const legendItems = legend.selectAll('.legend-item')
+                    .data(this.regions)
+                    .enter()
+                    .append('g')
+                    .attr('class', d => `legend-item ${this.activeRegions.has(d) ? 'active' : 'inactive'}`)
+                    .attr('transform', (d, i) => `translate(0, ${i * 28 + 15})`)
+                    .style('cursor', 'pointer')
+                    .on('click', (event, d) => {
+                        this.toggleRegion(d);
+                    })
+                    .on('mouseover', function(event, d) {
+                        if (this.classList.contains('active')) {
+                            d3.select(this).select('.legend-rect')
+                                .style('stroke-width', '2px')
+                                .style('transform', 'scale(1.1)');
+                        }
+                    })
+                    .on('mouseout', function(event, d) {
+                        d3.select(this).select('.legend-rect')
+                            .style('stroke-width', '1px')
+                            .style('transform', 'scale(1)');
+                    });
+
+                legendItems.append('rect')
+                    .attr('class', 'legend-rect')
+                    .attr('width', 18)
+                    .attr('height', 18)
+                    .attr('fill', d => this.colorScale(d))
+                    .style('opacity', d => this.activeRegions.has(d) ? 1.0 : 0.3);
+
+                legendItems.append('text')
+                    .attr('class', 'legend-text')
+                    .attr('x', 24)
+                    .attr('y', 14)
+                    .text(d => d)
+                    .style('font-size', '13px')
+                    .style('fill', '#333')
+                    .style('opacity', d => this.activeRegions.has(d) ? 1.0 : 0.5);
+
+                // Add click instruction
+                legend.append('text')
+                    .attr('x', 0)
+                    .attr('y', this.regions.length * 28 + 35)
+                    .style('font-size', '11px')
+                    .style('fill', '#666')
+                    .style('font-style', 'italic')
+                    .text('Click to toggle');
+            }
+
+            addTitle(g) {
+                // Remove existing titles
+                g.selectAll('.chart-title, .chart-subtitle').remove();
+
+                g.append('text')
+                    .attr('class', 'chart-title')
+                    .attr('x', this.width / 2)
+                    .attr('y', -80)
+                    .style('text-anchor', 'middle')
+                    .text('Media Coverage Evolution Across Global Conflict Regions');
+
+                g.append('text')
+                    .attr('class', 'chart-subtitle')
+                    .attr('x', this.width / 2)
+                    .attr('y', -55)
+                    .style('text-anchor', 'middle')
+                    .text('Average number of news sources per conflict by region over time');
+            }
+
+            addAnnotations(g) {
+                // Remove existing annotations
+                g.selectAll('.annotation').remove();
+
+                // Notable events to annotate (if they fall within the visible range)
+                const events = [
+                    { year: 2001, event: '9/11 Attacks' },
+                    { year: 2011, event: 'Arab Spring' },
+                    { year: 2014, event: 'Ukraine Crisis' },
+                    { year: 2022, event: 'Russia-Ukraine War' }
+                ];
+
+                const visibleEvents = events.filter(e => 
+                    e.year >= this.currentStartYear && e.year <= this.currentEndYear
+                );
+
+                const annotations = g.selectAll('.annotation')
+                    .data(visibleEvents)
+                    .enter()
+                    .append('g')
+                    .attr('class', 'annotation');
+
+                // Vertical lines for events
+                annotations.append('line')
+                    .attr('class', 'annotation-line')
+                    .attr('x1', d => this.xScale(d.year))
+                    .attr('x2', d => this.xScale(d.year))
+                    .attr('y1', 0)
+                    .attr('y2', this.height);
+
+                // Event labels
+                annotations.append('text')
+                    .attr('class', 'annotation-text')
+                    .attr('x', d => this.xScale(d.year))
+                    .attr('y', -10)
+                    .attr('transform', d => `rotate(-45, ${this.xScale(d.year)}, -10)`)
+                    .text(d => d.event);
+            }
+
+            setupControls() {
+                // Setup year range sliders
+                const startSlider = document.getElementById('startYearSlider');
+                const endSlider = document.getElementById('endYearSlider');
+                const yearDisplay = document.getElementById('yearDisplay');
+
+                const updateTimeRange = () => {
+                    this.currentStartYear = +startSlider.value;
+                    this.currentEndYear = +endSlider.value;
+                    
+                    // Ensure start year is not greater than end year
+                    if (this.currentStartYear > this.currentEndYear) {
+                        if (startSlider === document.activeElement) {
+                            this.currentEndYear = this.currentStartYear;
+                            endSlider.value = this.currentStartYear;
+                        } else {
+                            this.currentStartYear = this.currentEndYear;
+                            startSlider.value = this.currentEndYear;
+                        }
+                    }
+                    
+                    yearDisplay.textContent = `${this.currentStartYear} - ${this.currentEndYear}`;
+                    this.updateVisualization();
+                };
+
+                startSlider.addEventListener('input', updateTimeRange);
+                endSlider.addEventListener('input', updateTimeRange);
+
+                // Setup region filter buttons
+                this.createRegionFilters();
+            }
+
+            createRegionFilters() {
+                const filtersContainer = document.getElementById('regionFilters');
+                filtersContainer.innerHTML = '';
+
+                // Add "All" button
+                const allButton = document.createElement('button');
+                allButton.className = 'region-filter all-button active';
+                allButton.textContent = 'All Regions';
+                allButton.onclick = () => this.toggleAllRegions();
+                filtersContainer.appendChild(allButton);
+
+                // Add individual region buttons
+                this.regions.forEach(region => {
+                    const button = document.createElement('button');
+                    button.className = 'region-filter active';
+                    button.textContent = region;
+                    button.style.borderLeft = `4px solid ${this.colorScale(region)}`;
+                    button.onclick = () => this.toggleRegion(region);
+                    filtersContainer.appendChild(button);
+                });
+            }
+
+            toggleRegion(region) {
+                if (this.activeRegions.has(region)) {
+                    this.activeRegions.delete(region);
+                } else {
+                    this.activeRegions.add(region);
+                }
+                this.updateVisualization();
+                this.updateFilterButtons();
+            }
+
+            toggleAllRegions() {
+                if (this.activeRegions.size === this.regions.length) {
+                    // Deactivate all
+                    this.activeRegions.clear();
+                } else {
+                    // Activate all
+                    this.activeRegions = new Set(this.regions);
+                }
+                this.updateVisualization();
+                this.updateFilterButtons();
+            }
+
+            updateFilterButtons() {
+                const buttons = document.querySelectorAll('.region-filter');
+                buttons.forEach((button, index) => {
+                    if (index === 0) {
+                        // "All" button
+                        button.className = this.activeRegions.size === this.regions.length ? 
+                            'region-filter all-button active' : 'region-filter all-button';
+                    } else {
+                        // Individual region buttons
+                        const region = this.regions[index - 1];
+                        button.className = this.activeRegions.has(region) ? 
+                            'region-filter active' : 'region-filter';
+                    }
+                });
+            }
+
+            updateVisualization() {
+                this.updateScales();
+                const g = this.svg.select('g');
+                this.createAxes(g);
+                this.createGridLines(g);
+                this.createLines(g);
+                this.createDots(g);
+                this.createLegend(g);
+                this.addAnnotations(g);
+            }
+
+            showRegionTooltip(event, regionData) {
+                // Calculate statistics for the filtered time period
+                const filteredValues = regionData.values.filter(d => 
+                    d.year >= this.currentStartYear && d.year <= this.currentEndYear
+                );
+                
+                const totalSources = d3.sum(filteredValues, d => d.source_count);
+                const totalConflicts = d3.sum(filteredValues, d => d.unique_dyads);
+                const avgSources = totalConflicts > 0 ? (totalSources / totalConflicts).toFixed(1) : '0';
+                const maxSources = d3.max(filteredValues, d => d.sources_per_conflict) || 0;
+                const maxYear = filteredValues.find(d => d.sources_per_conflict === maxSources)?.year || 'N/A';
+
+                this.tooltip.transition()
+                    .duration(200)
+                    .style('opacity', .95);
+                
+                this.tooltip.html(`
+                    <div style="border-bottom: 1px solid #ccc; padding-bottom: 8px; margin-bottom: 8px;">
+                        <strong>${regionData.region}</strong>
+                    </div>
+                    <div><strong>Period:</strong> ${this.currentStartYear} - ${this.currentEndYear}</div>
+                    <div><strong>Avg Sources/Conflict:</strong> ${avgSources}</div>
+                    <div><strong>Peak Coverage:</strong> ${maxSources.toFixed(1)} (${maxYear})</div>
+                    <div><strong>Total Sources:</strong> ${totalSources.toLocaleString()}</div>
+                    <div><strong>Total Conflicts:</strong> ${totalConflicts.toLocaleString()}</div>
+                `)
+                    .style('left', (event.pageX + 10) + 'px')
+                    .style('top', (event.pageY - 28) + 'px');
+            }
+
+            showDotTooltip(event, d) {
+                this.tooltip.transition()
+                    .duration(200)
+                    .style('opacity', .95);
+                
+                this.tooltip.html(`
+                    <div style="border-bottom: 1px solid #ccc; padding-bottom: 6px; margin-bottom: 6px;">
+                        <strong>${d.region} - ${d.year}</strong>
+                    </div>
+                    <div><strong>News Sources:</strong> ${d.source_count.toLocaleString()}</div>
+                    <div><strong>Unique Conflicts:</strong> ${d.unique_dyads.toLocaleString()}</div>
+                    <div><strong>Sources per Conflict:</strong> ${d.sources_per_conflict.toFixed(2)}</div>
+                `)
+                    .style('left', (event.pageX + 10) + 'px')
+                    .style('top', (event.pageY - 28) + 'px');
+            }
+
+            hideTooltip() {
+                this.tooltip.transition()
+                    .duration(500)
+                    .style('opacity', 0);
+            }
+
+            showError(message) {
+                const container = document.querySelector('.timeline-container');
+                container.innerHTML = `
+                    <h2>Error Loading Visualization</h2>
+                    <p style="color: #d32f2f; text-align: center; font-size: 16px; margin: 40px;">${message}</p>
+                `;
+            }
+        }
+
+        // Initialize the visualization when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            new NewsSourcesTimeline();
+        });
+    </script>
+</body>
+</html>

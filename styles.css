@@ -440,6 +440,14 @@ li {
     margin-top: 2rem;                       /* Space above card grid */
 }
 
+/* Row-based responsive layout for main visualizations */
+.page-sections-row {
+    display: flex;                          /* Flexbox for row layout */
+    flex-wrap: wrap;                        /* Allow wrapping on smaller screens */
+    gap: 1.5rem;                           /* Space between cards */
+    margin-top: 2rem;                      /* Space above card row */
+}
+
 /* Individual page/visualization cards */
 .page-card {
     background: #f8f9fa;                    /* Light gray background */
@@ -473,6 +481,13 @@ li {
 /* Force new line in grid layout */
 .page-card-new-line {
     grid-column: 1 / -1;                   /* Span full width to force new line */
+}
+
+/* Flexible card layout for row sections */
+.page-card-flex {
+    flex: 1;                               /* Equal width distribution */
+    min-width: 280px;                      /* Minimum width before wrapping */
+    display: block;                        /* Block-level for full card click */
 }
 
 /* Card title styling */
@@ -582,6 +597,16 @@ Mobile-first approach for different screen sizes
     
     .nav-title {
         font-size: 1.25rem;                 /* Smaller navigation title */
+    }
+    
+    /* Responsive adjustments for page sections row */
+    .page-sections-row {
+        flex-direction: column;             /* Stack cards vertically on mobile */
+        gap: 1rem;                          /* Reduced gap for mobile */
+    }
+    
+    .page-card-flex {
+        min-width: auto;                    /* Remove min-width constraint on mobile */
     }
     
     /* Stack team members vertically on mobile (deprecated styles) */

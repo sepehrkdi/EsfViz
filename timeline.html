@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeline of Global Conflicts - EsfViz Project</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson@3"></script>
+    <style>
+        /* Timeline-specific styles */
+        .timeline-container {
+            background-color: #f5f5f5;
+            padding: 30px;
+            margin: 40px auto;
+            width: 1200px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .timeline-description {
+            margin-top: 20px;
+            font-size: 18px;
+            line-height: 1.5;
+            color: #333;
+            text-align: left;
+            padding: 20px;
+        }
+
+        .map-container {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .controls-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .play-pause-button {
+            background: #b82f2f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: 'Fira Sans', sans-serif;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+
+        .play-pause-button:hover {
+            background: #8a2323;
+            transform: translateY(-1px);
+        }
+
+        .play-pause-button.playing {
+            background: #d32f2f;
+        }
+
+        .play-pause-button.playing:hover {
+            background: #b71c1c;
+        }
+
+        .year-slider {
+            width: 300px;
+            margin: 0 20px;
+        }
+
+        .current-year {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            font-family: 'Roboto Slab', serif;
+            min-width: 60px;
+        }
+
+        .legend {
+            margin: 20px 0;
+            padding: 15px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 15px;
+            margin-right: 5px;
+            border: 1px solid #333;
+        }
+
+        .legend-text {
+            font-size: 12px;
+            font-family: 'Fira Sans', sans-serif;
+        }
+
+        .legend-title {
+            font-size: 14px;
+            font-weight: bold;
+            font-family: 'Fira Sans', sans-serif;
+            margin-right: 15px;
+        }
+
+        /* Map styles */
+        .country {
+            stroke: #fff;
+            stroke-width: 0.5px;
+            cursor: pointer;
+        }
+
+        .country-with-data {
+            stroke: #fff;
+            stroke-width: 0.5px;
+        }
+
+        .country:hover {
+            stroke: #333;
+            stroke-width: 2px;
+        }
+
+        .map-title {
+            font-family: 'Roboto Slab', serif;
+            font-size: 20px;
+            font-weight: 600;
+            fill: #2c3e50;
+            text-anchor: middle;
+        }
+
+        @media (max-width: 768px) {
+            .timeline-container {
+                width: 95%;
+                padding: 15px;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .year-slider {
+                width: 250px;
+            }
+
+            .legend {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="visualization-nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-back">← Back to Home</a>
+            <h1 class="nav-title">Timeline of Global Conflicts</h1>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="visualization-page">
+        <div class="timeline-container">
+            <h2>Animated Choropleth: Conflict Deaths Over Time (1989-2024)</h2>
+            <p class="timeline-description">
+                This interactive animated choropleth map visualizes the evolution of conflict-related deaths 
+                across the globe from 1989 to 2024. Each frame represents one year, with countries colored 
+                based on the sum of conflict deaths for that year. The color scale is adaptive, recalculating 
+                for each year to show relative intensities. Countries with no data appear in gray. Use the 
+                controls below to play the animation, pause at specific years, or scrub through the timeline 
+                manually with the slider.
+            </p>
+            
+            <!-- Map Container -->
+            <div class="map-container">
+                <svg id="world-map" width="1000" height="500"></svg>
+            </div>
+
+            <!-- Controls Container -->
+            <div class="controls-container">
+                <div class="controls">
+                    <button class="play-pause-button" id="play-pause-btn">▶ Play</button>
+                    <input type="range" class="year-slider" id="year-slider" 
+                           min="1989" max="2024" value="1989" step="1">
+                    <div class="current-year" id="current-year">1989</div>
+                </div>
+            </div>
+
+            <!-- Legend Container -->
+            <div class="legend" id="legend">
+                <span class="legend-title">Deaths per Year:</span>
+                <!-- Legend items will be dynamically generated -->
+            </div>
+        </div>
+    </div>
+
+    <!-- D3 Script -->
+    <script>
+        // Animation and data variables
+        let isPlaying = false;
+        let currentYear = 1989;
+        let animationTimer = null;
+        let deathsData = [];
+        let worldData = null;
+        let svg, projection, path, colorScale;
+        
+        // Comprehensive mapping: GeoJSON country name -> CSV country name
+        const geoToCSVMap = {
+            "United States of America": "United States of America",
+            "Russia": "Russia (Soviet Union)", 
+            "Russian Federation": "Russia (Soviet Union)",
+            "Dem. Rep. Congo": "DR Congo (Zaire)",
+            "Democratic Republic of the Congo": "DR Congo (Zaire)",
+            "Myanmar": "Myanmar (Burma)",
+            "Burma": "Myanmar (Burma)",
+            "Yemen": "Yemen (North Yemen)",
+            "Eswatini": "Kingdom of eSwatini (Swaziland)",
+            "Swaziland": "Kingdom of eSwatini (Swaziland)",
+            "Zimbabwe": "Zimbabwe (Rhodesia)",
+            "Bosnia and Herzegovina": "Bosnia-Herzegovina",
+            "Bosnia and Herz.": "Bosnia-Herzegovina",
+            "Macedonia": "North Macedonia",
+            "North Macedonia": "North Macedonia", 
+            "Serbia": "Serbia (Yugoslavia)",
+            "Cambodia": "Cambodia (Kampuchea)",
+            "Madagascar": "Madagascar (Malagasy)",
+            "Côte d'Ivoire": "Ivory Coast",
+            "Turkey": "Turkey",
+            "Türkiye": "Turkey",
+            "Iran": "Iran",
+            "Syria": "Syria",
+            "Tanzania": "Tanzania",
+            "Canada": "Canada",
+            "Kazakhstan": "Kazakhstan",
+            "Uzbekistan": "Uzbekistan", 
+            "Argentina": "Argentina",
+            "Chile": "Chile",
+            "Fiji": "Fiji",
+            "W. Sahara": "Morocco", // Western Sahara conflicts often coded as Morocco
+            "Dominican Rep.": "Dominican Republic",
+            "Eq. Guinea": "Equatorial Guinea",
+            "Central African Rep.": "Central African Republic",
+            "S. Sudan": "South Sudan",
+            "Czech Rep.": "Czech Republic",
+            "Slovak Rep.": "Slovakia",
+            "Lao PDR": "Laos",
+            "N. Korea": "North Korea",
+            "S. Korea": "South Korea"
+        };
+
+        // Helper function to find alternative country name matches
+        function findAlternativeCountryName(geoCountryName, dataMap) {
+            // Try exact match first
+            if (dataMap.has(geoCountryName)) {
+                return geoCountryName;
+            }
+            
+            // Try mapped conversion from GeoJSON name to CSV name
+            if (geoToCSVMap[geoCountryName] && dataMap.has(geoToCSVMap[geoCountryName])) {
+                return geoToCSVMap[geoCountryName];
+            }
+            
+            // Try partial matching (contains)
+            for (const [csvName, _] of dataMap.entries()) {
+                if (geoCountryName.toLowerCase().includes(csvName.toLowerCase()) || 
+                    csvName.toLowerCase().includes(geoCountryName.toLowerCase())) {
+                    return csvName;
+                }
+            }
+            
+            return null;
+        }
+
+        // Initialize the map
+        function initMap() {
+            svg = d3.select("#world-map");
+            const width = +svg.attr("width");
+            const height = +svg.attr("height");
+
+            // Set up projection and path
+            projection = d3.geoNaturalEarth1()
+                          .scale(160)
+                          .translate([width / 2, height / 2]);
+            
+            path = d3.geoPath().projection(projection);
+
+            // Add title
+            svg.append("text")
+               .attr("class", "map-title")
+               .attr("x", width / 2)
+               .attr("y", 25)
+               .text("Global Conflict Deaths by Country");
+        }
+
+        // Load and process data
+        async function loadData() {
+            try {
+                console.log("Loading data...");
+                
+                // Load deaths data
+                deathsData = await d3.csv("deathsThroughYears.csv");
+                console.log("Deaths data loaded:", deathsData.length, "rows");
+                
+                deathsData.forEach(d => {
+                    d.year = +d.year;
+                    d.deaths = +d.deaths;
+                });
+
+                // Try loading map data - handle both TopoJSON and GeoJSON
+                let worldDataLoaded = false;
+                const possibleFiles = ["world-110m.json", "world.geojson", "world-110m.geojson"];
+                
+                for (const filename of possibleFiles) {
+                    try {
+                        console.log("Trying to load:", filename);
+                        const rawData = await d3.json(filename);
+                        console.log("Successfully loaded:", filename);
+                        console.log("Raw data structure:", rawData);
+                        
+                        // Check if it's TopoJSON or GeoJSON
+                        if (rawData.type === "Topology") {
+                            console.log("Converting TopoJSON to GeoJSON...");
+                            // Convert TopoJSON to GeoJSON
+                            // Try different possible object names
+                            let objectName = null;
+                            if (rawData.objects) {
+                                const objectKeys = Object.keys(rawData.objects);
+                                console.log("Available TopoJSON objects:", objectKeys);
+                                
+                                // Common object names in TopoJSON files
+                                const commonNames = ["countries", "land", "world", "units", "collection"];
+                                objectName = commonNames.find(name => objectKeys.includes(name)) || objectKeys[0];
+                                console.log("Using object:", objectName);
+                            }
+                            
+                            if (objectName && rawData.objects[objectName]) {
+                                worldData = topojson.feature(rawData, rawData.objects[objectName]);
+                                console.log("TopoJSON converted successfully");
+                            } else {
+                                throw new Error("Could not find valid object in TopoJSON");
+                            }
+                        } else if (rawData.type === "FeatureCollection") {
+                            console.log("Using GeoJSON data directly");
+                            worldData = rawData;
+                        } else {
+                            throw new Error("Unknown data format: " + rawData.type);
+                        }
+                        
+                        worldDataLoaded = true;
+                        break;
+                    } catch (fileError) {
+                        console.log("Failed to load:", filename, fileError.message);
+                    }
+                }
+                
+                if (!worldDataLoaded) {
+                    throw new Error("Could not load world map data from any of the expected files");
+                }
+                
+                // Validate the final world data structure
+                if (!worldData || !worldData.features || !Array.isArray(worldData.features)) {
+                    console.error("Invalid final data structure:", worldData);
+                    throw new Error("Invalid map data format - missing features array");
+                }
+                
+                console.log("Number of countries in map:", worldData.features.length);
+                console.log("Sample country:", worldData.features[0]);
+                console.log("Sample country properties:", worldData.features[0].properties);
+                
+                // Log all available property names from first few countries
+                console.log("Available property names in countries:");
+                worldData.features.slice(0, 5).forEach((feature, i) => {
+                    console.log(`Country ${i} properties:`, Object.keys(feature.properties));
+                });
+                
+                console.log("Data loaded successfully, drawing map...");
+                drawMap();
+                updateVisualization(currentYear);
+                
+            } catch (error) {
+                console.error("Error loading data:", error);
+                // Show error message to user
+                d3.select("#world-map")
+                  .append("text")
+                  .attr("x", 500)
+                  .attr("y", 200)
+                  .attr("text-anchor", "middle")
+                  .attr("fill", "#b82f2f")
+                  .attr("font-size", "16px")
+                  .attr("font-family", "'Fira Sans', sans-serif")
+                  .text("Error loading map data:");
+                  
+                d3.select("#world-map")
+                  .append("text")
+                  .attr("x", 500)
+                  .attr("y", 220)
+                  .attr("text-anchor", "middle")
+                  .attr("fill", "#666")
+                  .attr("font-size", "14px")
+                  .attr("font-family", "'Fira Sans', sans-serif")
+                  .text(error.message);
+                  
+                d3.select("#world-map")
+                  .append("text")
+                  .attr("x", 500)
+                  .attr("y", 250)
+                  .attr("text-anchor", "middle")
+                  .attr("fill", "#666")
+                  .attr("font-size", "12px")
+                  .attr("font-family", "'Fira Sans', sans-serif")
+                  .text("Check browser console for details");
+            }
+        }
+
+        // Draw the base map
+        function drawMap() {
+            if (!worldData || !worldData.features) {
+                console.error("No world data available for drawing");
+                return;
+            }
+            
+            console.log("Drawing map with", worldData.features.length, "countries");
+            
+            svg.selectAll(".country")
+               .data(worldData.features)
+               .enter()
+               .append("path")
+               .attr("class", "country")
+               .attr("d", path)
+               .style("fill", "#ddd") // Ensure initial gray color
+               .on("mouseover", function(event, d) {
+                   showTooltip(event, d);
+               })
+               .on("mouseout", function() {
+                   hideTooltip();
+               });
+               
+            console.log("Map drawing completed");
+        }
+
+        // Get data for specific year
+        function getYearData(year) {
+            return deathsData.filter(d => d.year === year);
+        }
+
+        // Update visualization for specific year
+        function updateVisualization(year) {
+            const yearData = getYearData(year);
+            console.log(`Updating visualization for year ${year}:`);
+            console.log("Year data:", yearData.length, "countries with data");
+            console.log("Sample year data:", yearData.slice(0, 5));
+            
+            // Create data map for easy lookup - use original country names as keys
+            const dataMap = new Map();
+            yearData.forEach(d => {
+                dataMap.set(d.country, d.deaths);
+            });
+
+            console.log("Data map created with", dataMap.size, "countries");
+            console.log("Sample data map entries:", Array.from(dataMap.entries()).slice(0, 5));
+
+            // Update color scale based on current year data
+            const deathValues = yearData.map(d => d.deaths);
+            const maxDeaths = d3.max(deathValues) || 1;
+            console.log("Max deaths for", year, ":", maxDeaths);
+            
+            // Use logarithmic scale for better color distribution across wide death ranges
+            const minDeaths = d3.min(deathValues.filter(d => d > 0)) || 1;
+            colorScale = d3.scaleSequential(d3.interpolateOrRd)
+                          .domain([Math.log(minDeaths), Math.log(maxDeaths)]);
+
+            // Update countries
+            let matchedCountries = 0;
+            let unmatchedCountries = [];
+            let coloredCountries = 0;
+            
+            svg.selectAll(".country")
+               .transition()
+               .duration(300)
+               .style("fill", d => {
+                   const geoCountryName = d.properties.NAME || d.properties.ADMIN || d.properties.name || d.properties.NAME_EN || d.properties.SOVEREIGNT;
+                   
+                   // Removed excessive debugging for performance
+                   
+                   // Try direct match first
+                   let deaths = dataMap.get(geoCountryName);
+                   let matchedName = geoCountryName;
+                   
+                   if (deaths === undefined) {
+                       // Try alternative matching
+                       matchedName = findAlternativeCountryName(geoCountryName, dataMap);
+                       deaths = matchedName ? dataMap.get(matchedName) : undefined;
+                   }
+                   
+                   if (deaths !== undefined && deaths > 0) {
+                       matchedCountries++;
+                       coloredCountries++;
+                       // Use logarithmic scaling for color mapping
+                       const logDeaths = Math.log(Math.max(deaths, 1));
+                       const color = colorScale(logDeaths);
+                       if (year === 1989 && coloredCountries <= 3) {
+                           console.log(`Coloring ${geoCountryName}: ${deaths} deaths -> ${color}`);
+                       }
+                       return color;
+                   } else {
+                       if (year === 1989) {
+                           unmatchedCountries.push(geoCountryName);
+                       }
+                   }
+                   return "#cccccc"; // Light gray for no data
+               })
+               .attr("class", d => {
+                   const geoCountryName = d.properties.NAME || d.properties.ADMIN || d.properties.name || d.properties.NAME_EN || d.properties.SOVEREIGNT;
+                   let deaths = dataMap.get(geoCountryName);
+                   if (deaths === undefined) {
+                       const matchedName = findAlternativeCountryName(geoCountryName, dataMap);
+                       deaths = matchedName ? dataMap.get(matchedName) : undefined;
+                   }
+                   const hasData = deaths !== undefined && deaths > 0;
+                   return hasData ? "country country-with-data" : "country";
+               });
+               
+            console.log(`Year ${year}: Colored ${coloredCountries} countries`);
+
+            // Update legend
+            updateLegend(colorScale, maxDeaths);
+            
+            // Update current year display
+            d3.select("#current-year").text(year);
+            d3.select("#year-slider").property("value", year);
+        }
+
+        // Update legend
+        function updateLegend(colorScale, maxValue) {
+            const legend = d3.select("#legend");
+            
+            // Clear existing legend items
+            legend.selectAll(".legend-item").remove();
+            
+            // Create legend items using logarithmic steps for better representation
+            const steps = 6;
+            const minValue = 1;
+            const logMin = Math.log(minValue);
+            const logMax = Math.log(maxValue);
+            
+            const legendData = d3.range(steps).map(i => {
+                const logValue = logMin + (i / (steps - 1)) * (logMax - logMin);
+                const value = Math.round(Math.exp(logValue));
+                return {
+                    value: value,
+                    logValue: logValue,
+                    color: colorScale(logValue)
+                };
+            });
+            
+            // Add "No data" item
+            legendData.unshift({
+                value: 0,
+                logValue: 0,
+                color: "#ddd"
+            });
+
+            const legendItems = legend.selectAll(".legend-item")
+                                     .data(legendData)
+                                     .enter()
+                                     .append("div")
+                                     .attr("class", "legend-item");
+
+            legendItems.append("div")
+                      .attr("class", "legend-color")
+                      .style("background-color", d => d.color);
+
+            legendItems.append("span")
+                      .attr("class", "legend-text")
+                      .text(d => d.value === 0 ? "No data" : d.value.toLocaleString());
+        }
+
+        // Tooltip functions
+        function showTooltip(event, d) {
+            const geoCountryName = d.properties.NAME || d.properties.ADMIN || d.properties.name || d.properties.NAME_EN || d.properties.SOVEREIGNT;
+            const yearData = getYearData(currentYear);
+            
+            // Try to find matching country data
+            const csvCountryName = findAlternativeCountryName(geoCountryName, new Map(yearData.map(item => [item.country, item.deaths])));
+            const countryData = csvCountryName ? yearData.find(item => item.country === csvCountryName) : null;
+
+            const deaths = countryData ? countryData.deaths.toLocaleString() : "No data";
+            
+            // Create or update tooltip
+            let tooltip = d3.select("#tooltip");
+            if (tooltip.empty()) {
+                tooltip = d3.select("body")
+                           .append("div")
+                           .attr("id", "tooltip")
+                           .style("position", "absolute")
+                           .style("background", "rgba(0,0,0,0.8)")
+                           .style("color", "white")
+                           .style("padding", "8px 12px")
+                           .style("border-radius", "4px")
+                           .style("font-size", "12px")
+                           .style("font-family", "'Fira Sans', sans-serif")
+                           .style("pointer-events", "none")
+                           .style("opacity", 0);
+            }
+            
+            tooltip.html(`<strong>${geoCountryName}</strong><br>Year: ${currentYear}<br>Deaths: ${deaths}`)
+                   .style("left", (event.pageX + 10) + "px")
+                   .style("top", (event.pageY - 10) + "px")
+                   .transition()
+                   .duration(200)
+                   .style("opacity", 1);
+        }
+
+        function hideTooltip() {
+            d3.select("#tooltip")
+              .transition()
+              .duration(200)
+              .style("opacity", 0);
+        }
+
+        // Animation functions
+        function toggleAnimation() {
+            if (isPlaying) {
+                pauseAnimation();
+            } else {
+                startAnimation();
+            }
+        }
+
+        function startAnimation() {
+            if (isPlaying) return;
+            
+            isPlaying = true;
+            updatePlayPauseButton();
+            
+            animationTimer = setInterval(() => {
+                currentYear++;
+                if (currentYear > 2024) {
+                    currentYear = 1989; // Loop back to start
+                }
+                updateVisualization(currentYear);
+            }, 800); // 800ms per year as specified
+        }
+
+        function pauseAnimation() {
+            if (!isPlaying) return;
+            
+            isPlaying = false;
+            clearInterval(animationTimer);
+            updatePlayPauseButton();
+        }
+
+        function updatePlayPauseButton() {
+            const button = d3.select("#play-pause-btn");
+            if (isPlaying) {
+                button.text("⏸ Pause")
+                      .classed("playing", true);
+            } else {
+                button.text("▶ Play")
+                      .classed("playing", false);
+            }
+        }
+
+        // Event listeners
+        function setupEventListeners() {
+            d3.select("#play-pause-btn").on("click", toggleAnimation);
+            
+            d3.select("#year-slider").on("input", function() {
+                const year = +this.value;
+                currentYear = year;
+                updateVisualization(year);
+                
+                // Pause animation if it's playing
+                if (isPlaying) {
+                    pauseAnimation();
+                }
+            });
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("Page loaded, initializing timeline...");
+            console.log("D3 version:", d3.version);
+            
+            initMap();
+            setupEventListeners();
+            loadData();
+            
+            console.log("Initialization complete");
+        });
+    </script>
+</body>
+</html>

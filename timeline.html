@@ -129,6 +129,80 @@
             margin-right: 15px;
         }
 
+        /* Connection Map styles */
+        .connection-map-container {
+            background-color: #f5f5f5;
+            padding: 30px;
+            margin: 40px auto;
+            width: 1200px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .connection-line {
+            fill: none;
+            stroke-opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .connection-line:hover {
+            stroke-opacity: 1;
+        }
+
+        .country-node {
+            cursor: pointer;
+        }
+
+        .country-node:hover {
+            stroke: #333;
+            stroke-width: 2px;
+        }
+
+        .war-type-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .war-type-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .war-type-line {
+            width: 30px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .connection-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: 'Fira Sans', sans-serif;
+            pointer-events: none;
+            max-width: 350px;
+            z-index: 1000;
+        }
+
+        .connection-tooltip .war-name {
+            font-weight: bold;
+            color: #ff9800;
+            margin-bottom: 5px;
+        }
+
+        .connection-tooltip .war-details {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
         /* Map styles */
         .country {
             stroke: #fff;
@@ -216,6 +290,57 @@
             <div class="legend" id="legend">
                 <span class="legend-title">Deaths per Year:</span>
                 <!-- Legend items will be dynamically generated -->
+            </div>
+        </div>
+
+        <!-- Connection Map Section -->
+        <div class="connection-map-container">
+            <h2>War Connections Map: Countries in Conflict</h2>
+            <p class="timeline-description">
+                This connection map visualizes the relationships between countries involved in wars together.
+                Lines connect countries that participated in the same conflict, with different colors representing
+                different types of wars: <strong style="color:#b82f2f">Interstate (INTER)</strong> wars between nations,
+                and <strong style="color:#2e7d32">Intrastate (INTRA)</strong> civil or internal conflicts.
+                Hover over lines to see war details. Use the year filter to see active conflicts during specific periods.
+            </p>
+            
+            <!-- Connection Map Controls -->
+            <div class="controls-container">
+                <div class="controls">
+                    <label for="connection-year-slider" style="font-family: 'Fira Sans', sans-serif; font-weight: 500;">
+                        Filter by Year:
+                    </label>
+                    <input type="range" class="year-slider" id="connection-year-slider" 
+                           min="1816" max="2001" value="1990" step="1">
+                    <div class="current-year" id="connection-current-year">1990</div>
+                    <button class="play-pause-button" id="show-all-wars-btn">Show All Wars</button>
+                </div>
+            </div>
+
+            <!-- Connection Map Container -->
+            <div class="map-container">
+                <svg id="connection-map" width="1000" height="500"></svg>
+            </div>
+
+            <!-- War Type Legend -->
+            <div class="legend">
+                <span class="legend-title">War Types:</span>
+                <div class="war-type-legend">
+                    <div class="war-type-item">
+                        <div class="war-type-line" style="background-color: #b82f2f;"></div>
+                        <span class="legend-text">Interstate (INTER)</span>
+                    </div>
+                    <div class="war-type-item">
+                        <div class="war-type-line" style="background-color: #2e7d32;"></div>
+                        <span class="legend-text">Intrastate (INTRA)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Wars List -->
+            <div class="legend" id="active-wars-legend" style="flex-direction: column; align-items: flex-start;">
+                <span class="legend-title">Active Conflicts:</span>
+                <div id="active-wars-list" style="font-size: 12px; text-align: left; max-height: 150px; overflow-y: auto; width: 100%;"></div>
             </div>
         </div>
     </div>
@@ -712,8 +837,655 @@
             setupEventListeners();
             loadData();
             
+            // Initialize connection map
+            initConnectionMap();
+            
             console.log("Initialization complete");
         });
+
+        // ==================== CONNECTION MAP CODE ====================
+        
+        let connectionSvg, connectionProjection, connectionPath;
+        let warData = [];
+        let connectionWorldData = null;
+        let showAllWars = false;
+        let connectionCurrentYear = 1990;
+        
+        // Country name mapping for matching CSV to GeoJSON
+        const countryNameMap = {
+            "United States of America": ["United States of America", "United States", "USA"],
+            "Russia (Soviet Union)": ["Russia", "Russian Federation", "USSR", "Soviet Union"],
+            "United Kingdom": ["United Kingdom", "Great Britain", "UK", "Britain"],
+            "DR Congo (Zaire)": ["Dem. Rep. Congo", "Democratic Republic of the Congo", "DRC", "Zaire"],
+            "Myanmar (Burma)": ["Myanmar", "Burma"],
+            "Yugoslavia": ["Serbia", "Yugoslavia", "Kosovo"],
+            "Yugoslavia (Kingdom of Serbia)": ["Serbia", "Yugoslavia"],
+            "Germany": ["Germany", "West Germany", "East Germany"],
+            "Vietnam": ["Vietnam", "Viet Nam"],
+            "Republic of Vietnam": ["Vietnam", "South Vietnam"],
+            "Korea": ["South Korea", "North Korea", "Korea"],
+            "South Korea": ["South Korea", "Korea, Republic of"],
+            "North Korea": ["North Korea", "Korea, Dem. People's Rep."],
+            "Yemen Arab Republic": ["Yemen", "North Yemen"],
+            "Yemen People's Republic": ["Yemen", "South Yemen"],
+            "Czechoslovakia": ["Czech Republic", "Slovakia", "Czechia"],
+            "Austria-Hungary": ["Austria", "Hungary"],
+            "Two Sicilies": ["Italy"],
+            "Papal States": ["Italy", "Vatican"],
+            "Ottoman Empire": ["Turkey"],
+            "Egypt": ["Egypt"],
+            "China": ["China"],
+            "Tibet": ["China"],
+            "Taiwan": ["Taiwan"],
+            "Iran": ["Iran"],
+            "Iraq": ["Iraq"],
+            "Saudi Arabia": ["Saudi Arabia"],
+            "Ethiopia": ["Ethiopia"],
+            "Eritrea": ["Eritrea"],
+            "Sudan": ["Sudan", "South Sudan"],
+            "South Africa": ["South Africa"],
+            "Bosnia and Herzegovina": ["Bosnia and Herzegovina", "Bosnia and Herz."],
+            "Bosnia-Herzegovina": ["Bosnia and Herzegovina", "Bosnia and Herz."],
+            "Croatia": ["Croatia"],
+            "Macedonia": ["North Macedonia", "Macedonia"],
+            "Belgium": ["Belgium"],
+            "Netherlands": ["Netherlands"],
+            "France": ["France"],
+            "Spain": ["Spain"],
+            "Portugal": ["Portugal"],
+            "Italy": ["Italy"],
+            "Greece": ["Greece"],
+            "Poland": ["Poland"],
+            "Hungary": ["Hungary"],
+            "Romania": ["Romania", "Rumania"],
+            "Bulgaria": ["Bulgaria"],
+            "Finland": ["Finland"],
+            "Norway": ["Norway"],
+            "Sweden": ["Sweden"],
+            "Denmark": ["Denmark"],
+            "Turkey": ["Turkey", "Türkiye"],
+            "Syria": ["Syria"],
+            "Lebanon": ["Lebanon"],
+            "Jordan": ["Jordan"],
+            "Israel": ["Israel"],
+            "Cyprus": ["Cyprus"],
+            "Afghanistan": ["Afghanistan"],
+            "Pakistan": ["Pakistan"],
+            "India": ["India"],
+            "Bangladesh": ["Bangladesh"],
+            "Sri Lanka": ["Sri Lanka"],
+            "Nepal": ["Nepal"],
+            "Bhutan": ["Bhutan"],
+            "Thailand": ["Thailand"],
+            "Cambodia": ["Cambodia"],
+            "Laos": ["Laos", "Lao PDR"],
+            "Malaysia": ["Malaysia"],
+            "Indonesia": ["Indonesia"],
+            "Philippines": ["Philippines"],
+            "Japan": ["Japan"],
+            "Mongolia": ["Mongolia"],
+            "Australia": ["Australia"],
+            "New Zealand": ["New Zealand"],
+            "Canada": ["Canada"],
+            "Mexico": ["Mexico"],
+            "Cuba": ["Cuba"],
+            "Haiti": ["Haiti"],
+            "Dominican Republic": ["Dominican Republic", "Dominican Rep."],
+            "Guatemala": ["Guatemala"],
+            "El Salvador": ["El Salvador"],
+            "Honduras": ["Honduras"],
+            "Nicaragua": ["Nicaragua"],
+            "Costa Rica": ["Costa Rica"],
+            "Panama": ["Panama"],
+            "Colombia": ["Colombia"],
+            "Venezuela": ["Venezuela"],
+            "Ecuador": ["Ecuador"],
+            "Peru": ["Peru"],
+            "Bolivia": ["Bolivia"],
+            "Chile": ["Chile"],
+            "Argentina": ["Argentina"],
+            "Uruguay": ["Uruguay"],
+            "Paraguay": ["Paraguay"],
+            "Brazil": ["Brazil"],
+            "Algeria": ["Algeria"],
+            "Morocco": ["Morocco"],
+            "Tunisia": ["Tunisia"],
+            "Libya": ["Libya"],
+            "Nigeria": ["Nigeria"],
+            "Ghana": ["Ghana"],
+            "Ivory Coast": ["Côte d'Ivoire", "Ivory Coast"],
+            "Senegal": ["Senegal"],
+            "Mali": ["Mali"],
+            "Guinea": ["Guinea"],
+            "Guinea-Bissau": ["Guinea-Bissau"],
+            "Sierra Leone": ["Sierra Leone"],
+            "Liberia": ["Liberia"],
+            "Cameroon": ["Cameroon"],
+            "Chad": ["Chad"],
+            "Central African Republic": ["Central African Republic", "Central African Rep."],
+            "Congo": ["Congo", "Republic of the Congo"],
+            "Democratic Republic of the Congo": ["Dem. Rep. Congo", "Democratic Republic of the Congo", "DRC"],
+            "Angola": ["Angola"],
+            "Namibia": ["Namibia"],
+            "Zambia": ["Zambia"],
+            "Zimbabwe": ["Zimbabwe"],
+            "Mozambique": ["Mozambique"],
+            "Madagascar": ["Madagascar"],
+            "Tanzania": ["Tanzania"],
+            "Kenya": ["Kenya"],
+            "Uganda": ["Uganda"],
+            "Rwanda": ["Rwanda"],
+            "Burundi": ["Burundi"],
+            "Somalia": ["Somalia"],
+            "Djibouti": ["Djibouti"],
+            "Kuwait": ["Kuwait"],
+            "Qatar": ["Qatar"],
+            "United Arab Emirates": ["United Arab Emirates", "UAE"],
+            "Oman": ["Oman"],
+            "Armenia": ["Armenia"],
+            "Azerbaijan": ["Azerbaijan"],
+            "Georgia": ["Georgia"],
+            "Ukraine": ["Ukraine"],
+            "Belarus": ["Belarus"],
+            "Lithuania": ["Lithuania"],
+            "Latvia": ["Latvia"],
+            "Estonia": ["Estonia"],
+            "Kazakhstan": ["Kazakhstan"],
+            "Uzbekistan": ["Uzbekistan"],
+            "Turkmenistan": ["Turkmenistan"],
+            "Tajikistan": ["Tajikistan"],
+            "Kyrgyzstan": ["Kyrgyzstan", "Kyrgystan"]
+        };
+
+        // War type colors
+        const warTypeColors = {
+            "INTER": "#b82f2f",  // Red for interstate wars
+            "INTRA": "#2e7d32"   // Green for intrastate wars
+        };
+
+        function initConnectionMap() {
+            connectionSvg = d3.select("#connection-map");
+            const width = +connectionSvg.attr("width");
+            const height = +connectionSvg.attr("height");
+
+            // Set up projection and path
+            connectionProjection = d3.geoNaturalEarth1()
+                          .scale(160)
+                          .translate([width / 2, height / 2]);
+            
+            connectionPath = d3.geoPath().projection(connectionProjection);
+
+            // Add title
+            connectionSvg.append("text")
+               .attr("class", "map-title")
+               .attr("x", width / 2)
+               .attr("y", 25)
+               .text("War Connections Between Countries");
+
+            // Add group for countries (drawn first, so it's behind)
+            connectionSvg.append("g").attr("id", "countries-group");
+            
+            // Add group for connections (drawn after countries, so it's on top)
+            connectionSvg.append("g").attr("id", "connections-group");
+
+            // Load data
+            loadConnectionMapData();
+            setupConnectionMapListeners();
+        }
+
+        async function loadConnectionMapData() {
+            try {
+                console.log("Loading connection map data...");
+                
+                // Load war data
+                const rawWarData = await d3.csv("WarList.csv");
+                console.log("War data loaded:", rawWarData.length, "rows");
+                
+                // Process war data - filter out empty rows
+                warData = rawWarData.filter(d => d["War Name"] && d["Time Span"] && d["State Participants"]).map(d => {
+                    const timeSpan = d["Time Span"];
+                    const years = timeSpan.split("-");
+                    const startYear = parseInt(years[0]);
+                    const endYear = years[1] ? parseInt(years[1]) : startYear;
+                    
+                    // Parse participants - split by comma and clean up
+                    const participants = d["State Participants"]
+                        .split(",")
+                        .map(p => p.trim())
+                        .filter(p => p.length > 0);
+                    
+                    return {
+                        mainType: d["Main type"],
+                        warName: d["War Name"],
+                        timeSpan: timeSpan,
+                        startYear: startYear,
+                        endYear: endYear,
+                        locations: d["Locations"],
+                        participants: participants
+                    };
+                });
+                
+                console.log("Processed war data:", warData.length, "wars");
+                console.log("Sample war:", warData[0]);
+
+                // Reuse world data if already loaded, otherwise load it
+                if (!worldData) {
+                    const possibleFiles = ["world-110m.json", "world.geojson", "world-110m.geojson"];
+                    
+                    for (const filename of possibleFiles) {
+                        try {
+                            console.log("Trying to load:", filename);
+                            const rawData = await d3.json(filename);
+                            
+                            if (rawData.type === "Topology") {
+                                let objectName = null;
+                                if (rawData.objects) {
+                                    const objectKeys = Object.keys(rawData.objects);
+                                    const commonNames = ["countries", "land", "world", "units", "collection"];
+                                    objectName = commonNames.find(name => objectKeys.includes(name)) || objectKeys[0];
+                                }
+                                
+                                if (objectName && rawData.objects[objectName]) {
+                                    connectionWorldData = topojson.feature(rawData, rawData.objects[objectName]);
+                                }
+                            } else if (rawData.type === "FeatureCollection") {
+                                connectionWorldData = rawData;
+                            }
+                            break;
+                        } catch (fileError) {
+                            console.log("Failed to load:", filename);
+                        }
+                    }
+                } else {
+                    connectionWorldData = worldData;
+                }
+
+                if (connectionWorldData) {
+                    drawConnectionMap();
+                    updateConnectionMap(connectionCurrentYear);
+                }
+                
+            } catch (error) {
+                console.error("Error loading connection map data:", error);
+            }
+        }
+
+        function drawConnectionMap() {
+            if (!connectionWorldData || !connectionWorldData.features) {
+                console.error("No world data available for connection map");
+                return;
+            }
+            
+            console.log("Drawing connection map with", connectionWorldData.features.length, "countries");
+            
+            connectionSvg.select("#countries-group")
+               .selectAll(".country-node")
+               .data(connectionWorldData.features)
+               .enter()
+               .append("path")
+               .attr("class", "country-node")
+               .attr("d", connectionPath)
+               .style("fill", "#e0e0e0")
+               .style("stroke", "#fff")
+               .style("stroke-width", "0.5px")
+               .on("mouseover", function(event, d) {
+                   showCountryTooltip(event, d);
+                   d3.select(this)
+                       .style("stroke", "#333")
+                       .style("stroke-width", "2px");
+               })
+               .on("mousemove", function(event) {
+                   moveCountryTooltip(event);
+               })
+               .on("mouseout", function() {
+                   hideCountryTooltip();
+                   d3.select(this)
+                       .style("stroke", "#fff")
+                       .style("stroke-width", "0.5px");
+               });
+               
+            console.log("Connection map base drawn");
+        }
+
+        function getCountryCentroid(countryName) {
+            if (!connectionWorldData || !connectionWorldData.features) return null;
+            
+            // Find matching country in GeoJSON
+            for (const feature of connectionWorldData.features) {
+                const geoName = feature.properties.NAME || feature.properties.ADMIN || feature.properties.name || feature.properties.NAME_EN;
+                
+                // Check if this geo country matches the war participant
+                const mappedNames = countryNameMap[countryName];
+                if (mappedNames) {
+                    for (const mappedName of mappedNames) {
+                        if (geoName && (geoName === mappedName || 
+                            geoName.toLowerCase().includes(mappedName.toLowerCase()) ||
+                            mappedName.toLowerCase().includes(geoName.toLowerCase()))) {
+                            const centroid = connectionPath.centroid(feature);
+                            if (!isNaN(centroid[0]) && !isNaN(centroid[1])) {
+                                return centroid;
+                            }
+                        }
+                    }
+                }
+                
+                // Direct name match
+                if (geoName && (geoName === countryName || 
+                    geoName.toLowerCase().includes(countryName.toLowerCase()) ||
+                    countryName.toLowerCase().includes(geoName.toLowerCase()))) {
+                    const centroid = connectionPath.centroid(feature);
+                    if (!isNaN(centroid[0]) && !isNaN(centroid[1])) {
+                        return centroid;
+                    }
+                }
+            }
+            
+            return null;
+        }
+
+        function getActiveWars(year) {
+            if (showAllWars) {
+                return warData;
+            }
+            return warData.filter(war => war.startYear <= year && war.endYear >= year);
+        }
+
+        function updateConnectionMap(year) {
+            connectionCurrentYear = year;
+            const activeWars = getActiveWars(year);
+            
+            console.log(`Active wars in ${year}:`, activeWars.length);
+            
+            // Clear existing connections
+            connectionSvg.select("#connections-group").selectAll("*").remove();
+            
+            // Reset country colors
+            connectionSvg.select("#countries-group")
+                .selectAll(".country-node")
+                .style("fill", "#e0e0e0");
+            
+            // Track countries involved in wars
+            const involvedCountries = new Set();
+            const connections = [];
+            
+            // Process each active war
+            activeWars.forEach(war => {
+                const participants = war.participants;
+                
+                if (participants.length >= 2) {
+                    // Create connections between all pairs of participants
+                    for (let i = 0; i < participants.length; i++) {
+                        for (let j = i + 1; j < participants.length; j++) {
+                            const country1 = participants[i];
+                            const country2 = participants[j];
+                            
+                            const centroid1 = getCountryCentroid(country1);
+                            const centroid2 = getCountryCentroid(country2);
+                            
+                            if (centroid1 && centroid2) {
+                                connections.push({
+                                    source: centroid1,
+                                    target: centroid2,
+                                    war: war,
+                                    country1: country1,
+                                    country2: country2
+                                });
+                                involvedCountries.add(country1);
+                                involvedCountries.add(country2);
+                            }
+                        }
+                    }
+                } else if (participants.length === 1) {
+                    // Single participant (internal conflict) - just highlight the country
+                    involvedCountries.add(participants[0]);
+                }
+            });
+            
+            // Draw curved connection lines
+            const lineGenerator = d3.line()
+                .x(d => d[0])
+                .y(d => d[1])
+                .curve(d3.curveBasis);
+            
+            connectionSvg.select("#connections-group")
+                .selectAll(".connection-line")
+                .data(connections)
+                .enter()
+                .append("path")
+                .attr("class", "connection-line")
+                .attr("d", d => {
+                    // Create curved path with control point
+                    const midX = (d.source[0] + d.target[0]) / 2;
+                    const midY = (d.source[1] + d.target[1]) / 2;
+                    const dx = d.target[0] - d.source[0];
+                    const dy = d.target[1] - d.source[1];
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    // Curve height proportional to distance
+                    const curveHeight = Math.min(dist * 0.2, 50);
+                    const controlX = midX - (dy / dist) * curveHeight;
+                    const controlY = midY + (dx / dist) * curveHeight;
+                    
+                    return lineGenerator([d.source, [controlX, controlY], d.target]);
+                })
+                .style("stroke", d => warTypeColors[d.war.mainType] || "#666")
+                .style("stroke-width", 2)
+                .on("mouseover", function(event, d) {
+                    showConnectionTooltip(event, d);
+                    d3.select(this)
+                        .style("stroke-width", 4)
+                        .style("stroke-opacity", 1);
+                })
+                .on("mousemove", function(event, d) {
+                    moveConnectionTooltip(event);
+                })
+                .on("mouseout", function() {
+                    hideConnectionTooltip();
+                    d3.select(this)
+                        .style("stroke-width", 2)
+                        .style("stroke-opacity", 0.6);
+                });
+            
+            // Highlight involved countries
+            connectionSvg.select("#countries-group")
+                .selectAll(".country-node")
+                .style("fill", function(d) {
+                    const geoName = d.properties.NAME || d.properties.ADMIN || d.properties.name || d.properties.NAME_EN;
+                    
+                    for (const country of involvedCountries) {
+                        const mappedNames = countryNameMap[country];
+                        if (mappedNames) {
+                            for (const mappedName of mappedNames) {
+                                if (geoName && (geoName === mappedName || 
+                                    geoName.toLowerCase().includes(mappedName.toLowerCase()) ||
+                                    mappedName.toLowerCase().includes(geoName.toLowerCase()))) {
+                                    return "#ffcc80";  // Orange highlight for involved countries
+                                }
+                            }
+                        }
+                        
+                        if (geoName && (geoName === country || 
+                            geoName.toLowerCase().includes(country.toLowerCase()) ||
+                            country.toLowerCase().includes(geoName.toLowerCase()))) {
+                            return "#ffcc80";
+                        }
+                    }
+                    
+                    return "#e0e0e0";
+                });
+            
+            // Update active wars list
+            updateActiveWarsList(activeWars);
+            
+            // Update year display
+            d3.select("#connection-current-year").text(showAllWars ? "All" : year);
+        }
+
+        function updateActiveWarsList(activeWars) {
+            const listContainer = d3.select("#active-wars-list");
+            listContainer.html("");
+            
+            if (activeWars.length === 0) {
+                listContainer.html("<em>No active conflicts in this year</em>");
+                return;
+            }
+            
+            // Limit display if showing all wars
+            const displayWars = showAllWars ? activeWars.slice(0, 50) : activeWars;
+            
+            displayWars.forEach(war => {
+                const warItem = listContainer.append("div")
+                    .style("margin", "5px 0")
+                    .style("padding", "5px")
+                    .style("background", "#f9f9f9")
+                    .style("border-radius", "4px")
+                    .style("border-left", `3px solid ${warTypeColors[war.mainType] || "#666"}`);
+                
+                warItem.append("strong")
+                    .style("color", warTypeColors[war.mainType] || "#333")
+                    .text(war.warName);
+                
+                warItem.append("span")
+                    .style("color", "#666")
+                    .style("margin-left", "10px")
+                    .text(`(${war.timeSpan}) - ${war.participants.join(", ")}`);
+            });
+            
+            if (showAllWars && activeWars.length > 50) {
+                listContainer.append("div")
+                    .style("margin-top", "10px")
+                    .style("font-style", "italic")
+                    .style("color", "#666")
+                    .text(`...and ${activeWars.length - 50} more conflicts`);
+            }
+        }
+
+        function showConnectionTooltip(event, d) {
+            let tooltip = d3.select("#connection-tooltip");
+            if (tooltip.empty()) {
+                tooltip = d3.select("body")
+                    .append("div")
+                    .attr("id", "connection-tooltip")
+                    .attr("class", "connection-tooltip")
+                    .style("opacity", 0);
+            }
+            
+            tooltip.html(`
+                <div class="war-name">${d.war.warName}</div>
+                <div class="war-details">
+                    <strong>Type:</strong> ${d.war.mainType === "INTER" ? "Interstate" : "Intrastate"}<br>
+                    <strong>Period:</strong> ${d.war.timeSpan}<br>
+                    <strong>Location:</strong> ${d.war.locations}<br>
+                    <strong>Participants:</strong> ${d.war.participants.join(", ")}<br>
+                    <strong>Connection:</strong> ${d.country1} ↔ ${d.country2}
+                </div>
+            `)
+            .style("left", (event.pageX + 15) + "px")
+            .style("top", (event.pageY - 10) + "px")
+            .transition()
+            .duration(200)
+            .style("opacity", 1);
+        }
+
+        function moveConnectionTooltip(event) {
+            d3.select("#connection-tooltip")
+                .style("left", (event.pageX + 15) + "px")
+                .style("top", (event.pageY - 10) + "px");
+        }
+
+        function hideConnectionTooltip() {
+            d3.select("#connection-tooltip")
+                .transition()
+                .duration(200)
+                .style("opacity", 0);
+        }
+
+        function showCountryTooltip(event, d) {
+            const countryName = d.properties.NAME || d.properties.ADMIN || d.properties.name || d.properties.NAME_EN || "Unknown";
+            
+            // Find wars involving this country
+            const activeWars = getActiveWars(connectionCurrentYear);
+            const countryWars = activeWars.filter(war => {
+                return war.participants.some(participant => {
+                    const mappedNames = countryNameMap[participant];
+                    if (mappedNames) {
+                        return mappedNames.some(name => 
+                            countryName.toLowerCase().includes(name.toLowerCase()) ||
+                            name.toLowerCase().includes(countryName.toLowerCase())
+                        );
+                    }
+                    return countryName.toLowerCase().includes(participant.toLowerCase()) ||
+                           participant.toLowerCase().includes(countryName.toLowerCase());
+                });
+            });
+            
+            let tooltip = d3.select("#country-tooltip");
+            if (tooltip.empty()) {
+                tooltip = d3.select("body")
+                    .append("div")
+                    .attr("id", "country-tooltip")
+                    .attr("class", "connection-tooltip")
+                    .style("opacity", 0);
+            }
+            
+            let warsHtml = "";
+            if (countryWars.length > 0) {
+                warsHtml = `<br><strong>Active Conflicts (${countryWars.length}):</strong><br>`;
+                countryWars.slice(0, 5).forEach(war => {
+                    warsHtml += `• ${war.warName} (${war.timeSpan})<br>`;
+                });
+                if (countryWars.length > 5) {
+                    warsHtml += `<em>...and ${countryWars.length - 5} more</em>`;
+                }
+            } else {
+                warsHtml = `<br><em>No active conflicts in ${showAllWars ? "dataset" : connectionCurrentYear}</em>`;
+            }
+            
+            tooltip.html(`
+                <div class="war-name">${countryName}</div>
+                <div class="war-details">
+                    ${warsHtml}
+                </div>
+            `)
+            .style("left", (event.pageX + 15) + "px")
+            .style("top", (event.pageY - 10) + "px")
+            .transition()
+            .duration(200)
+            .style("opacity", 1);
+        }
+
+        function moveCountryTooltip(event) {
+            d3.select("#country-tooltip")
+                .style("left", (event.pageX + 15) + "px")
+                .style("top", (event.pageY - 10) + "px");
+        }
+
+        function hideCountryTooltip() {
+            d3.select("#country-tooltip")
+                .transition()
+                .duration(200)
+                .style("opacity", 0);
+        }
+
+        function setupConnectionMapListeners() {
+            d3.select("#connection-year-slider").on("input", function() {
+                const year = +this.value;
+                showAllWars = false;
+                d3.select("#show-all-wars-btn").text("Show All Wars");
+                updateConnectionMap(year);
+            });
+            
+            d3.select("#show-all-wars-btn").on("click", function() {
+                showAllWars = !showAllWars;
+                if (showAllWars) {
+                    d3.select(this).text("Filter by Year");
+                    updateConnectionMap(connectionCurrentYear);
+                } else {
+                    d3.select(this).text("Show All Wars");
+                    updateConnectionMap(+d3.select("#connection-year-slider").property("value"));
+                }
+            });
+        }
     </script>
 </body>
 </html>

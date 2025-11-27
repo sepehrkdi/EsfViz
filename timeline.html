@@ -228,6 +228,87 @@
             text-anchor: middle;
         }
 
+        /* Proportional Symbol Map styles */
+        .symbol-map-container {
+            background-color: #f5f5f5;
+            padding: 30px;
+            margin: 40px auto;
+            width: 1200px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .basemap-country {
+            fill: #e8e8e8;
+            stroke: #fff;
+            stroke-width: 0.5px;
+        }
+
+        .source-circle {
+            fill: #b82f2f;
+            fill-opacity: 0.7;
+            stroke: #8a2323;
+            stroke-width: 1px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .source-circle:hover {
+            fill-opacity: 0.9;
+            stroke-width: 2px;
+            r: 1.2;
+        }
+
+        .symbol-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: 'Fira Sans', sans-serif;
+            pointer-events: none;
+            max-width: 300px;
+            z-index: 1000;
+        }
+
+        .symbol-tooltip .country-name {
+            font-weight: bold;
+            color: #ff9800;
+            margin-bottom: 5px;
+        }
+
+        .symbol-legend {
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-family: 'Fira Sans', sans-serif;
+            font-size: 12px;
+        }
+
+        .legend-title-text {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .legend-item-symbol {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+
+        .legend-circle {
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
         @media (max-width: 768px) {
             .timeline-container {
                 width: 95%;
@@ -341,6 +422,24 @@
             <div class="legend" id="active-wars-legend" style="flex-direction: column; align-items: flex-start;">
                 <span class="legend-title">Active Conflicts:</span>
                 <div id="active-wars-list" style="font-size: 12px; text-align: left; max-height: 150px; overflow-y: auto; width: 100%;"></div>
+            </div>
+        </div>
+
+        <!-- Proportional Symbol Map Section -->
+        <div class="symbol-map-container">
+            <h2>Global Conflict Sources by Country</h2>
+            <p class="timeline-description">
+                This proportional symbol map visualizes the total number of conflict data sources by country.
+                Circle sizes are proportional to the total number of sources, with larger circles representing
+                countries with more documented conflicts. Syria, Ukraine, and Afghanistan show the highest
+                concentrations of conflict sources. Hover over circles to see exact source counts for each country.
+            </p>
+            
+            <!-- Symbol Map Container -->
+            <div class="map-container">
+                <svg id="symbol-map" width="1000" height="500">
+                    <!-- Legend will be positioned absolutely within this SVG -->
+                </svg>
             </div>
         </div>
     </div>
@@ -1486,6 +1585,498 @@
                 }
             });
         }
+    </script>
+    
+    <script>
+        // ==================== PROPORTIONAL SYMBOL MAP CODE ====================
+        
+        let symbolSvg, symbolProjection, symbolPath;
+        let countrySourcesData = [];
+        let symbolWorldData = null;
+        let radiusScale;
+        
+        // Enhanced country name mapping for sources data
+        const sourceCountryNameMap = {
+            // Exact matches from CSV
+            "Syria": ["Syria"],
+            "Ukraine": ["Ukraine"],
+            "Afghanistan": ["Afghanistan"],
+            "Mexico": ["Mexico"],
+            "Bosnia-Herzegovina": ["Bosnia and Herzegovina", "Bosnia and Herz."],
+            "India": ["India"],
+            "DR Congo (Zaire)": ["Dem. Rep. Congo", "Democratic Republic of the Congo", "Congo, Dem. Rep."],
+            "Colombia": ["Colombia"],
+            "Nigeria": ["Nigeria"],
+            "Brazil": ["Brazil"],
+            "Israel": ["Israel"],
+            "Myanmar (Burma)": ["Myanmar", "Burma"],
+            "Somalia": ["Somalia"],
+            "Iraq": ["Iraq"],
+            "Yemen (North Yemen)": ["Yemen"],
+            "Ethiopia": ["Ethiopia"],
+            "Pakistan": ["Pakistan"],
+            "Mali": ["Mali"],
+            "Sudan": ["Sudan"],
+            "Turkey": ["Turkey", "Türkiye"],
+            "Burundi": ["Burundi"],
+            "Burkina Faso": ["Burkina Faso"],
+            "Cameroon": ["Cameroon"],
+            "Central African Republic": ["Central African Republic", "Central African Rep."],
+            "Rwanda": ["Rwanda"],
+            "Philippines": ["Philippines"],
+            "Lebanon": ["Lebanon"],
+            "Russia (Soviet Union)": ["Russia", "Russian Federation"],
+            "Mozambique": ["Mozambique"],
+            "Libya": ["Libya"],
+            "Kenya": ["Kenya"],
+            "Venezuela": ["Venezuela"],
+            "South Sudan": ["South Sudan", "S. Sudan"],
+            "Egypt": ["Egypt"],
+            "Niger": ["Niger"],
+            "Indonesia": ["Indonesia"],
+            "Azerbaijan": ["Azerbaijan"],
+            "Ecuador": ["Ecuador"],
+            "Thailand": ["Thailand"],
+            "Iran": ["Iran"],
+            "Serbia (Yugoslavia)": ["Serbia"],
+            "Haiti": ["Haiti"],
+            "Algeria": ["Algeria"],
+            "Sierra Leone": ["Sierra Leone"],
+            "Chad": ["Chad"],
+            "El Salvador": ["El Salvador"],
+            "Bangladesh": ["Bangladesh"],
+            "Trinidad and Tobago": ["Trinidad and Tobago"],
+            "Angola": ["Angola"],
+            "Tunisia": ["Tunisia"],
+            "Peru": ["Peru"],
+            "United Kingdom": ["United Kingdom"],
+            "Guatemala": ["Guatemala"],
+            "Spain": ["Spain"],
+            "Papua New Guinea": ["Papua New Guinea"],
+            "Uganda": ["Uganda"],
+            "Ivory Coast": ["Côte d'Ivoire", "Ivory Coast"],
+            "South Africa": ["South Africa"],
+            "Armenia": ["Armenia"],
+            "Benin": ["Benin"],
+            "Saudi Arabia": ["Saudi Arabia"],
+            "Tajikistan": ["Tajikistan"],
+            "France": ["France"],
+            "Togo": ["Togo"],
+            "Honduras": ["Honduras"],
+            "Kyrgyzstan": ["Kyrgyzstan"],
+            "Cambodia (Kampuchea)": ["Cambodia"],
+            "Tanzania": ["Tanzania"],
+            "Congo": ["Congo", "Republic of the Congo"],
+            "Sri Lanka": ["Sri Lanka"],
+            "Kingdom of eSwatini (Swaziland)": ["Eswatini", "Swaziland"],
+            "Nicaragua": ["Nicaragua"],
+            "Zambia": ["Zambia"],
+            "Canada": ["Canada"],
+            "Senegal": ["Senegal"],
+            "Jamaica": ["Jamaica"],
+            "Madagascar (Malagasy)": ["Madagascar"],
+            "Ghana": ["Ghana"],
+            "Morocco": ["Morocco"],
+            "Zimbabwe (Rhodesia)": ["Zimbabwe"],
+            "Mauritania": ["Mauritania"],
+            "Guinea": ["Guinea"],
+            "Panama": ["Panama"],
+            "United States of America": ["United States of America", "United States"],
+            "Belgium": ["Belgium"],
+            "Djibouti": ["Djibouti"],
+            "Jordan": ["Jordan"],
+            "Nepal": ["Nepal"],
+            "Bolivia": ["Bolivia"],
+            "Paraguay": ["Paraguay"],
+            "Eritrea": ["Eritrea"],
+            "Namibia": ["Namibia"],
+            "China": ["China"],
+            "Gambia": ["Gambia"],
+            "Sweden": ["Sweden"],
+            "Germany": ["Germany"],
+            "Kuwait": ["Kuwait"],
+            "Liberia": ["Liberia"],
+            "Australia": ["Australia"],
+            "Georgia": ["Georgia"],
+            "Argentina": ["Argentina"],
+            "Lesotho": ["Lesotho"],
+            "Malaysia": ["Malaysia"],
+            "Comoros": ["Comoros"],
+            "United Arab Emirates": ["United Arab Emirates", "UAE"],
+            "Netherlands": ["Netherlands"],
+            "Guyana": ["Guyana"],
+            "Uzbekistan": ["Uzbekistan"],
+            "Austria": ["Austria"],
+            "Croatia": ["Croatia"],
+            "Solomon Islands": ["Solomon Islands"],
+            "Poland": ["Poland"]
+        };
+        
+        function initSymbolMap() {
+            symbolSvg = d3.select("#symbol-map");
+            const width = +symbolSvg.attr("width");
+            const height = +symbolSvg.attr("height");
+
+            // Set up projection and path - same as other maps for consistency
+            symbolProjection = d3.geoNaturalEarth1()
+                          .scale(160)
+                          .translate([width / 2, height / 2]);
+            
+            symbolPath = d3.geoPath().projection(symbolProjection);
+
+            // Add title
+            symbolSvg.append("text")
+               .attr("class", "map-title")
+               .attr("x", width / 2)
+               .attr("y", 25)
+               .text("Conflict Data Sources by Country");
+
+            // Add group for basemap (drawn first)
+            symbolSvg.append("g").attr("id", "basemap-group");
+            
+            // Add group for symbols (drawn on top)
+            symbolSvg.append("g").attr("id", "symbols-group");
+
+            // Load data
+            loadSymbolMapData();
+        }
+
+        async function loadSymbolMapData() {
+            try {
+                console.log("Loading symbol map data...");
+                
+                // Load country sources data
+                countrySourcesData = await d3.csv("country_sources.csv");
+                console.log("Country sources data loaded:", countrySourcesData.length, "rows");
+                
+                // Process data
+                countrySourcesData.forEach(d => {
+                    d.total_sources = +d.total_sources;
+                });
+                
+                console.log("Sample sources data:", countrySourcesData.slice(0, 5));
+
+                // Reuse world data if already loaded
+                if (!worldData) {
+                    const possibleFiles = ["world-110m.json", "world.geojson", "world-110m.geojson"];
+                    
+                    for (const filename of possibleFiles) {
+                        try {
+                            console.log("Trying to load:", filename);
+                            const rawData = await d3.json(filename);
+                            
+                            if (rawData.type === "Topology") {
+                                let objectName = null;
+                                if (rawData.objects) {
+                                    const objectKeys = Object.keys(rawData.objects);
+                                    const commonNames = ["countries", "land", "world", "units", "collection"];
+                                    objectName = commonNames.find(name => objectKeys.includes(name)) || objectKeys[0];
+                                }
+                                
+                                if (objectName && rawData.objects[objectName]) {
+                                    symbolWorldData = topojson.feature(rawData, rawData.objects[objectName]);
+                                }
+                            } else if (rawData.type === "FeatureCollection") {
+                                symbolWorldData = rawData;
+                            }
+                            break;
+                        } catch (fileError) {
+                            console.log("Failed to load:", filename);
+                        }
+                    }
+                } else {
+                    symbolWorldData = worldData;
+                }
+
+                if (symbolWorldData) {
+                    drawSymbolMap();
+                }
+                
+            } catch (error) {
+                console.error("Error loading symbol map data:", error);
+            }
+        }
+
+        function drawSymbolMap() {
+            if (!symbolWorldData || !symbolWorldData.features) {
+                console.error("No world data available for symbol map");
+                return;
+            }
+            
+            console.log("Drawing symbol map with", symbolWorldData.features.length, "countries");
+            
+            // Draw basemap
+            symbolSvg.select("#basemap-group")
+               .selectAll(".basemap-country")
+               .data(symbolWorldData.features)
+               .enter()
+               .append("path")
+               .attr("class", "basemap-country")
+               .attr("d", symbolPath)
+               .on("mouseover", function(event, d) {
+                   const geoCountryName = d.properties.NAME || d.properties.ADMIN || d.properties.name || d.properties.NAME_EN || d.properties.SOVEREIGNT;
+                   
+                   // Find matching sources data
+                   let sources = null;
+                   let matchedName = geoCountryName;
+                   
+                   // Check if this country has sources data
+                   const sourcesMap = new Map();
+                   countrySourcesData.forEach(data => {
+                       sourcesMap.set(data.country, data.total_sources);
+                   });
+                   
+                   sources = sourcesMap.get(geoCountryName);
+                   
+                   if (sources === undefined) {
+                       // Try alternative matching using our mapping
+                       for (const [csvName, geoNames] of Object.entries(sourceCountryNameMap)) {
+                           if (geoNames.some(geoName => 
+                               geoName === geoCountryName || 
+                               geoCountryName.toLowerCase().includes(geoName.toLowerCase()) ||
+                               geoName.toLowerCase().includes(geoCountryName.toLowerCase())
+                           )) {
+                               sources = sourcesMap.get(csvName);
+                               matchedName = csvName;
+                               break;
+                           }
+                       }
+                   }
+                   
+                   // Only show tooltip if country has data
+                   if (sources !== undefined && sources > 0) {
+                       showSymbolTooltip(event, {
+                           country: geoCountryName,
+                           csvName: matchedName,
+                           sources: sources
+                       });
+                       
+                       // Highlight the corresponding circle
+                       symbolSvg.selectAll(".source-circle")
+                           .filter(circleData => circleData.country === geoCountryName || circleData.csvName === matchedName)
+                           .style("fill-opacity", 0.9)
+                           .style("stroke-width", "2px")
+                           .attr("r", function() { 
+                               const currentRadius = +d3.select(this).attr("r");
+                               d3.select(this).attr("data-original-radius", currentRadius);
+                               return currentRadius * 1.1; 
+                           });
+                           
+                       // Dim other circles
+                       symbolSvg.selectAll(".source-circle")
+                           .filter(circleData => circleData.country !== geoCountryName && circleData.csvName !== matchedName)
+                           .style("fill-opacity", 0.3);
+                   }
+               })
+               .on("mouseout", function(event, d) {
+                   hideSymbolTooltip();
+                   
+                   // Reset all circles
+                   symbolSvg.selectAll(".source-circle")
+                       .style("fill-opacity", 0.7)
+                       .style("stroke-width", "1px")
+                       .attr("r", function() { 
+                           const originalRadius = +d3.select(this).attr("data-original-radius");
+                           return originalRadius || +d3.select(this).attr("r") / 1.1;
+                       });
+               });
+            
+            // Create radius scale
+            const sourceValues = countrySourcesData.map(d => d.total_sources);
+            const maxSources = d3.max(sourceValues);
+            const minSources = d3.min(sourceValues.filter(d => d > 0));
+            
+            // Use square root scale for circle areas
+            radiusScale = d3.scaleSqrt()
+                          .domain([0, maxSources])
+                          .range([0, 25]); // 0 to 25 pixels radius
+            
+            console.log("Radius scale domain:", [0, maxSources]);
+            console.log("Radius scale range:", [0, 25]);
+            
+            // Create data map for easy lookup
+            const sourcesMap = new Map();
+            countrySourcesData.forEach(d => {
+                sourcesMap.set(d.country, d.total_sources);
+            });
+            
+            // Prepare symbol data by matching countries
+            const symbolData = [];
+            let matchedCount = 0;
+            
+            symbolWorldData.features.forEach(feature => {
+                const geoCountryName = feature.properties.NAME || feature.properties.ADMIN || feature.properties.name || feature.properties.NAME_EN || feature.properties.SOVEREIGNT;
+                
+                // Try to find matching sources data
+                let sources = sourcesMap.get(geoCountryName);
+                let matchedName = geoCountryName;
+                
+                if (sources === undefined) {
+                    // Try alternative matching using our mapping
+                    for (const [csvName, geoNames] of Object.entries(sourceCountryNameMap)) {
+                        if (geoNames.some(geoName => 
+                            geoName === geoCountryName || 
+                            geoCountryName.toLowerCase().includes(geoName.toLowerCase()) ||
+                            geoName.toLowerCase().includes(geoCountryName.toLowerCase())
+                        )) {
+                            sources = sourcesMap.get(csvName);
+                            matchedName = csvName;
+                            break;
+                        }
+                    }
+                }
+                
+                if (sources !== undefined && sources > 0) {
+                    const centroid = symbolPath.centroid(feature);
+                    if (!isNaN(centroid[0]) && !isNaN(centroid[1])) {
+                        symbolData.push({
+                            country: geoCountryName,
+                            csvName: matchedName,
+                            sources: sources,
+                            centroid: centroid,
+                            radius: radiusScale(sources)
+                        });
+                        matchedCount++;
+                    }
+                }
+            });
+            
+            console.log(`Matched ${matchedCount} countries with sources data`);
+            console.log("Sample symbol data:", symbolData.slice(0, 5));
+            
+            // Sort symbol data by sources (descending) so largest circles are drawn first
+            symbolData.sort((a, b) => b.sources - a.sources);
+            console.log("Data sorted - largest to smallest:", symbolData.slice(0, 5).map(d => `${d.country}: ${d.sources}`));
+            
+            // Draw circles (no hover events on circles anymore)
+            const circles = symbolSvg.select("#symbols-group")
+                .selectAll(".source-circle")
+                .data(symbolData)
+                .enter()
+                .append("circle")
+                .attr("class", "source-circle")
+                .attr("cx", d => d.centroid[0])
+                .attr("cy", d => d.centroid[1])
+                .attr("r", d => d.radius)
+                .attr("data-original-radius", d => d.radius)
+                .style("pointer-events", "none"); // Disable pointer events on circles
+            
+            // Add legend
+            drawSymbolLegend(maxSources);
+            
+            console.log("Symbol map drawing completed");
+        }
+
+        function drawSymbolLegend(maxSources) {
+            // Create legend group - positioned on the left side
+            const legend = symbolSvg.append("g")
+                .attr("class", "symbol-legend")
+                .attr("transform", "translate(30, 80)");
+            
+            // Create legend items with proper spacing - reversed order (highest to lowest)
+            const legendValues = [
+                maxSources,
+                Math.round(maxSources * 0.8),
+                Math.round(maxSources * 0.4), 
+                Math.round(maxSources * 0.1)
+            ].filter(v => v > 0);
+            
+            console.log("Legend values:", legendValues);
+            
+            // Calculate the largest circle radius for proper spacing
+            const maxRadius = radiusScale(maxSources);
+            const itemSpacing = Math.max(maxRadius * 2 + 15, 40); // Ensure no overlap with extra padding
+            const legendHeight = legendValues.length * itemSpacing + 35;
+            
+            // // Legend background - adjusted for vertical layout
+            // legend.append("rect")
+            //     .attr("x", -30)                
+            //     .attr("y", -15)
+            //     .attr("width", 140)
+            //     .attr("height", legendHeight)
+            //     .attr("fill", "rgba(255, 255, 255, 0.95)")
+            //     .attr("stroke", "#ddd")
+            //     .attr("stroke-width", 1)
+            //     .attr("rx", 5);
+            
+            // Legend title
+            legend.append("text")
+                .attr("class", "legend-title-text")
+                .attr("x", -25)
+                .attr("y", -20)
+                .style("font-size", "14px")
+                .style("font-weight", "bold")
+                .style("font-family", "'Fira Sans', sans-serif")
+                .style("fill", "#2c3e50")
+                .text("Sources per Country");
+            
+            const legendItems = legend.selectAll(".legend-item-symbol")
+                .data(legendValues)
+                .enter()
+                .append("g")
+                .attr("class", "legend-item-symbol")
+                .attr("transform", (d, i) => `translate(0, ${25 + i * itemSpacing})`);
+            
+            // Legend circles - positioned to avoid overlap
+            legendItems.append("circle")
+                .attr("class", "legend-circle")
+                .attr("cx", d => 20) // Dynamic x position based on radius
+                .attr("cy", 0)
+                .attr("r", d => radiusScale(d))
+                .style("fill", "#b82f2f")
+                .style("fill-opacity", 0.7)
+                .style("stroke", "#8a2323")
+                .style("stroke-width", "1px");
+            
+            // Legend text - positioned after the largest possible circle
+            legendItems.append("text")
+                .attr("x", maxRadius + 45)
+                .attr("y", 0)
+                .attr("dy", "0.35em")
+                .style("font-size", "12px")
+                .style("font-family", "'Fira Sans', sans-serif")
+                .style("fill", "#333")
+                .text(d => d.toLocaleString());
+        }
+
+        function showSymbolTooltip(event, d) {
+            let tooltip = d3.select("#symbol-tooltip");
+            if (tooltip.empty()) {
+                tooltip = d3.select("body")
+                    .append("div")
+                    .attr("id", "symbol-tooltip")
+                    .attr("class", "symbol-tooltip")
+                    .style("opacity", 0);
+            }
+            
+            tooltip.html(`
+                <div class="country-name">${d.country}</div>
+                <div><strong>Total Sources:</strong> ${d.sources.toLocaleString()}</div>
+                <div style="font-size: 11px; margin-top: 5px; opacity: 0.8;">
+                    Circle area proportional to source count
+                </div>
+            `)
+            .style("left", (event.pageX + 15) + "px")
+            .style("top", (event.pageY - 10) + "px")
+            .transition()
+            .duration(200)
+            .style("opacity", 1);
+        }
+
+        function hideSymbolTooltip() {
+            d3.select("#symbol-tooltip")
+                .transition()
+                .duration(200)
+                .style("opacity", 0);
+        }
+
+        // Initialize symbol map when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait a bit to ensure other maps are initialized first
+            setTimeout(() => {
+                initSymbolMap();
+            }, 1000);
+        });
     </script>
 </body>
 </html>
